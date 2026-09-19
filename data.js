@@ -1,0 +1,14 @@
+const P=[
+{id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:485000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=85"},
+{id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:620000,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=85"},
+{id:3,n:"Commercial Convection Oven",c:"Bakery Equipment",p:780000,i:"https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=900&q=85"},
+{id:4,n:"Stainless Steel Work Table",c:"Kitchen Equipment",p:185000,i:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=85"},
+{id:5,n:"Commercial Upright Refrigerator",c:"Cold Storage",p:920000,i:"https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=900&q=85"},
+{id:6,n:"Planetary Cake Mixer",c:"Bakery Equipment",p:355000,i:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85"},
+{id:7,n:"Commercial Stainless Sink Station",c:"Kitchen Equipment",p:210000,i:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85"},
+{id:8,n:"Restaurant Dining Chair Set",c:"Restaurant & Hotel",p:145000,i:"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=85"},
+{id:9,n:"Commercial Gas Fryer",c:"Cooking Equipment",p:330000,i:"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85"},
+{id:10,n:"Bakery Display Counter",c:"Bakery Equipment",p:540000,i:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=85"},
+{id:11,n:"Commercial Blender Bar Station",c:"Bar & Beverage",p:165000,i:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=85"},
+{id:12,n:"Heavy-Duty Storage Rack",c:"Storage",p:125000,i:"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85"}];
+const C=[["Cooking Equipment","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80"],["Bakery Equipment","https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=700&q=80"],["Kitchen Equipment","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=700&q=80"],["Cold Storage","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=700&q=80"],["Restaurant & Hotel","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=700&q=80"],["Bar & Beverage","https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=700&q=80"]];
