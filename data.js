@@ -85,6 +85,11 @@ const PRODUCT_DETAIL_DEFAULTS={
 };
 P.forEach(function(p){p.details=Object.assign({},PRODUCT_DETAIL_DEFAULTS[p.c]||{},p.details||{});p.media=Object.assign({images:[p.i],video:"",source:"temporary catalogue visual"},p.media||{});});
 const MEDIA_LIBRARY=[
+{id:"twins-bread-display",type:"image",title:"Twins bakery bread display",category:"Bakery Equipment",src:"assets/media/twins-bakery-bread-display.jpg",alt:"Bakery bread display supplied by Twins"},
+{id:"twins-cake-display",type:"image",title:"Twins cake display counter",category:"Bakery Equipment",src:"assets/media/twins-cake-display-counter.jpg",alt:"Cake display counter supplied by Twins"},
+{id:"twins-video-01",type:"video",title:"Twins bakery media · 01",category:"Bakery Equipment",src:"assets/media/twins-media-video-01.mp4",poster:"assets/media/twins-bakery-bread-display.jpg",alt:"Twins bakery media video 01"},
+{id:"twins-video-02",type:"video",title:"Twins bakery media · 02",category:"Bakery Equipment",src:"assets/media/twins-media-video-02.mp4",poster:"assets/media/twins-cake-display-counter.jpg",alt:"Twins bakery media video 02"},
+{id:"twins-video-03",type:"video",title:"Twins bakery media · 03",category:"Bakery Equipment",src:"assets/media/twins-media-video-03.mp4",poster:"assets/media/twins-bakery-bread-display.jpg",alt:"Twins bakery media video 03"},
 {id:"kitchen",type:"image",title:"Commercial kitchen environment",category:"Cooking Equipment",src:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1800&q=90",alt:"Commercial kitchen"},
 {id:"bakery",type:"image",title:"Bakery production environment",category:"Bakery Equipment",src:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1800&q=90",alt:"Bakery production"},
 {id:"prep",type:"image",title:"Professional preparation workspace",category:"Kitchen Equipment",src:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1800&q=90",alt:"Kitchen preparation"},
