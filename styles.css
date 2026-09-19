@@ -115,6 +115,8 @@
 .plannerstatus{display:grid;gap:6px;padding:18px;background:#f7f7f5;border:1px solid var(--line)}
 .plannerstatus a{margin-top:6px;font-weight:800}
 .mediagrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.mediafilters{display:grid;grid-template-columns:1.4fr .8fr .7fr auto;gap:10px;margin-bottom:20px}.mediafilters input,.mediafilters select{min-height:44px;border:1px solid var(--line);background:#fff;padding:0 13px;font:inherit}.mediaresultcount{align-self:center;font-size:11px;color:#777;font-weight:800;white-space:nowrap}
+
 .mediacard{background:var(--white);border:1px solid var(--line);overflow:hidden}
 .mediacard img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
 .mediacard div{padding:20px}
