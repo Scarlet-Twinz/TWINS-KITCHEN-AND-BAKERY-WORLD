@@ -121,11 +121,16 @@ function delivery(){document.getElementById('delivery').innerHTML=head()+'<secti
 function contact(){document.getElementById('contact').innerHTML=head()+'<section class="page"><div class="wrap"><h1>Talk to Twins</h1><p class="muted">Equipment enquiries, business setups, bulk requirements and store visits.</p></div></section><section class="section"><div class="wrap contact"><div class="panel"><img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1100&q=85"><h2>Visit the store</h2><p>Alaba International Market, Nigeria</p><a class="btn red" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Alaba+International+Market">Get directions</a></div><div class="panel"><span class="eyebrow darkey">DIRECT CONTACT</span><h2>Tell us what you need.</h2><p class="muted">For the fastest equipment conversation, send a WhatsApp message.</p><a class="btn red full" target="_blank" href="https://wa.me/2348033231712">Open WhatsApp →</a><div class="contactline"><b>Phone</b><span>08033231712</span></div><div class="contactline"><b>Location</b><span>Alaba International Market</span></div><div class="contactline"><b>Hours</b><span>Open 24 hours</span></div><a class="btn light full" href="quote.html">Request a quotation</a></div></div></section>'+foot()+'<div id="toast"></div>'}
 function about(){document.getElementById('about').innerHTML=head()+'<section class="page"><div class="wrap"><h1>About Twins Kitchen & Bakery World</h1><p class="muted">Professional equipment at the centre of real business operations.</p></div></section><section class="section"><div class="wrap split aboutsplit"><div><span class="eyebrow darkey">THE STORE</span><h2>Equipment discovery should feel like business planning.</h2><p class="muted">This storefront is designed around the way operators actually buy: identify the operation, understand the workflow, discover equipment, build a list and speak to a real person when the decision becomes specific.</p><p class="muted">Twins Kitchen & Bakery World is based at Alaba International Market, Nigeria, serving kitchen, bakery, catering, restaurant and hospitality equipment needs.</p><a class="btn red" href="build-your-business.html">Build a business plan →</a></div><img class="aboutimage" src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"></div></section>'+foot()+'<div id="toast"></div>'}
 
+
 function categoryDetail(){
-var u=new URLSearchParams(location.search),name=u.get('cat')||C[0][0];if(!C.some(function(x){return x[0]===name}))name=C[0][0];var list=P.filter(function(p){return p.c===name}),desc={
+var u=new URLSearchParams(location.search);
+var name=u.get('cat')||C[0][0];
+if(!C.some(function(x){return x[0]===name;}))name=C[0][0];
+var list=P.filter(function(p){return p.c===name;});
+var descriptions={
 "Cooking Equipment":"Build the hot line around the menu, throughput, fuel or power availability and the space available for cooking.",
 "Bakery Equipment":"Plan bakery production around mixing, baking, proofing, cooling, display and storage.",
-"Kitchen Equipment":"Create practical prep and workstation areas with durable surfaces, sinks and supporting kitchen infrastructure.",
+"Kitchen Equipment":"Create practical prep and workstation areas with durable surfaces, sinks and supporting infrastructure.",
 "Cold Storage":"Protect ingredients and finished products with refrigeration and freezer capacity matched to the operation.",
 "Restaurant & Hotel":"Equip the service environment with furniture and hospitality equipment that fits the concept and guest flow.",
 "Bar & Beverage":"Build beverage service around preparation, chilling, blending, coffee and front-counter workflow.",
@@ -134,18 +139,44 @@ var u=new URLSearchParams(location.search),name=u.get('cat')||C[0][0];if(!C.some
 "Serving Equipment":"Support holding, presentation and service with equipment that matches the pace of the operation.",
 "Catering Supplies":"Prepare for mobile service with transport, holding and service equipment that can move with the business.",
 "Ventilation":"Plan extraction and ventilation around the cooking line, equipment layout and the requirements of the exact installation."
-}[name]||"Explore equipment in this operating area and confirm the exact specification before purchase.");
-document.getElementById('category').innerHTML=head()+'<section class="page categoryhero"><div class="wrap"><div class="crumb">Store / Categories / '+name+'</div><span class="eyebrow darkey">EQUIPMENT AREA</span><h1>'+name+'</h1><p class="muted">'+desc+'</p><div class="categorystats"><span><b>'+list.length+'</b> catalogue items</span><span><b>Commercial</b> use focus</span><span><b>Quote</b> available</span></div></div></section><section class="section"><div class="wrap"><div class="categorylayout"><aside class="panel categoryaside"><span class="eyebrow darkey">SHOP THE CATALOGUE</span><h3>Equipment areas</h3>'+C.map(function(x){return '<a class="'+(x[0]===name?'active':'')+'" href="category.html?cat='+encodeURIComponent(x[0])+'">'+x[0]+' <span>'+P.filter(function(p){return p.c===x[0]}).length+'</span></a>'}).join('')+'</aside><div><div class="categoryintro"><div><span class="eyebrow darkey">BUYING FOCUS</span><h2>Choose by operation, then verify the exact unit.</h2><p class="muted">'+desc+' Use the catalogue as a starting point and confirm current price, stock, dimensions, utilities and installation requirements with Twins.</p></div><a class="btn red" href="quote.html">Request a quote →</a></div><div class="grid">'+(list.length?cards(list):'<div class="empty"><h2>No demo items in this area yet.</h2><a class="btn light" href="products.html">Browse all equipment</a></div>')+'</div></div></div></div></section><section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">NOT SURE WHAT FITS?</span><h2>Build a plan around your business.</h2><p class="muted">The planner connects equipment areas to restaurant, bakery, hotel, catering, bar and café workflows.</p></div><a class="btn dark" href="build-your-business.html">Open business planner →</a></div></div></section></main>'+foot()+'<div id="toast"></div>';
+};
+var desc=descriptions[name]||"Explore equipment in this operating area and confirm the exact specification before purchase.";
+var links=C.map(function(x){
+var active=x[0]===name?'active':'';
+var count=P.filter(function(p){return p.c===x[0];}).length;
+return '<a class="'+active+'" href="category.html?cat='+encodeURIComponent(x[0])+'">'+x[0]+' <span>'+count+'</span></a>';
+}).join('');
+var products=list.length?cards(list):'<div class="empty"><h2>No demo items in this area yet.</h2><a class="btn light" href="products.html">Browse all equipment</a></div>';
+document.getElementById('category').innerHTML=head()+
+'<section class="page categoryhero"><div class="wrap"><div class="crumb">Store / Categories / '+name+'</div><span class="eyebrow darkey">EQUIPMENT AREA</span><h1>'+name+'</h1><p class="muted">'+desc+'</p><div class="categorystats"><span><b>'+list.length+'</b> catalogue items</span><span><b>Commercial</b> use focus</span><span><b>Quote</b> available</span></div></div></section>'+
+'<section class="section"><div class="wrap"><div class="categorylayout"><aside class="panel categoryaside"><span class="eyebrow darkey">SHOP THE CATALOGUE</span><h3>Equipment areas</h3>'+links+'</aside><div><div class="categoryintro"><div><span class="eyebrow darkey">BUYING FOCUS</span><h2>Choose by operation, then verify the exact unit.</h2><p class="muted">'+desc+' Use the catalogue as a starting point and confirm current price, stock, dimensions, utilities and installation requirements with Twins.</p></div><a class="btn red" href="quote.html">Request a quote →</a></div><div class="grid">'+products+'</div></div></div></div></section>'+
+'<section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">NOT SURE WHAT FITS?</span><h2>Build a plan around your business.</h2><p class="muted">Connect this equipment area to a restaurant, bakery, hotel, catering, bar or café workflow.</p></div><a class="btn dark" href="build-your-business.html">Open business planner →</a></div></div></section></main>'+foot()+'<div id="toast"></div>';
 }
 function finder(){
 var choices=["Any business","Restaurant","Bakery","Hotel","Catering Business","Bar / Lounge","Café"];
-document.getElementById('finder').innerHTML=head()+'<section class="page finderhero"><div class="wrap"><span class="eyebrow darkey">EQUIPMENT FINDER</span><h1>Start with the job your equipment needs to do.</h1><p class="muted">Choose a business and a working area. The finder returns demo catalogue matches you can save, compare or add to an equipment list.</p></div></section><section class="section"><div class="wrap"><div class="finderbox"><div class="field"><label>Business type</label><select id="findBusiness">'+choices.map(function(x){return '<option>'+x+'</option>'}).join('')+'</select></div><div class="field"><label>Equipment area</label><select id="findCat"><option>Any category</option>'+C.map(function(x){return '<option>'+x[0]+'</option>'}).join('')+'</select></div><div class="field"><label>Search term</label><input id="findText" placeholder="e.g. oven, mixer, refrigerator"></div><button class="btn red" onclick="runFinder()">Find equipment →</button></div><div id="finderResults" class="finderresults"><div class="empty"><h2>Choose what you are building.</h2><p class="muted">Your matches will appear here.</p></div></div></div></section>'+foot()+'<div id="toast"></div>';
+var businessOptions=choices.map(function(x){return '<option>'+x+'</option>';}).join('');
+var categoryOptions=C.map(function(x){return '<option>'+x[0]+'</option>';}).join('');
+document.getElementById('finder').innerHTML=head()+
+'<section class="page finderhero"><div class="wrap"><span class="eyebrow darkey">EQUIPMENT FINDER</span><h1>Start with the job your equipment needs to do.</h1><p class="muted">Choose a business and a working area. The finder returns catalogue matches you can save, compare or add to an equipment list.</p></div></section>'+
+'<section class="section"><div class="wrap"><div class="finderbox"><div class="field"><label>Business type</label><select id="findBusiness">'+businessOptions+'</select></div><div class="field"><label>Equipment area</label><select id="findCat"><option>Any category</option>'+categoryOptions+'</select></div><div class="field"><label>Search term</label><input id="findText" placeholder="e.g. oven, mixer, refrigerator"></div><button class="btn red" onclick="runFinder()">Find equipment →</button></div><div id="finderResults" class="finderresults"><div class="empty"><h2>Choose what you are building.</h2><p class="muted">Your matches will appear here.</p></div></div></div></section>'+foot()+'<div id="toast"></div>';
 }
 function runFinder(){
-var b=document.getElementById('findBusiness').value,cat=document.getElementById('findCat').value,t=(document.getElementById('findText').value||'').toLowerCase();
-var wanted=b==='Any business'?[]:(B.find(function(x){return x[0]===b})||[])[2]||[];
-var list=P.filter(function(p){return (!cat||cat==='Any category'||p.c===cat)&&(!t||(p.n+' '+p.desc+' '+p.spec).toLowerCase().indexOf(t)>-1)&&(!wanted.length||wanted.indexOf(p.c)>-1)});
-document.getElementById('finderResults').innerHTML='<div class="head"><div><h2>'+list.length+' matches</h2><p class="muted">'+(b==='Any business'?'General catalogue matches':b+' equipment matches')+'</p></div></div><div class="grid">'+(list.length?cards(list):'<div class="empty"><h2>No exact matches.</h2><p class="muted">Try another category or remove the search term.</p></div>')+'</div>';
+var business=document.getElementById('findBusiness').value;
+var category=document.getElementById('findCat').value;
+var textValue=(document.getElementById('findText').value||'').toLowerCase();
+var wanted=[];
+if(business!=='Any business'){
+var match=B.find(function(x){return x[0]===business;});
+wanted=match?match.slice(2):[];
+}
+var list=P.filter(function(p){
+var categoryOK=category==='Any category'||p.c===category;
+var textOK=!textValue||(p.n+' '+p.c+' '+p.desc+' '+p.spec).toLowerCase().indexOf(textValue)>-1;
+var businessOK=!wanted.length||wanted.indexOf(p.c)>-1;
+return categoryOK&&textOK&&businessOK;
+});
+var result=list.length?cards(list):'<div class="empty"><h2>No exact matches.</h2><p class="muted">Try another category or remove the search term.</p></div>';
+document.getElementById('finderResults').innerHTML='<div class="head"><div><h2>'+list.length+' matches</h2><p class="muted">'+(business==='Any business'?'General catalogue matches':business+' equipment matches')+'</p></div></div><div class="grid">'+result+'</div>';
 }
 
 if(page==='index.html'||page==='')home();else if(page==='products.html')products();else if(page==='category.html')categoryDetail();else if(page==='equipment-finder.html')finder();else if(page==='product.html')product();else if(page==='categories.html')categories();else if(page==='bundles.html')bundles();else if(page==='guides.html')guides();else if(page==='resources.html')resources();else if(page==='showroom.html')showroom();else if(page==='support.html')support();else if(page==='build-your-business.html')builder();else if(page==='wishlist.html')wishlist();else if(page==='compare.html')comparePage();else if(page==='cart.html')cartPage();else if(page==='quote.html')quote();else if(page==='dashboard.html')dashboard();else if(page==='login.html')auth(false);else if(page==='signup.html')auth(true);else if(page==='faq.html')faq();else if(page==='delivery.html')delivery();else if(page==='contact.html')contact();else if(page==='about.html')about();
