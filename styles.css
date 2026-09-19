@@ -131,3 +131,6 @@
 .mediagrid{grid-template-columns:1fr}
 .mediaformats{grid-template-columns:1fr}
 }
+
+/* Procurement action polish */
+.quoteactions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.price-note{display:block;margin-top:5px}.media-note{margin:8px 0 0}@media(max-width:560px){.quoteactions{grid-template-columns:1fr}}
