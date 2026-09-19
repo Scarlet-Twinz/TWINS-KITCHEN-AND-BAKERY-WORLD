@@ -227,10 +227,30 @@ setTimeout(function(){location.reload()},350);
 }
 function media(){
 var images=typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY:[];
+var cats=["All media"].concat(C.map(function(x){return x[0];}));
+var types=["All formats","Photos","Videos"];
+function mediaCards(list){return list.map(function(m){return '<article class="mediacard" data-media-category="'+m.category+'" data-media-type="'+m.type+'">'+(m.type==='video'?'<video controls preload="metadata" playsinline poster="'+(m.poster||'')+'"><source src="'+m.src+'" type="video/mp4">Your browser does not support video playback.</video>':'<img src="'+m.src+'" alt="'+m.alt+'" onerror="this.src=\'assets/media/twins-deck-oven-stack.jpg\'">')+'<div><span class="eyebrow darkey">'+m.category+(m.type==='video'?' · VIDEO':' · PHOTO')+'</span><h2>'+m.title+'</h2><a href="products.html?cat='+encodeURIComponent(m.category)+'">Explore this equipment area →</a></div></article>';}).join('');}
 document.getElementById('media').innerHTML=head()+
 '<section class="page mediahero"><div class="wrap"><span class="eyebrow darkey">TWINS MEDIA</span><h1>The business behind the equipment.</h1><p class="muted">A visual library for commercial kitchens, bakeries, hospitality, preparation and beverage operations.</p></div></section>'+
-'<section class="section"><div class="wrap"><div class="mediagrid">'+images.map(function(m){return '<article class="mediacard">'+(m.type==='video'?'<video controls preload="metadata" playsinline poster="'+m.poster+'"><source src="'+m.src+'" type="video/mp4">Your browser does not support video playback.</video>':'<img src="'+m.src+'" alt="'+m.alt+'" onerror="this.src=\'assets/media/twins-deck-oven-stack.jpg\'">')+'<div><span class="eyebrow darkey">'+m.category+(m.type==='video'?' · VIDEO':' · PHOTO')+'</span><h2>'+m.title+'</h2><a href="products.html?cat='+encodeURIComponent(m.category)+'">Explore this equipment area →</a></div></article>'}).join('')+'</div></div></section>'+
+'<section class="section"><div class="wrap"><div class="mediafilters"><input id="mediaSearch" placeholder="Search photos, equipment or media"><select id="mediaCategory">'+cats.map(function(x){return '<option>'+x+'</option>';}).join('')+'</select><select id="mediaType">'+types.map(function(x){return '<option>'+x+'</option>';}).join('')+'</select><span id="mediaCount" class="mediaresultcount"></span></div><div class="mediagrid" id="mediaGrid">'+mediaCards(images)+'</div></div></section>'+
 '<section class="section soft"><div class="wrap"><div class="mediaupload"><div><span class="eyebrow darkey">REAL TWINS MEDIA</span><h2>Your actual photos and videos belong here.</h2><p class="muted">Real Twins photos and videos are now part of the media library. More product, shop, delivery and installation media can be added to the same data structure as it becomes available.</p></div><div class="mediaformats"><span>PHOTO GALLERY</span><span>PRODUCT VIDEOS</span><span>SHOP TOUR</span><span>INSTALLATION</span><span>DELIVERY</span></div></div></div></section>'+foot()+'<div id="toast"></div>';
+function applyMediaFilters(){
+var q=(document.getElementById('mediaSearch').value||'').toLowerCase().trim();
+var cat=document.getElementById('mediaCategory').value;
+var type=document.getElementById('mediaType').value;
+var filtered=images.filter(function(m){
+var text=(m.title+' '+m.category+' '+(m.alt||'')).toLowerCase();
+var catOK=cat==='All media'||m.category===cat;
+var typeOK=type==='All formats'||(type==='Videos'?m.type==='video':m.type==='image');
+return catOK&&typeOK&&(!q||text.indexOf(q)>-1);
+});
+document.getElementById('mediaGrid').innerHTML=filtered.length?mediaCards(filtered):'<div class="empty"><h2>No media matches.</h2><p class="muted">Try another search, category or format.</p></div>';
+document.getElementById('mediaCount').textContent=filtered.length+' of '+images.length+' media items';
+}
+document.getElementById('mediaSearch').addEventListener('input',applyMediaFilters);
+document.getElementById('mediaCategory').addEventListener('change',applyMediaFilters);
+document.getElementById('mediaType').addEventListener('change',applyMediaFilters);
+applyMediaFilters();
 }
 function finder(){
 var choices=["Any business","Restaurant","Bakery","Hotel","Catering Business","Bar / Lounge","Café"];
