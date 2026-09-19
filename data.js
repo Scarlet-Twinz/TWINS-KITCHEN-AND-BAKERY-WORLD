@@ -1,14 +1,43 @@
 const P=[
-{id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:485000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=85"},
-{id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:620000,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=85"},
-{id:3,n:"Commercial Convection Oven",c:"Bakery Equipment",p:780000,i:"https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=900&q=85"},
-{id:4,n:"Stainless Steel Work Table",c:"Kitchen Equipment",p:185000,i:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=85"},
-{id:5,n:"Commercial Upright Refrigerator",c:"Cold Storage",p:920000,i:"https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=900&q=85"},
-{id:6,n:"Planetary Cake Mixer",c:"Bakery Equipment",p:355000,i:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85"},
-{id:7,n:"Commercial Stainless Sink Station",c:"Kitchen Equipment",p:210000,i:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85"},
-{id:8,n:"Restaurant Dining Chair Set",c:"Restaurant & Hotel",p:145000,i:"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=85"},
-{id:9,n:"Commercial Gas Fryer",c:"Cooking Equipment",p:330000,i:"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=85"},
-{id:10,n:"Bakery Display Counter",c:"Bakery Equipment",p:540000,i:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=85"},
-{id:11,n:"Commercial Blender Bar Station",c:"Bar & Beverage",p:165000,i:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=85"},
-{id:12,n:"Heavy-Duty Storage Rack",c:"Storage",p:125000,i:"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85"}];
-const C=[["Cooking Equipment","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80"],["Bakery Equipment","https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=700&q=80"],["Kitchen Equipment","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=700&q=80"],["Cold Storage","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=700&q=80"],["Restaurant & Hotel","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=700&q=80"],["Bar & Beverage","https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=700&q=80"]];
+{id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:485000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
+{id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:620000,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Production-focused mixer for bread and dough preparation.",spec:"Spiral mixing · bakery production · heavy duty"},
+{id:3,n:"Commercial Convection Oven",c:"Bakery Equipment",p:780000,i:"https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=1000&q=85",tag:"Featured",desc:"Versatile commercial oven for consistent baking and cooking.",spec:"Convection · commercial use · production oven"},
+{id:4,n:"Stainless Steel Work Table",c:"Kitchen Equipment",p:185000,i:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1000&q=85",tag:"Essential",desc:"Durable prep surface for professional food operations.",spec:"Stainless steel · prep station · easy clean"},
+{id:5,n:"Commercial Upright Refrigerator",c:"Cold Storage",p:920000,i:"https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=1000&q=85",tag:"Cold Storage",desc:"Large-format cold storage for restaurants and hospitality.",spec:"Upright format · commercial refrigeration"},
+{id:6,n:"Planetary Cake Mixer",c:"Bakery Equipment",p:355000,i:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Multi-purpose mixer for cakes, creams and pastry work.",spec:"Planetary mixing · bakery · pastry"},
+{id:7,n:"Commercial Stainless Sink Station",c:"Kitchen Equipment",p:210000,i:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=85",tag:"Essential",desc:"Commercial washing and cleaning station.",spec:"Stainless steel · wash station"},
+{id:8,n:"Restaurant Dining Chair Set",c:"Restaurant & Hotel",p:145000,i:"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85",tag:"Front of House",desc:"Guest seating for restaurants, hotels and hospitality spaces.",spec:"Dining · hospitality · seating"},
+{id:9,n:"Commercial Gas Fryer",c:"Cooking Equipment",p:330000,i:"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"High-output fryer for fast food and commercial kitchens.",spec:"Commercial frying · high output"},
+{id:10,n:"Bakery Display Counter",c:"Bakery Equipment",p:540000,i:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85",tag:"Display",desc:"Front-of-house display solution for bakery products.",spec:"Display · bakery · customer-facing"},
+{id:11,n:"Commercial Blender Bar Station",c:"Bar & Beverage",p:165000,i:"https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=1000&q=85",tag:"Beverage",desc:"Blend and prepare drinks efficiently in a beverage operation.",spec:"Beverage · bar · commercial blender"},
+{id:12,n:"Heavy-Duty Storage Rack",c:"Storage",p:125000,i:"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1000&q=85",tag:"Storage",desc:"Organized storage for equipment, ingredients and supplies.",spec:"Heavy duty · storage · shelving"},
+{id:13,n:"Commercial Deep Freezer",c:"Cold Storage",p:610000,i:"https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=1000&q=85",tag:"Cold Storage",desc:"Dedicated frozen storage for high-volume food operations.",spec:"Freezer · commercial · bulk storage"},
+{id:14,n:"Electric Food Warmer",c:"Serving Equipment",p:195000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Service",desc:"Keep prepared food ready for service.",spec:"Food holding · service · commercial"},
+{id:15,n:"Commercial Meat Slicer",c:"Food Preparation",p:285000,i:"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85",tag:"Prep",desc:"Efficient slicing equipment for professional food prep.",spec:"Food prep · slicing · commercial"},
+{id:16,n:"Stainless Steel Extraction Hood",c:"Ventilation",p:430000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Kitchen",desc:"Ventilation equipment for professional cooking areas.",spec:"Kitchen ventilation · extraction"},
+{id:17,n:"Commercial Coffee Machine",c:"Bar & Beverage",p:475000,i:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1000&q=85",tag:"Coffee",desc:"Coffee service equipment for cafés, hotels and restaurants.",spec:"Coffee · beverage · hospitality"},
+{id:18,n:"Bakery Proofing Cabinet",c:"Bakery Equipment",p:515000,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Controlled proofing support for bakery production.",spec:"Proofing · bakery · production"},
+{id:19,n:"Commercial Ice Maker",c:"Cold Storage",p:565000,i:"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85",tag:"Hospitality",desc:"Ice production for restaurants, bars and hospitality.",spec:"Ice production · hospitality"},
+{id:20,n:"Catering Service Trolley",c:"Catering Supplies",p:175000,i:"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85",tag:"Catering",desc:"Mobile service support for catering and events.",spec:"Catering · transport · service"}
+];
+const C=[
+["Cooking Equipment","High-output cooking, ranges, fryers and hot-line equipment.","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80"],
+["Bakery Equipment","Mixers, ovens, proofing and bakery production equipment.","https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80"],
+["Kitchen Equipment","Prep stations, sinks, utensils and kitchen infrastructure.","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=80"],
+["Cold Storage","Refrigerators, freezers and cold-chain equipment.","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=900&q=80"],
+["Restaurant & Hotel","Front-of-house, seating and hospitality equipment.","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80"],
+["Bar & Beverage","Coffee, blending, drink preparation and beverage service.","https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80"],
+["Food Preparation","Slicing, mixing, cutting and preparation workflow equipment.","https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"],
+["Storage","Shelving, racks and operational storage solutions.","https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80"],
+["Serving Equipment","Food holding, service stations and front-of-house support.","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80"],
+["Catering Supplies","Equipment for mobile kitchens, events and catering operations.","https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=900&q=80"],
+["Ventilation","Extraction and climate-control support for working kitchens.","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80"]
+];
+const B=[
+["Restaurant","Hot line · prep · cold storage · service","Cooking Equipment","Cold Storage","Food Preparation","Serving Equipment"],
+["Bakery","Mixing · proofing · baking · display","Bakery Equipment","Cold Storage","Storage","Serving Equipment"],
+["Hotel","Kitchen · breakfast · beverage · guest service","Cooking Equipment","Restaurant & Hotel","Bar & Beverage","Cold Storage"],
+["Catering Business","Mobile prep · cooking · transport · service","Cooking Equipment","Food Preparation","Catering Supplies","Serving Equipment"],
+["Bar / Lounge","Beverage · ice · chilling · service","Bar & Beverage","Cold Storage","Restaurant & Hotel","Serving Equipment"],
+["Café","Coffee · pastry · refrigeration · front of house","Bar & Beverage","Bakery Equipment","Cold Storage","Restaurant & Hotel"]
+];
