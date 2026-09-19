@@ -191,6 +191,40 @@ document.getElementById('category').innerHTML=head()+
 '<section class="section"><div class="wrap"><div class="categorylayout"><aside class="panel categoryaside"><span class="eyebrow darkey">SHOP THE CATALOGUE</span><h3>Equipment areas</h3>'+links+'</aside><div><div class="categoryintro"><div><span class="eyebrow darkey">BUYING FOCUS</span><h2>Choose by operation, then verify the exact unit.</h2><p class="muted">'+desc+' Use the catalogue as a starting point and confirm current price, stock, dimensions, utilities and installation requirements with Twins.</p></div><a class="btn red" href="quote.html">Request a quote →</a></div><div class="grid">'+products+'</div></div></div></div></section>'+
 '<section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">NOT SURE WHAT FITS?</span><h2>Build a plan around your business.</h2><p class="muted">Connect this equipment area to a restaurant, bakery, hotel, catering, bar or café workflow.</p></div><a class="btn dark" href="build-your-business.html">Open business planner →</a></div></div></section></main>'+foot()+'<div id="toast"></div>';
 }
+function projectPlanner(){
+var savedPlan=get('twins_project_plan',null);
+var businessOptions=B.map(function(b){return '<option '+(savedPlan&&savedPlan.business===b[0]?'selected':'')+'>'+b[0]+'</option>'}).join('');
+var stageOptions=PROJECT_STAGES.map(function(x){return '<option '+(savedPlan&&savedPlan.stage===x?'selected':'')+'>'+x+'</option>'}).join('');
+document.getElementById('planner').innerHTML=head()+
+'<section class="page plannerhero"><div class="wrap"><span class="eyebrow darkey">PROJECT PLANNER</span><h1>Turn a business idea into an equipment brief.</h1><p class="muted">Capture the information that matters before requesting equipment pricing. Save the brief in this browser and continue into the quotation workflow.</p></div></section>'+
+'<section class="section"><div class="wrap"><div class="plannerlayout"><form class="panel plannerform" onsubmit="saveProjectPlan(event)">'+
+'<div class="field"><label>Business type</label><select id="ppBusiness" required><option value="">Choose a business</option>'+businessOptions+'</select></div>'+
+'<div class="field"><label>Project stage</label><select id="ppStage">'+stageOptions+'</select></div>'+
+'<div class="field"><label>Location / delivery area</label><input id="ppLocation" value="'+(savedPlan?savedPlan.location:'')+'" placeholder="City, state or delivery area"></div>'+
+'<div class="field"><label>Expected capacity / output</label><input id="ppCapacity" value="'+(savedPlan?savedPlan.capacity:'')+'" placeholder="e.g. 100 meals/day, 20 trays/day, 40 seats"></div>'+
+'<div class="field"><label>Available space</label><input id="ppSpace" value="'+(savedPlan?savedPlan.space:'')+'" placeholder="Approximate room size or layout notes"></div>'+
+'<div class="field"><label>Power / fuel situation</label><input id="ppUtilities" value="'+(savedPlan?savedPlan.utilities:'')+'" placeholder="Electricity, gas, generator, water, drainage"></div>'+
+'<div class="field"><label>Equipment already owned</label><textarea id="ppOwned" placeholder="List anything you already have">'+(savedPlan?savedPlan.owned:'')+'</textarea></div>'+
+'<div class="field"><label>What do you need?</label><textarea id="ppNeeds" placeholder="Describe the equipment, workflow or menu requirements">'+(savedPlan?savedPlan.needs:'')+'</textarea></div>'+
+'<button class="btn red full">Save project brief →</button></form>'+
+'<aside class="panel planneraside"><span class="eyebrow darkey">PROJECT CONTEXT</span><h2>A better equipment conversation starts with context.</h2><div class="plannerpoints"><span><b>01</b> Business model</span><span><b>02</b> Production or guest capacity</span><span><b>03</b> Space and movement</span><span><b>04</b> Power, gas, water and drainage</span><span><b>05</b> Existing equipment</span><span><b>06</b> Equipment requirements</span></div><div class="plannerstatus">'+(savedPlan?'<b>Project brief saved</b><span>'+savedPlan.business+' · '+savedPlan.stage+'</span><a href="quote.html">Continue to quotation →</a>':'<b>No project brief yet</b><span>Complete the form to create one.</span>')+'</div></aside></div></div></section>'+
+'<section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">NEXT STEP</span><h2>Combine the brief with your equipment list.</h2><p class="muted">Browse equipment, add quantities to your cart, then send the project context with your quotation request.</p></div><a class="btn red" href="products.html">Browse equipment →</a></div></div></section>'+foot()+'<div id="toast"></div>';
+}
+function saveProjectPlan(e){
+e.preventDefault();
+var plan={business:document.getElementById('ppBusiness').value,stage:document.getElementById('ppStage').value,location:document.getElementById('ppLocation').value,capacity:document.getElementById('ppCapacity').value,space:document.getElementById('ppSpace').value,utilities:document.getElementById('ppUtilities').value,owned:document.getElementById('ppOwned').value,needs:document.getElementById('ppNeeds').value,savedAt:new Date().toISOString()};
+if(!plan.business){toast('Choose a business type');return}
+put('twins_project_plan',plan);
+toast('Project brief saved');
+setTimeout(function(){location.reload()},350);
+}
+function media(){
+var images=typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY:[];
+document.getElementById('media').innerHTML=head()+
+'<section class="page mediahero"><div class="wrap"><span class="eyebrow darkey">TWINS MEDIA</span><h1>The business behind the equipment.</h1><p class="muted">A visual library for commercial kitchens, bakeries, hospitality, preparation and beverage operations.</p></div></section>'+
+'<section class="section"><div class="wrap"><div class="mediagrid">'+images.map(function(m){return '<article class="mediacard"><img src="'+m.src+'" alt="'+m.alt+'"><div><span class="eyebrow darkey">'+m.category+'</span><h2>'+m.title+'</h2><a href="products.html?cat='+encodeURIComponent(m.category)+'">Explore this equipment area →</a></div></article>'}).join('')+'</div></div></section>'+
+'<section class="section soft"><div class="wrap"><div class="mediaupload"><div><span class="eyebrow darkey">REAL TWINS MEDIA</span><h2>Your actual photos and videos belong here.</h2><p class="muted">The current gallery is a temporary visual layer. Real shop, equipment, delivery, installation and product videos can be added to the same media data without rebuilding the page.</p></div><div class="mediaformats"><span>PHOTO GALLERY</span><span>PRODUCT VIDEOS</span><span>SHOP TOUR</span><span>INSTALLATION</span><span>DELIVERY</span></div></div></div></section>'+foot()+'<div id="toast"></div>';
+}
 function finder(){
 var choices=["Any business","Restaurant","Bakery","Hotel","Catering Business","Bar / Lounge","Café"];
 var businessOptions=choices.map(function(x){return '<option>'+x+'</option>';}).join('');
@@ -218,5 +252,5 @@ var result=list.length?cards(list):'<div class="empty"><h2>No exact matches.</h2
 document.getElementById('finderResults').innerHTML='<div class="head"><div><h2>'+list.length+' matches</h2><p class="muted">'+(business==='Any business'?'General catalogue matches':business+' equipment matches')+'</p></div></div><div class="grid">'+result+'</div>';
 }
 
-if(page==='index.html'||page==='')home();else if(page==='products.html')products();else if(page==='category.html')categoryDetail();else if(page==='equipment-finder.html')finder();else if(page==='product.html')product();else if(page==='categories.html')categories();else if(page==='bundles.html')bundles();else if(page==='guides.html')guides();else if(page==='resources.html')resources();else if(page==='showroom.html')showroom();else if(page==='support.html')support();else if(page==='build-your-business.html')builder();else if(page==='wishlist.html')wishlist();else if(page==='compare.html')comparePage();else if(page==='cart.html')cartPage();else if(page==='quote.html')quote();else if(page==='dashboard.html')dashboard();else if(page==='login.html')auth(false);else if(page==='signup.html')auth(true);else if(page==='faq.html')faq();else if(page==='delivery.html')delivery();else if(page==='contact.html')contact();else if(page==='about.html')about();
+if(page==='index.html'||page==='')home();else if(page==='products.html')products();else if(page==='category.html')categoryDetail();else if(page==='equipment-finder.html')finder();else if(page==='project-planner.html')projectPlanner();else if(page==='media.html')media();else if(page==='product.html')product();else if(page==='categories.html')categories();else if(page==='bundles.html')bundles();else if(page==='guides.html')guides();else if(page==='resources.html')resources();else if(page==='showroom.html')showroom();else if(page==='support.html')support();else if(page==='build-your-business.html')builder();else if(page==='wishlist.html')wishlist();else if(page==='compare.html')comparePage();else if(page==='cart.html')cartPage();else if(page==='quote.html')quote();else if(page==='dashboard.html')dashboard();else if(page==='login.html')auth(false);else if(page==='signup.html')auth(true);else if(page==='faq.html')faq();else if(page==='delivery.html')delivery();else if(page==='contact.html')contact();else if(page==='about.html')about();
 document.addEventListener('DOMContentLoaded',renderBadges);
