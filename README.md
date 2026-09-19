@@ -6,14 +6,15 @@ A commerce-style static storefront for **Twins Kitchen & Bakery World**, designe
 
 - Large responsive storefront homepage
 - Searchable equipment catalogue
-- 20 structured catalogue products
+- 40 structured catalogue products
 - Category discovery
 - Business-type equipment planner
-- Product detail pages with related equipment
+- Project planning brief with saved project context
+- Product detail pages with related equipment and structured specifications
 - Recently viewed products
 - Saved / wishlist products
 - Product comparison
-- Persistent cart with quantity controls
+- Persistent cart with quantity controls and reusable saved equipment lists
 - Quotation request flow
 - WhatsApp enquiry flow
 - Customer login/signup demo
@@ -21,6 +22,7 @@ A commerce-style static storefront for **Twins Kitchen & Bakery World**, designe
 - FAQ and delivery information
 - Contact, directions and business information
 - Responsive mobile layouts
+- Visual media gallery ready for real Twins photos and videos
 - GitHub Pages-ready static architecture
 - Real-world photography placeholders
 - Red / white / black visual system ready for the final Twins logo
@@ -76,7 +78,7 @@ The storefront does not need to be thrown away when that happens. The current UI
 
 ## Current demo data
 
-Product names, images, specifications and prices are structured demonstration data. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
+Product names, images, specifications and prices are structured demonstration data. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
 
 Business:
 
