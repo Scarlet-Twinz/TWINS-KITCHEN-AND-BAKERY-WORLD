@@ -89,12 +89,13 @@ const REAL_PRODUCT_MEDIA={
 3:{images:["assets/media/twins-rack-oven-installed.jpg","assets/media/twins-rack-oven-crated.jpg"],source:"supplied Twins media"},
 6:{images:["assets/media/twins-planetary-food-mixer.jpg"],source:"supplied Twins second batch"},
 10:{images:["assets/media/twins-cake-display-counter.jpg"],source:"supplied Twins media"},
-21:{images:["assets/media/twins-commercial-cooking-range-production.jpg"],source:"supplied Twins second batch"},
+28:{images:["assets/media/twins-upright-glass-display-cabinet.jpg"],source:"supplied Twins second batch"},
 23:{images:["assets/media/twins-pizza-oven.jpg"],source:"supplied Twins media"},
 25:{images:["assets/media/twins-food-chopper-wj-r07-plus.jpg"],source:"supplied Twins second batch"},
 27:{images:["assets/media/twins-cup-sealer.jpg"],source:"supplied Twins second batch"},
 30:{images:["assets/media/twins-commercial-ice-cream-machine.jpg","assets/media/twins-commercial-ice-cream-machine-02.jpg"],source:"supplied Twins second batch"},
-37:{images:["assets/media/twins-heated-bakery-display.jpg"],source:"supplied Twins media"}
+37:{images:["assets/media/twins-heated-bakery-display.jpg"],source:"supplied Twins media"},
+40:{images:["assets/media/twins-spiral-mixer.jpg","assets/media/twins-spiral-mixers.jpg"],source:"supplied Twins media"}
 };
 P.forEach(function(p){var real=REAL_PRODUCT_MEDIA[p.id]||{};p.details=Object.assign({},PRODUCT_DETAIL_DEFAULTS[p.c]||{},p.details||{});p.media=Object.assign({images:[p.i],video:"",source:"temporary catalogue visual"},real,p.media||{});p.i=p.media.images[0]||p.i;});
 const MEDIA_LIBRARY=[
