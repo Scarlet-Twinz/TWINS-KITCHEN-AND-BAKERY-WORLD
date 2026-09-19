@@ -61,3 +61,24 @@
 .supportgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.supportcard{background:#fff;border:1px solid #ddd;border-radius:18px;padding:25px;min-height:240px;display:flex;flex-direction:column}.supportcard h2{font-size:23px;margin:12px 0}.supportcard p{font-size:12px;color:#777;line-height:1.65}.supportcard a{margin-top:auto;color:#d71920;font-size:11px;font-weight:900}
 @media(max-width:800px){.resourcegrid,.showroomgrid{grid-template-columns:1fr 1fr}.resourcefeature{grid-template-columns:1fr}.resourcefeature img{height:300px}.supportgrid{grid-template-columns:1fr}}
 @media(max-width:560px){.resourcegrid,.showroomgrid,.supportgrid{grid-template-columns:1fr}.resourcefeature h2{font-size:31px}.resourcechecks{grid-template-columns:1fr 1fr}.showroomcard img{height:210px}}
+
+/* Category detail + equipment finder */
+.categoryhero,.finderhero{background:linear-gradient(135deg,#f7f7f7,#fff);border-bottom:1px solid #e7e7e7;padding:68px 0 54px}
+.categoryhero h1,.finderhero h1{max-width:850px;font-size:clamp(40px,6vw,76px);line-height:.98;margin:12px 0 18px;letter-spacing:-.045em}
+.categoryhero p,.finderhero p{max-width:760px;font-size:18px;line-height:1.7}
+.categorystats{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.categorystats span{background:#fff;border:1px solid #ddd;border-radius:999px;padding:10px 15px;color:#555}
+.categorylayout{display:grid;grid-template-columns:250px 1fr;gap:34px;align-items:start}
+.categoryaside{position:sticky;top:90px;padding:22px}
+.categoryaside h3{margin:8px 0 14px}
+.categoryaside a{display:flex;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:1px solid #eee;color:#444}
+.categoryaside a.active{font-weight:800;color:#c51f2b}
+.categoryaside a span{color:#999}
+.categoryintro{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #e8e8e8}
+.categoryintro h2{margin:5px 0 8px;max-width:650px}
+.categoryintro p{max-width:760px;line-height:1.7}
+.finderbox{display:grid;grid-template-columns:1fr 1fr 1.2fr auto;gap:14px;align-items:end;background:#fff;border:1px solid #ddd;padding:22px;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.06)}
+.finderbox .field{margin:0}
+.finderresults{margin-top:42px}
+@media(max-width:900px){.categorylayout{grid-template-columns:1fr}.categoryaside{position:static}.finderbox{grid-template-columns:1fr 1fr}.finderbox .btn{width:100%}}
+@media(max-width:560px){.categoryhero,.finderhero{padding:46px 0 38px}.categoryhero h1,.finderhero h1{font-size:42px}.categoryintro{display:block}.categoryintro .btn{margin-top:15px}.finderbox{grid-template-columns:1fr}.categorystats{display:grid;grid-template-columns:1fr}.categorystats span{border-radius:12px}}
