@@ -42,15 +42,15 @@ const P=[
 {id:40,n:"Commercial Spiral Mixer",c:"Bakery Equipment",p:null,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Heavy-duty spiral mixing for higher-volume dough production.",spec:"Spiral mixing · commercial bakery · heavy duty"}
 ];
 const C=[
-["Cooking Equipment","High-output cooking, ranges, fryers and hot-line equipment.","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80"],
-["Bakery Equipment","Mixers, ovens, proofing and bakery production equipment.","https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80"],
-["Kitchen Equipment","Prep stations, sinks, utensils and kitchen infrastructure.","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=80"],
-["Cold Storage","Refrigerators, freezers and cold-chain equipment.","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=900&q=80"],
+["Cooking Equipment","High-output cooking, ranges, fryers and hot-line equipment.","assets/media/twins-six-burner-range.jpg"],
+["Bakery Equipment","Mixers, ovens, proofing and bakery production equipment.","assets/media/twins-deck-oven-stack.jpg"],
+["Kitchen Equipment","Prep stations, sinks, utensils and kitchen infrastructure.","assets/media/twins-commercial-equipment-showroom-02.jpg"],
+["Cold Storage","Refrigerators, freezers and cold-chain equipment.","assets/media/twins-refrigerated-display-case.jpg"],
 ["Restaurant & Hotel","Front-of-house, seating and hospitality equipment.","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80"],
-["Bar & Beverage","Coffee, blending, drink preparation and beverage service.","https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80"],
-["Food Preparation","Slicing, mixing, cutting and preparation workflow equipment.","https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"],
-["Storage","Shelving, racks and operational storage solutions.","https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80"],
-["Serving Equipment","Food holding, service stations and front-of-house support.","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80"],
+["Bar & Beverage","Coffee, blending, drink preparation and beverage service.","assets/media/twins-commercial-ice-cream-machine.jpg"],
+["Food Preparation","Slicing, mixing, cutting and preparation workflow equipment.","assets/media/twins-food-chopper-wj-r07-plus.jpg"],
+["Storage","Shelving, racks and operational storage solutions.","assets/media/twins-supermarket-shelf-blue.jpg"],
+["Serving Equipment","Food holding, service stations and front-of-house support.","assets/media/twins-hot-food-counter.jpg"],
 ["Catering Supplies","Equipment for mobile kitchens, events and catering operations.","https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=900&q=80"],
 ["Ventilation","Extraction and climate-control support for working kitchens.","https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80"]
 ];
