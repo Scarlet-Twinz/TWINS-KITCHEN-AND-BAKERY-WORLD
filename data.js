@@ -1,3 +1,4 @@
+const SITE_CONFIG={name:"Twins Kitchen & Bakery World",email:"Ikegodsunday@gmail.com",phoneDisplay:"08033231712",whatsappNumber:"2348033231712",address:"Alaba International Market, Nigeria",hours:"Open 24 hours",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Alaba+International+Market",whatsappUrl:"https://wa.me/2348033231712"};
 const P=[
 {id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:485000,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
 {id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:620000,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Production-focused mixer for bread and dough preparation.",spec:"Spiral mixing · bakery production · heavy duty"},
