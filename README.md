@@ -22,9 +22,9 @@ A commerce-style static storefront for **Twins Kitchen & Bakery World**, designe
 - FAQ and delivery information
 - Contact, directions and business information
 - Responsive mobile layouts
-- Visual media gallery ready for real Twins photos and videos
+- Expanded visual media gallery with supplied Twins equipment photography and video records
 - GitHub Pages-ready static architecture
-- Real-world photography placeholders
+- Remaining generic photography is clearly treated as temporary visual context until replaced with more Twins-owned media
 - Red / white / black visual system ready for the final Twins logo
 
 ## Run locally in VS Code
@@ -78,7 +78,7 @@ The storefront does not need to be thrown away when that happens. The current UI
 
 ## Current demo data
 
-Product names, images, specifications and prices are structured demonstration data. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
+Product names and specifications are structured demonstration data until Twins confirms the exact commercial catalogue. Pricing is intentionally quote-first because market and supplier prices can change. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
 
 Business:
 
