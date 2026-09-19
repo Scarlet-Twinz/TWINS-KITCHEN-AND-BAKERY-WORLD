@@ -83,7 +83,7 @@ const PRODUCT_DETAIL_DEFAULTS={
 "Catering Supplies":{material:"Commercial catering construction / model dependent",capacity:"Confirm service or transport capacity",utility:"Confirm utility requirements for exact unit",dimensions:"Confirm exact model dimensions",installation:"Confirm transport, access and setup requirements"},
 "Ventilation":{material:"Stainless steel / model dependent",capacity:"Confirm extraction capacity",utility:"Confirm electrical and ducting requirements",dimensions:"Confirm exact model dimensions",installation:"Professional site and ventilation assessment required"}
 };
-P.forEach(function(p){p.details=Object.assign({},PRODUCT_DETAIL_DEFAULTS[p.c]||{},p.details||{});});
+P.forEach(function(p){p.details=Object.assign({},PRODUCT_DETAIL_DEFAULTS[p.c]||{},p.details||{});p.media=Object.assign({images:[p.i],video:"",source:"temporary catalogue visual"},p.media||{});});
 const MEDIA_LIBRARY=[
 {id:"kitchen",type:"image",title:"Commercial kitchen environment",category:"Cooking Equipment",src:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1800&q=90",alt:"Commercial kitchen"},
 {id:"bakery",type:"image",title:"Bakery production environment",category:"Bakery Equipment",src:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1800&q=90",alt:"Bakery production"},
