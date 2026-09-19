@@ -45,3 +45,19 @@
   .authbox .visual{min-height:220px}
   .dashbar .wrap{gap:8px}
 }
+
+/* Resource centre, visual showroom and support pages */
+.resourcehero,.showroomhero,.supporthero{background:#f7f7f5}
+.resourcegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.resourcecard{background:#fff;border:1px solid #ddd;border-radius:18px;padding:24px;min-height:230px;display:flex;flex-direction:column;transition:.2s}
+.resourcecard:hover{transform:translateY(-3px);box-shadow:0 16px 35px #0000000c;border-color:#d71920}
+.resourcecard h2{font-size:24px;line-height:1.05;margin:12px 0}.resourcecard p{font-size:12px;color:#777;line-height:1.65}.resourcecard b{margin-top:auto;color:#d71920;font-size:11px}
+.resourcefeature{display:grid;grid-template-columns:1fr .8fr;gap:32px;align-items:center}
+.resourcefeature h2{font-size:40px;line-height:1.02;margin:10px 0}.resourcefeature img{width:100%;height:390px;object-fit:cover;border-radius:20px}
+.resourcechecks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}.resourcechecks span{padding:12px;background:#fff;border:1px solid #ddd;border-radius:10px;font-size:11px;font-weight:800}
+.showroomgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.showroomcard{background:#fff;border:1px solid #ddd;border-radius:18px;overflow:hidden}
+.showroomcard img{width:100%;height:230px;object-fit:cover}.showroomcard div{padding:20px}.showroomcard h2{font-size:21px;margin:8px 0}.showroomcard p{font-size:11px;color:#777}.showroomcard a{font-size:11px;color:#d71920;font-weight:900}
+.supportgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.supportcard{background:#fff;border:1px solid #ddd;border-radius:18px;padding:25px;min-height:240px;display:flex;flex-direction:column}.supportcard h2{font-size:23px;margin:12px 0}.supportcard p{font-size:12px;color:#777;line-height:1.65}.supportcard a{margin-top:auto;color:#d71920;font-size:11px;font-weight:900}
+@media(max-width:800px){.resourcegrid,.showroomgrid{grid-template-columns:1fr 1fr}.resourcefeature{grid-template-columns:1fr}.resourcefeature img{height:300px}.supportgrid{grid-template-columns:1fr}}
+@media(max-width:560px){.resourcegrid,.showroomgrid,.supportgrid{grid-template-columns:1fr}.resourcefeature h2{font-size:31px}.resourcechecks{grid-template-columns:1fr 1fr}.showroomcard img{height:210px}}
