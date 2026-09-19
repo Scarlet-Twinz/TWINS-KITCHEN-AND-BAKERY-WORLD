@@ -1,40 +1,86 @@
 # Twins Kitchen & Bakery World
 
-A substantial static commerce-style storefront for Twins Kitchen & Bakery World, designed around professional kitchen, bakery, catering, restaurant and hospitality equipment.
+A commerce-style static storefront for **Twins Kitchen & Bakery World**, designed around professional kitchen, bakery, catering, restaurant and hospitality equipment.
 
-## Run it
+## What is in this version
 
-This version intentionally uses **HTML + CSS + vanilla JavaScript** so it works immediately with VS Code Live Server.
-
-1. Clone the repository.
-2. Open it in VS Code.
-3. Right-click `index.html`.
-4. Select **Open with Live Server**.
-
-No backend, database or authentication server is required for this first phase. Login/sign-up are local demo flows using browser storage.
-
-## Experience
-
-- Commerce-style homepage
-- Store catalogue
-- Search and category filtering
-- Product detail pages
-- Cart persistence with localStorage
-- Login and sign-up
+- Large responsive storefront homepage
+- Searchable equipment catalogue
+- 20 structured catalogue products
+- Category discovery
+- Business-type equipment planner
+- Product detail pages with related equipment
+- Recently viewed products
+- Saved / wishlist products
+- Product comparison
+- Persistent cart with quantity controls
+- Quotation request flow
+- WhatsApp enquiry flow
+- Customer login/signup demo
 - Customer dashboard
-- Business setup planner
-- Contact and WhatsApp enquiry flow
-- About page
-- Responsive layouts
-- Large real-world photography set
-- Red/white brand-ready visual system
+- FAQ and delivery information
+- Contact, directions and business information
+- Responsive mobile layouts
+- GitHub Pages-ready static architecture
+- Real-world photography placeholders
+- Red / white / black visual system ready for the final Twins logo
 
-## Important
+## Run locally in VS Code
 
-Product names, images and prices currently form a structured **demo catalogue**. Real inventory, prices, stock status, product specifications and the final logo should replace these before production launch.
+### 1. Clone the repository
+
+Open PowerShell or the VS Code terminal and run:
+
+```powershell
+cd Desktop
+git clone https://github.com/Scarlet-Twinz/TWINS-KITCHEN-AND-BAKERY-WORLD.git
+cd TWINS-KITCHEN-AND-BAKERY-WORLD
+code .
+```
+
+If your Projects folder is elsewhere, replace `Desktop` with that location.
+
+### 2. Open the site
+
+In VS Code, install **Live Server** if you do not already have it.
+
+Then:
+
+1. Open `index.html`.
+2. Right-click inside the file.
+3. Choose **Open with Live Server**.
+4. The storefront will open in your browser.
+5. Click through the catalogue, product pages, saved products, comparison, cart, planner and dashboard.
+
+You can also open the repository normally in VS Code without Live Server and edit the files directly.
+
+## Important architecture decision
+
+This phase is intentionally **HTML + CSS + vanilla JavaScript**.
+
+GitHub can store the source code and GitHub Pages can publish this static HTML/CSS/JavaScript site. A server backend is **not required** for the storefront, catalogue discovery, browser cart, saved products or demo customer workspace.
+
+A real backend can be added later when Twins needs things such as:
+
+- real customer accounts
+- database-backed inventory
+- real stock availability
+- admin catalogue management
+- real orders
+- payment processing
+- delivery management
+- staff access
+- server-side quotation records
+
+The storefront does not need to be thrown away when that happens. The current UI can become the frontend for that backend.
+
+## Current demo data
+
+Product names, images, specifications and prices are structured demonstration data. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
 
 Business:
-**Twins Kitchen & Bakery World**
-Alaba International Market, Nigeria
-08033231712
+
+**Twins Kitchen & Bakery World**  
+Alaba International Market, Nigeria  
+**08033231712**  
 Open 24 hours
