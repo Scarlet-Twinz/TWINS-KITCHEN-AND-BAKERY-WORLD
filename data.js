@@ -41,3 +41,10 @@ const B=[
 ["Bar / Lounge","Beverage · ice · chilling · service","Bar & Beverage","Cold Storage","Restaurant & Hotel","Serving Equipment"],
 ["Café","Coffee · pastry · refrigeration · front of house","Bar & Beverage","Bakery Equipment","Cold Storage","Restaurant & Hotel"]
 ];
+const KITCHEN_PACKAGES=[
+{id:"restaurant-starter",name:"Restaurant Starter Kitchen",type:"Restaurant",size:"Starter operation",intro:"A planning bundle for a restaurant that needs the core cooking, preparation, storage and service workflow.",ids:[1,4,5,9,14,15],note:"Demo planning package — confirm exact equipment, dimensions, fuel/power and current pricing with Twins."},
+{id:"bakery-production",name:"Bakery Production Setup",type:"Bakery",size:"Production-focused",intro:"A bakery workflow built around mixing, baking, proofing, cold storage and customer-facing display.",ids:[2,3,5,6,10,18],note:"Demo planning package — final bakery setup should be sized around production volume and available space."},
+{id:"cafe-launch",name:"Café Launch Package",type:"Café",size:"Compact operation",intro:"A café-oriented starting list connecting beverage service, pastry support, refrigeration and front-of-house needs.",ids:[4,5,6,8,17,19],note:"Demo planning package — confirm electrical requirements, capacity and layout before purchase."},
+{id:"bar-lounge",name:"Bar & Lounge Setup",type:"Bar / Lounge",size:"Service-focused",intro:"A beverage and hospitality package covering chilling, ice, blending and guest service.",ids:[5,8,11,13,19,14],note:"Demo planning package — ice, refrigeration and service capacity should be matched to expected demand."},
+{id:"catering-mobile",name:"Catering Business Setup",type:"Catering Business",size:"Mobile / events",intro:"A flexible catering list focused on cooking, preparation, holding and movement between service locations.",ids:[1,9,15,14,20,12],note:"Demo planning package — transport, venue access and power/fuel availability should be confirmed for each job."}
+];
