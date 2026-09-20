@@ -59,7 +59,7 @@ function finalMediaFor(p){
  return {src:"",status:"pending",source:"product photo verification required"};
 }
 function productMedia(p){return finalMediaFor(p)}
-function mediaPlaceholder(p){return "assets/media/twins-commercial-equipment-showroom-02.jpg"}
+function mediaPlaceholder(p){return "assets/media/twins-product-photo-pending.svg"}
 function mediaAudit(){return {verified:P.length,pending:0,total:P.length}}
 
 
