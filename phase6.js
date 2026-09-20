@@ -94,9 +94,13 @@ var VARIANTS=["Economy","Standard","Premium","Heavy-Duty","Compact","Large Capac
 function esc6(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 function mediaFor6(p,index){
  if(typeof finalMediaFor==="function")return finalMediaFor(p);
- if(p&&p.source==="Web research reference image"&&p.i)return {src:p.i,status:"reference",source:p.source};
- var src=WEB_REFERENCE_MEDIA[index%WEB_REFERENCE_MEDIA.length];
- return {src:src,status:"reference",source:"Web research reference image"};
+ if(p&&p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
+   return {src:p.media.images[0],status:"twins",source:p.media.source};
+ }
+ if(p&&p.source&&p.source!=="Web research reference image"&&p.i){
+   return {src:p.i,status:"reference",source:p.source};
+ }
+ return {src:"",status:"pending",source:"product photo verification required"};
 }
 
 /* Scale the catalogue from the existing 500-item dataset to 1,000 structured references.
@@ -116,7 +120,8 @@ function expandCatalogue(){
      var mediaIndex=(id+catIndex)%WEB_REFERENCE_MEDIA.length;
      var businesses=BUSINESS_LABELS.filter(function(b){return BUSINESS_MAP[b].indexOf(cat)>-1}).slice(0,5);
      P.push({
-       id:id,n:name,c:cat,p:null,i:WEB_REFERENCE_MEDIA[mediaIndex],
+       id:id,n:name,c:cat,p:null,i:"",
+       media:{images:[],video:"",source:"product photo verification required"},
        tag:["Popular","Essential","Commercial","Professional","New Reference"][id%5],
        desc:"Catalogue reference for "+cat.toLowerCase()+" workflows, suitable for planning and quotation discussions.",
        spec:"Reference item · confirm exact make, model, dimensions, utilities, current price, stock and delivery with Twins.",
@@ -136,7 +141,8 @@ function expandCatalogue(){
    var cat=Object.keys(EXTRA_TEMPLATES)[k%Object.keys(EXTRA_TEMPLATES).length];
    var base=fallback[k%fallback.length],variant=VARIANTS[(k+11)%VARIANTS.length];
    var name=variant+" Commercial "+base+" "+Math.floor(k/Math.max(1,fallback.length)+1);
-   P.push({id:next++,n:name,c:cat,p:null,i:WEB_REFERENCE_MEDIA[(next+cat.length)%WEB_REFERENCE_MEDIA.length],
+   P.push({id:next++,n:name,c:cat,p:null,i:"",
+     media:{images:[],video:"",source:"product photo verification required"},
      tag:"Catalogue",desc:"Additional structured catalogue reference for "+cat.toLowerCase()+".",
      spec:"Reference item · exact model, price, stock and technical specifications require Twins confirmation.",
      businesses:BUSINESS_LABELS.filter(function(b){return BUSINESS_MAP[b].indexOf(cat)>-1}).slice(0,4),
@@ -166,7 +172,7 @@ function query6(text){
 function card6(p){
  var m=mediaFor6(p,p.id),savedNow=saved().indexOf(p.id)>-1,cmp=compare().indexOf(p.id)>-1;
  var biz=(p.businesses||[]).slice(0,2).join(" · ");
- var src=esc6(m.src||"assets/media/twins-commercial-equipment-showroom-02.jpg");
+ var src=esc6(m.src||"assets/media/twins-product-photo-pending.svg");
  return '<article class="prod p6card">'+
   '<div class="prodimg"><a href="product.html?id='+p.id+'"><img loading="lazy" decoding="async" src="'+src+'" alt="'+esc6(p.n)+' reference image" onerror="this.onerror=null;this.src=\'assets/media/twins-commercial-equipment-showroom-02.jpg\'"></a>'+
   '<span class="badge">'+esc6(p.tag||"Equipment")+'</span><span class="mediaflag">'+(m.status==="twins"?"TWINS MEDIA":"REFERENCE IMAGE")+'</span>'+
@@ -189,7 +195,14 @@ function renderCommerce6(){
  if(sort==="name")list.sort(function(a,b){return a.n.localeCompare(b.n)});
  var size=30,total=list.length,pages=Math.max(1,Math.ceil(total/size));if(pageNo>pages)pageNo=pages;
  var visible=list.slice((pageNo-1)*size,pageNo*size);
- function url(o){var x=new URLSearchParams(location.search);Object.keys(o).forEach(function(k){if(o[k])x.set(k,o[k]);else x.delete(k)});x.delete("page");return"products.html"+(x.toString()?"?"+x.toString():"")}
+ function url(o){
+ var x=new URLSearchParams(location.search);
+ Object.keys(o).forEach(function(k){
+   if(o[k]!==undefined&&o[k]!==null&&o[k]!=="")x.set(k,o[k]);
+   else x.delete(k);
+ });
+ return"products.html"+(x.toString()?"?"+x.toString():"");
+}
  var suggestions=P.slice(0,80).map(function(p){return'<option value="'+esc6(p.n)+'">'}).join("");
  root.innerHTML=head()+
  '<main class="page"><div class="wrap"><div class="crumb">Store / '+esc6(business||cat||"All equipment")+'</div>'+
