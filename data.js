@@ -25,7 +25,7 @@ const CATALOG_MEDIA_OVERRIDES={
   "storage rack":"https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg",
   "three compartment sink":"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg",
   "dstv hd decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
-  "dstv decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
+  "dstv decoder":"https://cdn-prd-02.pnp.co.za/sys-master/images/h6f/he8/11826863964190/silo-product-image-v2-26Apr2025-180054-6002508002849-Straight_on-315454-94_515Wx515H",
   "gotv decoder":"https://i0.wp.com/dtmedia.tech/wp-content/uploads/2022/06/GOtv-Latest-Decoder.jpg?ssl=1&w=1500",
   "restaurant dining chair set":"https://cdnimg.webstaurantstore.com/images/products/large/357776/1312912.jpg",
   "commercial gas fryer":"https://cdnimg.webstaurantstore.com/images/products/large/695717/2475049.jpg",
