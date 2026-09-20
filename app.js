@@ -50,11 +50,11 @@ function finalMediaFor(p){
  if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("verified product reference")===0){
    return {src:p.media.images[0],status:"reference",source:p.media.source};
  }
- if(p.i&&p.source&&p.source!=="Web research reference image"){
-   return {src:p.i,status:"reference",source:p.source||"catalogue reference"};
+ if(p.i&&String(p.i).indexOf("assets/media/")===0){
+   return {src:p.i,status:"twins",source:"local Twins catalogue media"};
  }
- if(p.i&&(!p.source||p.source==="")){
-   return {src:p.i,status:"reference",source:"catalogue reference"};
+ if(p.i&&p.media&&p.media.images&&p.media.images.indexOf(p.i)>-1&&String(p.media.source||"").indexOf("verified product reference")===0){
+   return {src:p.i,status:"reference",source:p.media.source};
  }
  return {src:"",status:"pending",source:"product photo verification required"};
 }
