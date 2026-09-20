@@ -242,3 +242,28 @@ img{max-width:100%}
 .btn{border-radius:999px}
 .panel,.categoryaside,.sellerForm,.sellerAside,.marketcat,.packagecard{border-radius:22px}
 @media(max-width:650px){.prodimg img{height:210px}.prodbody{padding:17px}.storestats>span{width:100%;text-align:center}}
+
+/* Twins Trade Desk: business-first discovery */
+.visualtrade{padding-top:70px}
+.visualtradehead{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:24px}
+.visualtradehead h2{font-size:clamp(34px,4.8vw,58px);line-height:1.02;letter-spacing:-.04em;margin:8px 0 12px;max-width:780px}
+.tradegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tradecard{min-height:205px;padding:25px;border:1px solid #deded9;border-radius:26px;background:#fff;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;text-decoration:none;color:#111;position:relative;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.tradecard:before{content:"";position:absolute;inset:auto -30px -70px auto;width:170px;height:170px;border-radius:50%;background:#f2f2ee}
+.tradecard:hover{transform:translateY(-5px);box-shadow:0 18px 45px rgba(0,0,0,.08);border-color:#cfcfc9}
+.tradecard>*{position:relative;z-index:1}
+.tradecard span{font-size:9px;font-weight:900;letter-spacing:.12em;color:#d71920}
+.tradecard b{font-size:25px;letter-spacing:-.03em}
+.tradecard small{font-size:11px;line-height:1.5;color:#777;max-width:300px}
+.tradeprimary{background:#111;color:#fff;border-color:#111}
+.tradeprimary:before{background:#d71920}
+.tradeprimary small{color:#bbb}
+.tradecommunity{background:#f8e9ea;border-color:#efd0d2}
+.tradepromise{padding-top:35px;padding-bottom:35px}
+.promisegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.promisegrid>div{background:#fff;border:1px solid #ddd;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:7px}
+.promisegrid b{font-size:9px;color:#d71920;letter-spacing:.12em}
+.promisegrid strong{font-size:14px}
+.promisegrid span{font-size:10px;color:#777;line-height:1.5}
+@media(max-width:900px){.tradegrid{grid-template-columns:1fr 1fr}.promisegrid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.visualtradehead{display:block}.tradegrid,.promisegrid{grid-template-columns:1fr}.tradecard{min-height:175px}.visualtradehead h2{font-size:35px}}
