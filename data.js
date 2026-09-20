@@ -79,6 +79,15 @@ const INDUSTRY_ITEMS=[
 ["Cafés","Coffee, pastry, refrigeration and front-of-house equipment for compact service environments.","Café"]
 ];
 
+const FAQ_ITEMS=[
+["Do you sell equipment for complete business setups?","Yes. The catalogue is structured around cooking, bakery, prep, storage, service and other operating areas. For a complete setup, use the Business Planner or request a quotation."],
+["Are the prices on this website final?","This storefront uses a quote-first model. Confirm the current price, stock, specifications, delivery and installation requirements with Twins before purchase."],
+["Can I order through WhatsApp?","Yes. Product pages and quotation flows can prepare a WhatsApp enquiry using the business phone number."],
+["Where is Twins Kitchen & Bakery World?","Alaba International Market, Nigeria. The business is listed as open 24 hours."],
+["Will online payment work now?","No live payment processing is connected in this static phase. The current experience is designed for discovery, cart building and enquiries."],
+["Can the site eventually have real accounts and orders?","Yes. The backend architecture is being prepared to support real authentication, inventory, orders, admin tools, payments and database persistence."]
+];
+
 const KITCHEN_PACKAGES=[
 {id:"restaurant-starter",name:"Restaurant Starter Kitchen",type:"Restaurant",size:"Starter operation",intro:"A planning bundle for a restaurant that needs the core cooking, preparation, storage and service workflow.",ids:[1,4,5,9,14,15],note:"Demo planning package — confirm exact equipment, dimensions, fuel/power and current pricing with Twins."},
 {id:"bakery-production",name:"Bakery Production Setup",type:"Bakery",size:"Production-focused",intro:"A bakery workflow built around mixing, baking, proofing, cold storage and customer-facing display.",ids:[2,3,5,6,10,18],note:"Demo planning package — final bakery setup should be sized around production volume and available space."},
