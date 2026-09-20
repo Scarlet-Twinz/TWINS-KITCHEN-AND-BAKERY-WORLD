@@ -16,7 +16,7 @@ const CATALOG_MEDIA_OVERRIDES={
   "reverse osmosis machine 500l":"https://static.wixstatic.com/media/6fef01_0c17df3f63d8412db776705d971a74d3~mv2.png/v1/fill/w_1087%2Ch_1447%2Cal_c%2Cq_90%2Cenc_avif%2Cquality_auto/6fef01_0c17df3f63d8412db776705d971a74d3~mv2.png",
   "reverse osmosis machine 1000l":"https://static.wixstatic.com/media/6fef01_7b57a00cb4614c0a9c90765c4b58ebbe~mv2.png/v1/fill/w_1448%2Ch_1086%2Cal_c%2Cq_90%2Cenc_avif%2Cquality_auto/6fef01_7b57a00cb4614c0a9c90765c4b58ebbe~mv2.png",
   "2000 lph commercial reverse osmosis machine":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/05/2000-LPH-reverse-osmosis-machine-scaled.jpg",
-  "glass food display warmer":"https://cdnimg.webstaurantstore.com/images/products/large/166113/3075000.jpg",
+  "glass food display warmer":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/X/V/203520_1692622495.jpg",
   "single-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
   "one-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
   "1-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
