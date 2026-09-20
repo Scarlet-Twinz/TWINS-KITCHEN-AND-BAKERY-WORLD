@@ -59,6 +59,8 @@ function buildOverrideMap(){
 }
 function mediaCandidateFor(p){
  if(PHASE_SIX_MEDIA_BLOCKLIST[p.id])return {src:"",status:"pending",source:"strict media audit blocked mismatched supplied image"};
+ var idOverride=(typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"&&CATALOG_MEDIA_OVERRIDES_BY_ID[p.id])||"";
+ if(idOverride)return {src:idOverride,status:"reference",source:"verified product reference",sourceKey:"product-id-"+p.id};
  var overrides=buildOverrideMap(),override=overrides[p.id];
  if(override)return {src:override,status:"reference",source:"verified product reference",sourceKey:String(p.n||"")};
  if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
