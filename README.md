@@ -1,12 +1,12 @@
-# Twins Kitchen & Bakery World
+# Twins Kitchen
 
-A commerce-style static storefront for **Twins Kitchen & Bakery World**, designed around professional kitchen, bakery, catering, restaurant and hospitality equipment.
+A commerce-style static storefront for **Twins Kitchen**, designed around professional kitchen, bakery, catering, restaurant and hospitality equipment.
 
 ## What is in this version
 
 - Large responsive storefront homepage
 - Searchable equipment catalogue
-- 40 structured catalogue products
+- 280 structured catalogue products
 - Category discovery
 - Business-type equipment planner
 - Project planning brief with saved project context
@@ -24,7 +24,7 @@ A commerce-style static storefront for **Twins Kitchen & Bakery World**, designe
 - Responsive mobile layouts
 - Expanded visual media gallery with supplied Twins equipment photography and video records
 - GitHub Pages-ready static architecture
-- Remaining generic photography is clearly treated as temporary visual context until replaced with more Twins-owned media
+- External reference imagery is clearly labelled separately from supplied Twins media
 - Red / white / black visual system ready for the final Twins logo
 
 ## Run locally in VS Code
@@ -82,7 +82,7 @@ Product names and specifications are structured demonstration data until Twins c
 
 Business:
 
-**Twins Kitchen & Bakery World**  
+**Twins Kitchen**  
 Alaba International Market, Nigeria  
 **08033231712**  
 Open 24 hours
@@ -110,3 +110,12 @@ The project now separates the static storefront from the planned production back
 
 ### Backend boundary
 See backend/README.md, backend/openapi.yaml and backend/schema.sql. The backend is deliberately not claimed as deployed yet; it is the implementation contract for the next stage.
+
+
+## Twins Marketplace
+
+The repository now includes a separate community marketplace layer: `marketplace.html`, `sell-on-twins.html` and `seller-dashboard.html`. Community seller submissions are deliberately separated from official Twins stock. The current static prototype stores drafts locally; production publishing requires authenticated seller accounts, server-side media storage, moderation, reports and payment webhooks.
+
+## Payments
+
+The intended production flow is quote-first for variable Twins equipment pricing. Once confirmed prices/inventory exist, customer checkout can use a Nigerian/African payment gateway such as Paystack or Flutterwave. Seller memberships and promoted listings can use the same gateway, with payment confirmation handled by server-side webhooks rather than trusting browser state.
