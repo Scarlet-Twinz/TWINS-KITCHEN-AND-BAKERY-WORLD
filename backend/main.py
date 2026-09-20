@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     cookie_secure: bool=False
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
-app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.2.0")
+app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
-app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","OPTIONS"],allow_headers=["Content-Type"])
+app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
 
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
@@ -64,6 +64,25 @@ class MarketplaceListingPayload(BaseModel):
 
 class SellerPlanPayload(BaseModel):
     plan:str=Field(min_length=2,max_length=80)
+
+class ProjectPlanPayload(BaseModel):
+    business:str|None=None
+    stage:str|None=None
+    location:str|None=None
+    capacity:str|None=None
+    space:str|None=None
+    utilities:str|None=None
+    owned:str|None=None
+    needs:str|None=None
+
+class SellerProfilePayload(BaseModel):
+    displayName:str=Field(min_length=2,max_length=120)
+    phone:str|None=None
+    location:str|None=None
+
+class MarketplaceReportPayload(BaseModel):
+    reason:str=Field(min_length=3,max_length=120)
+    details:str|None=None
 
 class QuotePayload(BaseModel):
     reference:str|None=None
@@ -164,6 +183,60 @@ def seller_plan_intent(payload:SellerPlanPayload,request:Request):
         conn.execute("insert into seller_subscriptions (id,seller_id,plan,status) values (%s,%s,%s,'pending_payment')",(sid,seller[0],payload.plan))
         conn.commit()
     return {"subscription":{"id":str(sid),"plan":payload.plan,"status":"pending_payment"}}
+
+@app.get("/api/project-plans/me")
+def my_project_plan(request:Request):
+    session=require_session(request)
+    with db() as conn:
+        row=conn.execute("select id,business,stage,location,capacity,space,utilities,owned,needs,created_at,updated_at from project_plans where user_id=%s order by updated_at desc limit 1",(session["sub"],)).fetchone()
+    if not row:return {"plan":None}
+    return {"plan":{"id":str(row[0]),"business":row[1],"stage":row[2],"location":row[3],"capacity":row[4],"space":row[5],"utilities":row[6],"owned":row[7],"needs":row[8],"createdAt":row[9].isoformat(),"updatedAt":row[10].isoformat()}}
+
+@app.post("/api/project-plans",status_code=201)
+def save_project_plan(payload:ProjectPlanPayload,request:Request):
+    session=require_session(request);pid=uuid.uuid4()
+    with db() as conn:
+        conn.execute("delete from project_plans where user_id=%s",(session["sub"],))
+        conn.execute("insert into project_plans (id,user_id,business,stage,location,capacity,space,utilities,owned,needs) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(pid,session["sub"],payload.business,payload.stage,payload.location,payload.capacity,payload.space,payload.utilities,payload.owned,payload.needs));conn.commit()
+    return {"plan":{"id":str(pid),"business":payload.business,"stage":payload.stage,"location":payload.location,"capacity":payload.capacity,"space":payload.space,"utilities":payload.utilities,"owned":payload.owned,"needs":payload.needs}}
+
+@app.get("/api/seller/profile")
+def seller_profile(request:Request):
+    session=require_session(request)
+    with db() as conn: row=conn.execute("select id,display_name,phone,location,verification_status,seller_status,created_at from seller_profiles where user_id=%s",(session["sub"],)).fetchone()
+    if not row:return {"profile":None}
+    return {"profile":{"id":str(row[0]),"displayName":row[1],"phone":row[2],"location":row[3],"verificationStatus":row[4],"sellerStatus":row[5],"createdAt":row[6].isoformat()}}
+
+@app.post("/api/seller/profile",status_code=201)
+def create_seller_profile(payload:SellerProfilePayload,request:Request):
+    session=require_session(request);uid=uuid.UUID(session["sub"])
+    with db() as conn:
+        row=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
+        if row:
+            conn.execute("update seller_profiles set display_name=%s,phone=%s,location=%s,updated_at=now() where id=%s",(payload.displayName,payload.phone,payload.location,row[0]));sid=row[0]
+        else:
+            sid=uuid.uuid4();conn.execute("insert into seller_profiles (id,user_id,display_name,phone,location) values (%s,%s,%s,%s,%s)",(sid,uid,payload.displayName,payload.phone,payload.location))
+        conn.commit()
+    return {"profile":{"id":str(sid),"displayName":payload.displayName,"phone":payload.phone,"location":payload.location,"verificationStatus":"pending"}}
+
+@app.post("/api/marketplace/listings/{listing_id}/report",status_code=201)
+def report_listing(listing_id:str,payload:MarketplaceReportPayload,request:Request):
+    session=read_session(request);rid=uuid.uuid4()
+    with db() as conn:
+        exists=conn.execute("select id from marketplace_listings where id=%s",(uuid.UUID(listing_id),)).fetchone()
+        if not exists:raise HTTPException(status_code=404,detail="Listing not found")
+        conn.execute("insert into marketplace_reports (id,listing_id,reporter_user_id,reason,details) values (%s,%s,%s,%s,%s)",(rid,uuid.UUID(listing_id),uuid.UUID(session["sub"]) if session else None,payload.reason,payload.details));conn.commit()
+    return {"report":{"id":str(rid),"status":"open"}}
+
+@app.patch("/api/admin/marketplace/listings/{listing_id}")
+def moderate_listing(listing_id:str,status:str,request:Request):
+    require_admin(request)
+    allowed={"published","rejected","paused","sold","archived"}
+    if status not in allowed:raise HTTPException(status_code=422,detail="Unsupported moderation status")
+    with db() as conn:
+        cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,uuid.UUID(listing_id)));conn.commit()
+        if cur.rowcount==0:raise HTTPException(status_code=404,detail="Listing not found")
+    return {"ok":True,"status":status}
 
 @app.post("/api/quotes",status_code=201)
 def create_quote(payload:QuotePayload,request:Request):
