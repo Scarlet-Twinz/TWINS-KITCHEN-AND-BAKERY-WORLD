@@ -28,6 +28,18 @@ const CATALOG_MEDIA_OVERRIDES={
   "dstv decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
   "gotv decoder":"https://i0.wp.com/dtmedia.tech/wp-content/uploads/2022/06/GOtv-Latest-Decoder.jpg?ssl=1&w=1500"
 };
+const PREMIUM_MEDIA_LIBRARY={
+"commercial 6-burner stainless range":"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1400&q=90",
+"professional spiral dough mixer":"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1400&q=90",
+"commercial convection oven":"https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=1400&q=90",
+"stainless steel work table":"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1400&q=90",
+"commercial upright refrigerator":"https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=1400&q=90",
+"planetary cake mixer":"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1400&q=90",
+"commercial stainless sink station":"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=90",
+"restaurant dining chair set":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=90",
+"commercial gas fryer":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=90",
+"commercial coffee machine":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=90"
+};
 const P=[
 {id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:null,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
 {id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:null,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Production-focused mixer for bread and dough preparation.",spec:"Spiral mixing · bakery production · heavy duty"},
