@@ -189,3 +189,15 @@ create index if not exists idx_marketplace_listings_status_created on marketplac
 create index if not exists idx_marketplace_listings_seller on marketplace_listings(seller_id, created_at desc);
 create index if not exists idx_marketplace_reports_status on marketplace_reports(status, created_at desc);
 create index if not exists idx_payment_transactions_user on payment_transactions(user_id, created_at desc);
+
+-- Phase 4 production hardening.
+create index if not exists idx_users_email_lower on users(lower(email));
+create index if not exists idx_seller_profiles_verification on seller_profiles(verification_status,seller_status);
+create index if not exists idx_marketplace_reports_listing_status on marketplace_reports(listing_id,status);
+create index if not exists idx_product_media_product_order on product_media(product_id,sort_order);
+create index if not exists idx_project_plans_user_updated on project_plans(user_id,updated_at desc);
+
+alter table users add column if not exists email_verified_at timestamptz;
+alter table seller_profiles add column if not exists verified_at timestamptz;
+alter table marketplace_listings add column if not exists published_at timestamptz;
+alter table payment_transactions add column if not exists processed_at timestamptz;
