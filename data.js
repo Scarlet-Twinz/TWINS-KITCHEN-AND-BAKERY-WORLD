@@ -63,16 +63,9 @@ const CATALOG_MEDIA_OVERRIDES={
   "rotary bakery oven":"https://www.fornifiorini.com/templates/yootheme/cache/be/forno-rotativo-rotor-bee36f2f.jpeg",
   "double-deck pizza oven":"https://image.made-in-china.com/202f0j00oKOftUksEDbn/Restaurant-Professional-2-Layers-Commercial-Pizza-Oven.webp",
   "10l planetary mixer":"https://www.therange.co.uk/media/8/9/1622196894_12_4731.jpg",
-  "20l planetary mixer":"https://krdcatering.co.uk/cdn/shop/files/BH20C-Planetary-Mixer.jpg",
-  "30l planetary cake mixer":"https://www.empiresuppliesonline.co.uk/cdn/shop/products/EMP-30PM-E.jpg",
-  "20l spiral dough mixer":"https://www.bigw.com.au/medias/sys_master/images/images/hf8/h74/9902903045/9902903045-1.jpg",
-  "30l spiral dough mixer":"https://image.made-in-china.com/2f0j00QwoTCdYyAArk/Caterwin-30L-Professional-Commercial-Bakery-Equipment-Cake-Bread-Dough-Mixing-Machine-Spiral-Mixer.jpg",
-  "commercial dough divider":"https://www.americaneaglemachine.com/wp-content/uploads/2017/06/AE-DDE30R-1.jpg",
   "4-burner commercial gas range":"https://image.made-in-china.com/2f0j00IcEWoTiyHObU/Commercial-Kitchen-Equipment-Stainless-Steel-4-Burner-Kitchen-Gas-Range.webp",
-  "range with griddle & fryer":"https://chefmaxequipment.com/wp-content/uploads/2022/03/CM-HFMX-1830.jpg",
   "heavy-duty double fryer":"https://www.mm-gastroshop.de/media/catalog/product/1/6/162651_3.jpg?height=700&width=700",
   "commercial pasta cooker":"https://ifea.com.au/wp-content/uploads/2014/10/Italgi-pasta-cooker-CP900-900x1366.jpg",
-  "45kg commercial ice maker":"https://www.bunnings.com.au/medias/0807773.jpg?context=bWFzdGVyfGltYWdlc3wxMDAwMDB8aW1hZ2UvanBlZ3xhRGhrTDJnMFlpOHlOekF6TWpJME1qUTN3TkRrNU1pOHdNRGN3TnpjeE1pMHdNRGt3TURBfGQ4NzM5ZTU2Y2ZjOGI4Y2RlZDAyY2M0YjA2MWYwOTRhNTU0MzQxNzM1ZDc2MzA2YzIwY2YyYzU0MjY5NjYy",
   "double-bowl stainless sink table":"https://ml68s3tzebcb.i.optimole.com/cb%3A9WfF.24555/w%3A1080/h%3A1080/q%3Amauto/g%3Asm/f%3Abest/id%3Abadbbcb51b5e785f46a4f269377a02e8/https%3A/www.kwcommercial.com.au/dsbd7-2400l-left-inlet-double-sink.jpg",
 };
 const PREMIUM_MEDIA_LIBRARY={
