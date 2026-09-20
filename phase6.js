@@ -318,7 +318,7 @@ function audit6(){
  var root=document.body;
  root.dataset.catalogueCount=P.length;
  root.dataset.phase6="complete";
- window.TWINS_PHASE6_AUDIT={catalogue:P.length,businesses:BUSINESS_LABELS.length,saved:saved().length,compared:compare().length,cartQuantity:cart().reduce(function(a,x){return a+x.q},0)};
+ window.TWINS_PHASE6_AUDIT={catalogue:P.length,businesses:BUSINESS_LABELS.length,saved:saved().length,compared:compare().length,cartQuantity:cart().reduce(function(a,x){return a+x.q},0),media:(typeof mediaAudit==="function"?mediaAudit():null)};
 }
 
 expandCatalogue();
