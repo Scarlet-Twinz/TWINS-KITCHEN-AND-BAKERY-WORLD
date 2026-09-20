@@ -47,7 +47,7 @@ const CATALOG_MEDIA_OVERRIDES={
   "6-burner commercial gas range":"https://cdnimg.webstaurantstore.com/images/products/large/4958/2981064.jpg",
   "8-burner commercial gas range":"https://cdnimg.webstaurantstore.com/images/products/large/858444/2972446.jpg",
   "stainless hand wash sink":"https://cdnimg.webstaurantstore.com/images/products/large/605674/2545661.jpg",
-  "commercial popcorn machine":"https://cdnimg.webstaurantstore.com/images/products/large/382/1234567.jpg",
+  "commercial popcorn machine":"https://cdnimg.webstaurantstore.com/images/products/large/107220/2242737.jpg",
   "commercial blender bar station":"https://cdnimg.webstaurantstore.com/images/products/large/226322/1025341.jpg",
   "commercial shawarma grill":"https://img.yfisher.com/m6454/1757239691850-shawarma-grill-machine-commercial/png100-t3-scale100.webp",
   "commercial pizza oven":"https://cdnimg.webstaurantstore.com/images/products/large/573324/2132673.jpg",
