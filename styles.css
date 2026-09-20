@@ -187,3 +187,5 @@ button,.btn,a,input,select,textarea{touch-action:manipulation}
 button:disabled,.btn.disabled{opacity:.55;cursor:not-allowed}
 img{max-width:100%}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.navtoplink{display:inline-flex;align-items:center;height:42px;white-space:nowrap}.navtoplink:hover{text-decoration:none;color:var(--brand,#d71920)}
