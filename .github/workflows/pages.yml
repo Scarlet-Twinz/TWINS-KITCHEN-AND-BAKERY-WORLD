@@ -41,6 +41,8 @@ jobs:
           rsync -a             --exclude='.git'             --exclude='.github'             --exclude='backend'             --exclude='scripts'             --exclude='docker-compose.yml'             --exclude='DEPLOYMENT.md'             --exclude='README.md'             --exclude='*.md'             ./ site/
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
