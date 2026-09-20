@@ -44,10 +44,13 @@ var __twinsOverrideById=null;
 function buildOverrideMap(){
  if(__twinsOverrideById)return __twinsOverrideById;
  __twinsOverrideById={};
- Object.keys(CATALOG_MEDIA_OVERRIDES||{}).forEach(function(k){
-   var key=String(k).toLowerCase();
-   var p=P.find(function(x){return String(x.n||"").toLowerCase().indexOf(key)>-1});
-   if(p&&__twinsOverrideById[p.id]===undefined)__twinsOverrideById[p.id]=CATALOG_MEDIA_OVERRIDES[k];
+ P.forEach(function(p){
+   var name=String(p.n||"").toLowerCase().trim();
+   var matches=Object.keys(CATALOG_MEDIA_OVERRIDES||{}).filter(function(k){
+     var key=String(k).toLowerCase().trim();
+     return key&&name.indexOf(key)>-1;
+   }).sort(function(a,b){return b.length-a.length});
+   if(matches.length)__twinsOverrideById[p.id]=CATALOG_MEDIA_OVERRIDES[matches[0]];
  });
  return __twinsOverrideById;
 }
