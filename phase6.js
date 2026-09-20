@@ -93,8 +93,8 @@ var VARIANTS=["Economy","Standard","Premium","Heavy-Duty","Compact","Large Capac
 
 function esc6(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 function mediaFor6(p,index){
+ if(typeof finalMediaFor==="function")return finalMediaFor(p);
  if(p&&p.source==="Web research reference image"&&p.i)return {src:p.i,status:"reference",source:p.source};
- if(typeof phase5Media==="function")return phase5Media(p);
  var src=WEB_REFERENCE_MEDIA[index%WEB_REFERENCE_MEDIA.length];
  return {src:src,status:"reference",source:"Web research reference image"};
 }
@@ -164,11 +164,12 @@ function query6(text){
 }
 
 function card6(p){
- var m=mediaFor6(p,p.id), savedNow=saved().indexOf(p.id)>-1,cmp=compare().indexOf(p.id)>-1;
+ var m=mediaFor6(p,p.id),savedNow=saved().indexOf(p.id)>-1,cmp=compare().indexOf(p.id)>-1;
  var biz=(p.businesses||[]).slice(0,2).join(" · ");
+ var src=esc6(m.src||"assets/media/twins-commercial-equipment-showroom-02.jpg");
  return '<article class="prod p6card">'+
-  '<div class="prodimg"><a href="product.html?id='+p.id+'"><img loading="lazy" decoding="async" src="'+esc6(m.src)+'" alt="'+esc6(p.n)+' reference image"></a>'+
-  '<span class="badge">'+esc6(p.tag||"Equipment")+'</span><span class="mediaflag">'+(m.status==="twins"?"TWINS MEDIA":"REFERENCE")+'</span>'+
+  '<div class="prodimg"><a href="product.html?id='+p.id+'"><img loading="lazy" decoding="async" src="'+src+'" alt="'+esc6(p.n)+' reference image" onerror="this.onerror=null;this.src=\'assets/media/twins-commercial-equipment-showroom-02.jpg\'"></a>'+
+  '<span class="badge">'+esc6(p.tag||"Equipment")+'</span><span class="mediaflag">'+(m.status==="twins"?"TWINS MEDIA":"REFERENCE IMAGE")+'</span>'+
   '<button class="icon save '+(savedNow?"active":"")+'" aria-label="Save '+esc6(p.n)+'" onclick="toggleSave('+p.id+');return false">♡</button></div>'+
   '<div class="prodbody"><small class="muted">'+esc6(p.c)+'</small><a href="product.html?id='+p.id+'"><h3>'+esc6(p.n)+'</h3></a>'+
   '<p class="desc">'+esc6(p.desc)+'</p><div class="p6tags"><span>Quote on request</span><span>'+esc6(p.availability||"Stock to confirm")+'</span></div>'+
@@ -292,12 +293,9 @@ function marketplace6(){
 }
 
 function nav6(){
- var nav=document.querySelector(".navlinks");if(!nav||nav.dataset.p6==="1")return;
- nav.dataset.p6="1";
- var links=nav.querySelectorAll("a");
- links.forEach(function(a){if(a.textContent.trim()==="All Equipment")a.innerHTML="Shop Equipment";});
- var quote=document.createElement("a");quote.href="quote.html";quote.textContent="Quote";
- nav.appendChild(quote);
+ var nav=document.querySelector(".navlinks");
+ if(!nav)return;
+ nav.classList.add("p6-clean-nav");
 }
 
 function performance6(){
