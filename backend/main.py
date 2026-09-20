@@ -54,6 +54,17 @@ class QuoteItem(BaseModel):
     id:int
     name:str|None=None
     quantity:int=Field(ge=1,le=10000)
+class MarketplaceListingPayload(BaseModel):
+    title:str=Field(min_length=3,max_length=160)
+    category:str=Field(min_length=2,max_length=80)
+    description:str=Field(min_length=10,max_length=2000)
+    priceMode:str=Field(default="on_request")
+    price:float|None=Field(default=None,ge=0)
+    location:str|None=None
+
+class SellerPlanPayload(BaseModel):
+    plan:str=Field(min_length=2,max_length=80)
+
 class QuotePayload(BaseModel):
     reference:str|None=None
     name:str=Field(min_length=2,max_length=120)
@@ -111,6 +122,48 @@ def me(request:Request):
 def catalogue():
     with db() as conn:rows=conn.execute("select legacy_catalogue_id,name,description,tag,price_mode,active from products where active=true order by legacy_catalogue_id").fetchall()
     return {"products":[{"id":r[0],"name":r[1],"description":r[2],"tag":r[3],"priceMode":r[4],"active":r[5]} for r in rows]}
+
+
+@app.get("/api/marketplace/listings")
+def marketplace_listings(category:str|None=None,limit:int=Field(default=50,ge=1,le=100)):
+    with db() as conn:
+        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,sp.display_name,sp.verification_status
+        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
+        where ml.status='published' and (%s is null or ml.category=%s)
+        order by ml.created_at desc limit %s""",(category,category,limit)).fetchall()
+    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"seller":r[8],"sellerVerification":r[9]} for r in rows]}
+
+@app.post("/api/marketplace/listings",status_code=201)
+def create_marketplace_listing(payload:MarketplaceListingPayload,request:Request):
+    session=require_session(request)
+    uid=uuid.UUID(session["sub"]);lid=uuid.uuid4()
+    with db() as conn:
+        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
+        if not seller:
+            seller_id=uuid.uuid4()
+            conn.execute("insert into seller_profiles (id,user_id,display_name,phone,verification_status) values (%s,%s,(select name from users where id=%s),(select phone from users where id=%s),'pending')",(seller_id,uid,uid,uid))
+        else:seller_id=seller[0]
+        conn.execute("insert into marketplace_listings (id,seller_id,title,category,description,price_mode,price,location,status) values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review')",(lid,seller_id,payload.title,payload.category,payload.description,payload.priceMode,payload.price,payload.location))
+        conn.commit()
+    return {"listing":{"id":str(lid),"status":"pending_review"}}
+
+@app.get("/api/marketplace/me")
+def my_marketplace_listings(request:Request):
+    session=require_session(request);uid=uuid.UUID(session["sub"])
+    with db() as conn:
+        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,ml.status,ml.created_at
+        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id where sp.user_id=%s order by ml.created_at desc limit 100""",(uid,)).fetchall()
+    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"status":r[8],"createdAt":r[9].isoformat()} for r in rows]}
+
+@app.post("/api/marketplace/seller-plan-intent",status_code=201)
+def seller_plan_intent(payload:SellerPlanPayload,request:Request):
+    session=require_session(request);uid=uuid.UUID(session["sub"]);sid=uuid.uuid4()
+    with db() as conn:
+        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
+        if not seller:raise HTTPException(status_code=400,detail="Create a seller profile first")
+        conn.execute("insert into seller_subscriptions (id,seller_id,plan,status) values (%s,%s,%s,'pending_payment')",(sid,seller[0],payload.plan))
+        conn.commit()
+    return {"subscription":{"id":str(sid),"plan":payload.plan,"status":"pending_payment"}}
 
 @app.post("/api/quotes",status_code=201)
 def create_quote(payload:QuotePayload,request:Request):
