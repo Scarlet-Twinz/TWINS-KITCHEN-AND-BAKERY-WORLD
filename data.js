@@ -36,9 +36,12 @@ const CATALOG_MEDIA_OVERRIDES={
   "stainless steel extraction hood":"https://cdnimg.webstaurantstore.com/images/products/large/520462/1923071.jpg",
   "commercial chest freezer":"https://cdnimg.webstaurantstore.com/images/products/large/610335/2517575.jpg",
   "commercial dishwasher":"https://cdnimg.webstaurantstore.com/images/products/large/777471/3057330.jpg",
+  "commercial food processor":"https://cdnimg.webstaurantstore.com/images/products/large/833229/2829458.jpg",
+  "display chiller cabinet":"https://cdnimg.webstaurantstore.com/images/products/large/674060/2433917.jpg",
+  "commercial ice cream machine":"https://cdnimg.webstaurantstore.com/images/products/large/212347/1835129.jpg",
   "commercial blender bar station":"https://cdnimg.webstaurantstore.com/images/products/large/226322/1025341.jpg",
   "commercial shawarma grill":"https://img.yfisher.com/m6454/1757239691850-shawarma-grill-machine-commercial/png100-t3-scale100.webp",
-  "commercial pizza oven":"https://static-data2.manualslib.com/product-images/4c3/1779684/moretti-forni-p110g-c-a-oven.jpg",
+  "commercial pizza oven":"https://cdnimg.webstaurantstore.com/images/products/large/573324/2132673.jpg",
   "bakery proofing cabinet":"https://canmac.co.uk/cdn/shop/files/FJ26_-1200x1200_1024x1024.jpg?v=1756648261",
   "commercial ice maker":"https://assets.wfcdn.com/im/33203324/compr-r85/3189/318913607/Commercial%2BIce%2BMaker%2C265Lbs%2F24H%2BWith%2B55Lbs%2BIce%2BStorage%2BCapacity%2C%2BBuilt-In%2BIce%2BMaeffice%2BBar%2BRestaurant.jpg",
   "catering service trolley":"https://www.cateringsuperstore.co.uk/3616-medium_default/professional-built-to-last-commercial-serving-service-clearing-trolley-stainless-steel-3-tier-810x460x900mm-for-catering-service.jpg",
@@ -60,7 +63,7 @@ const PREMIUM_MEDIA_LIBRARY={
 "commercial stainless sink station":"https://cdnimg.webstaurantstore.com/images/products/large/114718/2899097.jpg",
 "restaurant dining chair set":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=90",
 "commercial gas fryer":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=90",
-"commercial coffee machine":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=90"
+"commercial coffee machine":"https://cdnimg.webstaurantstore.com/images/products/large/448775/1659944.jpg"
 };
 const P=[
 {id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:null,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
