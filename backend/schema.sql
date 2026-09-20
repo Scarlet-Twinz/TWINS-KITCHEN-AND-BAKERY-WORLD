@@ -100,3 +100,8 @@ create index if not exists idx_quotes_user_created on quotes(user_id, created_at
 create index if not exists idx_quote_items_quote on quote_items(quote_id);
 create index if not exists idx_products_active on products(active);
 create index if not exists idx_quotes_status_created on quotes(status, created_at desc);
+
+
+-- Safe upgrades for databases created from an earlier scaffold.
+alter table users add column if not exists name text not null default '';
+alter table quotes add column if not exists package_name text;
