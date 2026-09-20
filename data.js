@@ -76,7 +76,7 @@ const CATALOG_MEDIA_OVERRIDES={
   "commercial stainless sink station":"https://cdnimg.webstaurantstore.com/images/products/large/114718/2899097.jpg",
   "commercial shawarma grill":"https://system4.ua/images/product/product_32435_168969/600",
   "commercial coffee machine":"https://canmac.co.uk/cdn/shop/files/MIA5_6-1200x1200_1024x1024.jpg?v=1756647383",
-  "commercial meat slicer":"https://www.walmart.com/ip/KWS-MS-12ES-Metal-Collection-Commercial-420W-Electric-Meat-Slicer-10-Inch-304-Stainless-Steel-Blade-Extended-Back-Space-Frozen-Meat-Cheese-Food-Slice/138006845",
+  
   "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg"
 };
 const PREMIUM_MEDIA_LIBRARY={
