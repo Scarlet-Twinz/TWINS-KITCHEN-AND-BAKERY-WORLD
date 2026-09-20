@@ -103,13 +103,15 @@ function mediaFor6(p,index){
  return {src:"",status:"pending",source:"product photo verification required"};
 }
 
-/* Scale the catalogue from the existing 500-item dataset to 1,000 structured references.
+/* Scale the catalogue from the existing dataset to 1,075 structured references.
+   The current data.js catalogue may already contain IDs above 500, so generated IDs
+   must begin after the highest existing ID to prevent collisions.
    Every generated entry is clearly marked as a catalogue/reference item and does not claim stock. */
 function expandCatalogue(){
  if(window.__twinsPhase6Expanded)return;
  window.__twinsPhase6Expanded=true;
- var existingIds={};P.forEach(function(p){existingIds[p.id]=true});
- var next=501, created=0;
+ var maxId=P.reduce(function(max,p){return Math.max(max,Number(p.id)||0)},0);
+ var next=maxId+1, created=0;
  Object.keys(EXTRA_TEMPLATES).forEach(function(cat,catIndex){
    EXTRA_TEMPLATES[cat].forEach(function(base,j){
      if(created>=500)return;
