@@ -3,6 +3,13 @@ const MARKETPLACE_CONFIG={name:"Twins Marketplace",description:"A moderated comm
 const OWNER_PROFILE={name:"Ikechukwu Umeh",role:"Founder",origin:"Anambra State, Nigeria",base:"Lagos, Nigeria",delivery:"Nigeria and across Africa",story:"Ikechukwu Umeh opened Twins Kitchen with a practical idea: make it easier for people building food and hospitality businesses to find the equipment they need, understand the workflow around it and have a direct conversation before committing to a purchase. With roots in Anambra State and the business based in Lagos, the company is positioned around real commercial equipment enquiries from restaurants, bakeries, cafés, hotels, catering businesses and other food-service operators. The aim is simple — make equipment buying clearer, more personal and more useful, from the first idea through the final specification."};
 
 const CATALOG_MEDIA_OVERRIDES={
+  "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
+  "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
+  "commercial juice extractor":"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp",
+  "commercial ice cream machine":"https://www.chillcooler.ie/cdn/shop/files/T29_ICE_CREAM_MACHINE.png?v=1737660661&width=600",
+  "stainless wall shelf":"https://i5.walmartimages.com/asr/ca3cb10e-ff82-45ae-9aa7-69585f2da0ff.3da4c638d939c45c8facd978ac065b5e.jpeg",
+  "stainless steel wall cabinet":"https://cdnimg.webstaurantstore.com/images/products/xxl/565845/2109219.jpg",
+  "commercial chest freezer":"https://maxx-cold.com/cdn/shop/files/vergnj69iqmpledx5xhh_800x.jpg?v=1766909172",
   "commercial 6-burner stainless range":"https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2",
   "commercial food processor 5.5l":"https://cdnimg.webstaurantstore.com/images/products/large/833229/2829458.jpg",
   "commercial deep freezer":"https://static.wixstatic.com/media/bf19ef_ec158d37a8104c3184b96eb23e924dd7~mv2.jpg/v1/fill/w_1080,h_1080,al_c,q_85,enc_avif/bf19ef_ec158d37a8104c3184b96eb23e924dd7~mv2.jpg",
