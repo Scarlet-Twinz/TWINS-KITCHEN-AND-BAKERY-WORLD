@@ -48,11 +48,14 @@ create table quotes (
   reference text unique not null,
   user_id uuid references users(id),
   name text not null,
+  email text,
   phone text not null,
   business text,
   project_stage text,
   location text,
   capacity text,
+  space text,
+  utilities text,
   requirements text,
   status text not null default 'Draft' check (status in ('Draft','Prepared','Sent to Twins','In review','Quoted','Closed')),
   created_at timestamptz not null default now(),
@@ -90,3 +93,7 @@ create table audit_logs (
   metadata jsonb,
   created_at timestamptz not null default now()
 );
+
+create index if not exists idx_quotes_user_created on quotes(user_id, created_at desc);
+create index if not exists idx_quote_items_quote on quote_items(quote_id);
+create index if not exists idx_products_active on products(active);
