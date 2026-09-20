@@ -60,6 +60,13 @@ paths:
       responses:
         '201': { description: Quote created }
         '400': { description: Invalid request }
+  /api/account/me:
+    get:
+      summary: Get the current authenticated account
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Account }
+        '401': { description: Authentication required }
   /api/quotes/me:
     get:
       summary: List the current user's quote requests
@@ -98,11 +105,14 @@ components:
       required: [name, phone]
       properties:
         name: { type: string }
+        email: { type: string, format: email }
         phone: { type: string }
         business: { type: string }
         projectStage: { type: string }
         location: { type: string }
         capacity: { type: string }
+        space: { type: string }
+        utilities: { type: string }
         requirements: { type: string }
         items:
           type: array
