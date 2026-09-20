@@ -6,7 +6,7 @@ A commerce-style static storefront for **Twins Kitchen**, designed around profes
 
 - Large responsive storefront homepage
 - Searchable equipment catalogue
-- 1,075 structured catalogue references (575 base records + 500 Phase 6 generated references)
+- 1,030 structured catalogue references (530 base records + 500 Phase 6 generated references)
 - Category discovery
 - Business-type equipment planner
 - Project planning brief with saved project context
