@@ -34,7 +34,15 @@ var WEB_REFERENCE_MEDIA=[
  "https://cdn.shopify.com/s/files/1/0802/3493/8688/files/Eta_Inox_Utensilios_de_cozinha_Luanda.jpg?v=1762093998",
  "https://images.squarespace-cdn.com/content/v1/54ac7387e4b04f1bf4ddeda7/1673292569550-C2BY1Q7Y2TRULU3SYS8U/St.Alice_Kitchen6%2Bsmall.jpg",
  "https://images.yybcdn.com/sites/98500/98781/1776320979903289415784509440.png"
-];
+"https://i.ebayimg.com/images/g/V3oAAOSw1y1eQcJJ/s-l500.jpg",
+ "https://img.vevorstatic.com/mx/LSSYLJMCLDSMFA7TMV1/original_img-v2/commercial-freezer-m100-12.jpg?format=webp&timestamp=1716366184000",
+ "https://cdn.usa-rs.com/products/ee616f83-dea6-4291-a7bd-5f9734ebb1af/feature-images/2-729195c9ba29b8fb.png",
+ "https://witcdn.cafemarkt.com/robot-coupe-r-5-v-v-set-top-shredder-5-9-l-230v-en-vegetable-cutting-machines-robot-coupe-85153-43-B.jpg",
+ "https://www.nskequipments.com/images/seo-images/commercial-refrigerator-manufacturers.jpg",
+ "https://www.ghanayello.com/img/gh/c/1570207055-63-kwekus-technologies.jpg",
+ "https://mindtrip.ai/cdn-cgi/image/format%3Dwebp%2Cw%3D1200/https%3A/images.mindtrip.ai/attractions/5650/0910/6e61/de9c/6714/4ac7/fa8c/8622",
+ "https://www.techni-contact.com/ressources/images/produits/zoom/chaise-pour-restaurant-cafes-et-bars-92194597-3.jpg",
+ ];
 
 var EXTRA_TEMPLATES={
  "Cooking Equipment":[
@@ -85,6 +93,7 @@ var VARIANTS=["Economy","Standard","Premium","Heavy-Duty","Compact","Large Capac
 
 function esc6(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 function mediaFor6(p,index){
+ if(p&&p.source==="Web research reference image"&&p.i)return {src:p.i,status:"reference",source:p.source};
  if(typeof phase5Media==="function")return phase5Media(p);
  var src=WEB_REFERENCE_MEDIA[index%WEB_REFERENCE_MEDIA.length];
  return {src:src,status:"reference",source:"Web research reference image"};
