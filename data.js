@@ -20,7 +20,11 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={"6":"https://homemygarden.com.au/cdn/shop/f
   "135":"https://m.media-amazon.com/images/I/513rwRNOoWL._AC_SL1000_.jpg",
   "136":"https://m.media-amazon.com/images/I/71Am8lvWpoL._AC_SL1500_.jpg",
   "137":"https://m.media-amazon.com/images/I/516ksW3LvlL._AC_.jpg",
-  "138":"https://m.media-amazon.com/images/I/61zfFTCG2HL._AC_SL1500_.jpg"};
+  "138":"https://m.media-amazon.com/images/I/61zfFTCG2HL._AC_SL1500_.jpg",
+  "162":"https://tiimg.tistatic.com/fp/1/008/101/150-liters-300-watts-power-long-lasting-stainless-steel-water-cooler-264.jpg",
+  "163":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD732/2507/23/products/44bca5b6ca-6d87.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100%2Fresize%2Cm_lfit%2Ch_640%2Cw_640",
+  "165":"https://www.webstaurantstore.com/images/products/large/190504/903619.jpg",
+  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"};
 const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
   "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
