@@ -26,7 +26,20 @@ const CATALOG_MEDIA_OVERRIDES={
   "three compartment sink":"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg",
   "dstv hd decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
   "dstv decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
-  "gotv decoder":"https://i0.wp.com/dtmedia.tech/wp-content/uploads/2022/06/GOtv-Latest-Decoder.jpg?ssl=1&w=1500"
+  "gotv decoder":"https://i0.wp.com/dtmedia.tech/wp-content/uploads/2022/06/GOtv-Latest-Decoder.jpg?ssl=1&w=1500",
+  "commercial blender bar station":"https://cdnimg.webstaurantstore.com/images/products/large/226322/1025341.jpg",
+  "commercial shawarma grill":"https://img.yfisher.com/m6454/1757239691850-shawarma-grill-machine-commercial/png100-t3-scale100.webp",
+  "commercial pizza oven":"https://static-data2.manualslib.com/product-images/4c3/1779684/moretti-forni-p110g-c-a-oven.jpg",
+  "bakery proofing cabinet":"https://canmac.co.uk/cdn/shop/files/FJ26_-1200x1200_1024x1024.jpg?v=1756648261",
+  "commercial ice maker":"https://assets.wfcdn.com/im/33203324/compr-r85/3189/318913607/Commercial%2BIce%2BMaker%2C265Lbs%2F24H%2BWith%2B55Lbs%2BIce%2BStorage%2BCapacity%2C%2BBuilt-In%2BIce%2BMaeffice%2BBar%2BRestaurant.jpg",
+  "catering service trolley":"https://www.cateringsuperstore.co.uk/3616-medium_default/professional-built-to-last-commercial-serving-service-clearing-trolley-stainless-steel-3-tier-810x460x900mm-for-catering-service.jpg",
+  "heavy-duty gas griddle":"https://platincdn.com/2416/pictures/MWRPSFGTXQ222202392747_R70CE-P-.jpg",
+  "commercial vegetable cutter":"https://wxswif.en.made-in-china.com/product/lTXUYdfxJncZ/China-Electric-Cutter-Vegetable-Food-Cutter-Slicer-Commercial-Stainless-Steel-Cutting-Machine.html",
+  "commercial juice extractor":"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp",
+  "commercial chest freezer":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=",
+  "stainless wall shelf":"https://cdnimg.webstaurantstore.com/images/products/large/91751/3087559.jpg",
+  "stainless chafing dish set":"https://m.media-amazon.com/images/I/71uJFsr6msL.jpg",
+  "bakery dough sheeter":"https://image.made-in-china.com/2f0j00SpkoQgvdEBbL/650mm-Commercial-Kitchen-Equipment-Full-Stainless-Steel-Pastry-Dough-Sheeter-for-Bakery.webp"
 };
 const PREMIUM_MEDIA_LIBRARY={
 "commercial 6-burner stainless range":"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1400&q=90",
