@@ -1,6 +1,44 @@
 const SITE_CONFIG={name:"Twins Kitchen",email:"Ikegodsunday@gmail.com",phoneDisplay:"08033231712",whatsappNumber:"2348033231712",address:"Alaba International Market, Ojo, Lagos, Nigeria",hours:"Open 24 hours",deliveryArea:"Nigeria and across Africa",catalogueMode:"demo",priceLabel:"Current price on request",apiBase:"http://localhost:8000",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Alaba+International+Market",whatsappUrl:"https://wa.me/2348033231712"};
 const MARKETPLACE_CONFIG={name:"Twins Marketplace",description:"A moderated community marketplace alongside the official Twins catalogue.",sellerModel:"Verified seller listings",paymentModel:"Seller membership and promotion payments will connect to a production payment gateway after merchant credentials are configured.",buyerProtection:"Community listings begin as enquiry-first. Twins-owned catalogue checkout can use a payment gateway once prices and inventory are production-ready."};
 const OWNER_PROFILE={name:"Ikechukwu Umeh",role:"Founder",origin:"Anambra State, Nigeria",base:"Lagos, Nigeria",delivery:"Nigeria and across Africa",story:"Ikechukwu Umeh opened Twins Kitchen with a practical idea: make it easier for people building food and hospitality businesses to find the equipment they need, understand the workflow around it and have a direct conversation before committing to a purchase. With roots in Anambra State and the business based in Lagos, the company is positioned around real commercial equipment enquiries from restaurants, bakeries, cafés, hotels, catering businesses and other food-service operators. The aim is simple — make equipment buying clearer, more personal and more useful, from the first idea through the final specification."};
+
+const CATALOG_MEDIA_OVERRIDES={
+  "single-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
+  "one-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
+  "1-burner":"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg",
+  "two-burner":"https://www.aajjo.com/assets/product-images/main/stainless-steel-silver-commercial-two-burner-gas-stove-for-kitchen.jpg",
+  "2-burner":"https://www.aajjo.com/assets/product-images/main/stainless-steel-silver-commercial-two-burner-gas-stove-for-kitchen.jpg",
+  "three-burner":"https://cdn.myikas.com/images/42158d38-d603-46cf-81ea-1639749e332d/0e45f817-b321-4f3e-9b86-5be1d127a60a/3840/cej25l.webp",
+  "3-burner":"https://cdn.myikas.com/images/42158d38-d603-46cf-81ea-1639749e332d/0e45f817-b321-4f3e-9b86-5be1d127a60a/3840/cej25l.webp",
+  "four-burner":"https://www.gastrodiscount.info/media/image/product/6212/lg/gasherd-serie-900-4-brenner-9999-36-kw-g20-900x900x850-mm-bxtxh.jpg",
+  "4-burner":"https://www.gastrodiscount.info/media/image/product/6212/lg/gasherd-serie-900-4-brenner-9999-36-kw-g20-900x900x850-mm-bxtxh.jpg",
+  "six-burner":"https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2",
+  "6-burner":"https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2",
+  "spiral mixer":"https://www.hobartcorp.com/sites/default/files/styles/max_1300x1300/public/webdam-assets/Spiral%20Mixer%20HSL130%20f%20.png?itok=XAbWgPIq",
+  "planetary mixer":"https://cdnimg.webstaurantstore.com/images/products/large/52221/833586.jpg",
+  "convection oven":"https://www.ekmekciler.gen.tr/Dosyalar/UrunResim/maksan-mkf-10-digi-konveksiyonlu-firin_3172.jpg",
+  "3 deck 9 tray":"https://caterqecape.co.za/products/view/653/3-deck-9-tray-oven",
+  "dough sheeter":"https://www.gleadkitchen.com/Commercial-Dough-Sheeter-pd512463648.html",
+  "food processor":"https://uploads.prod01.sydney.platformos.com/instances/647/assets/modules/homepage/webapp_uploads/blog/images/robotcoupe-r301ultrafoodprocessor21772766060899-1772766063538.png",
+  "vegetable cutter":"https://www.italyline.rs/f/pics/Seckalice-za-povrce/seckalica-za-povrce-samic-CA301_b.jpg",
+  "meat slicer":"https://m.media-amazon.com/images/I/71d8q4Q0xBL._AC_SL1500_.jpg",
+  "meat grinder":"https://m.media-amazon.com/images/I/71j0sLh8VGL._AC_SL1500_.jpg",
+  "deep fryer":"https://static.wixstatic.com/media/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp/v1/fill/w_570%2Ch_570%2Cal_c%2Cq_80%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp",
+  "shawarma":"https://www.kaesidkitchen.com/wp-content/uploads/2025/05/Commercial-Stainless-Steel-Gas-Shawarma-Machine.jpg",
+  "juice extractor":"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp",
+  "ice maker":"https://m.media-amazon.com/images/I/71cV4r4vJrL._AC_SL1500_.jpg",
+  "upright refrigerator":"https://i5.walmartimages.com/seo/NSF-54-Commercial-Refrigerator-49-Cu-Ft-Stainless-Steel-Reach-In-Solid-Door-Upright-Cooler-for-Restaurant_7d5f8d6d-5e11-4f4b-9a31-4e0b4f5a8b8a.1c0c1f0e8a4f5f2d0c5c5f2a6a7b8c9d.jpeg",
+  "commercial blender":"https://shopee.co.id/HAMILTON-BEACH-HBB255S-COMMERCIAL-BAR-BLENDER-BLENDER-BARISTA-Stainless-Steel-0.95L-i.174148935.20266973775",
+  "coffee machine":"https://coffeeya.net/data/editor/goods/1/2020/07/3996_a517ae935e170bfaf94ea2e0a803ef401335531.jpg",
+  "proofing cabinet":"https://cabinet.matttroy.net/wp-content/uploads/2022/11/proofer-cabinet-bakery.jpg",
+  "work table":"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg",
+  "three compartment sink":"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg",
+  "storage rack":"https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg",
+  "dstv hd decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
+  "dstv decoder":"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737",
+  "gotv decoder":"https://i0.wp.com/dtmedia.tech/wp-content/uploads/2022/06/GOtv-Latest-Decoder.jpg?ssl=1&w=1500"
+};
+
 const P=[
 {id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:null,i:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
 {id:2,n:"Professional Spiral Dough Mixer",c:"Bakery Equipment",p:null,i:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=85",tag:"Bakery",desc:"Production-focused mixer for bread and dough preparation.",spec:"Spiral mixing · bakery production · heavy duty"},
