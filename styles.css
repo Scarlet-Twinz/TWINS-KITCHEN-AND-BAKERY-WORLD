@@ -179,3 +179,11 @@
 .servicegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.servicecard{min-height:250px;background:#fff;border:1px solid #ddd;border-radius:16px;padding:25px;display:flex;flex-direction:column}.serviceindex{font-size:10px;font-weight:900;letter-spacing:.12em;color:#d71920}.servicecard h2{margin:35px 0 10px}.servicecard p{flex:1}.servicecard a{font-weight:900;font-size:11px}.industrygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.industrycard{background:#fff;border:1px solid #ddd;border-radius:16px;overflow:hidden;display:grid;grid-template-columns:.9fr 1.1fr}.industryimage{min-height:280px}.industryimage img{width:100%;height:100%;object-fit:cover}.industrycard>div:last-child{padding:26px}.industrycard h2{font-size:30px;margin:10px 0}.legal{max-width:850px}.legal h2{margin:35px 0 10px}.legal h2:first-child{margin-top:0}.legal p{color:#555;line-height:1.8}.legal a{color:#d71920;font-weight:800}
 @media(max-width:900px){.servicegrid{grid-template-columns:1fr 1fr}.industrygrid{grid-template-columns:1fr}}
 @media(max-width:600px){.servicegrid{grid-template-columns:1fr}.industrycard{grid-template-columns:1fr}.industryimage{min-height:210px}}
+
+
+/* Production accessibility polish */
+:focus-visible{outline:3px solid #d71920;outline-offset:3px;border-radius:5px}
+button,.btn,a,input,select,textarea{touch-action:manipulation}
+button:disabled,.btn.disabled{opacity:.55;cursor:not-allowed}
+img{max-width:100%}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
