@@ -71,13 +71,25 @@ function mediaCandidateFor(p){
  }
  return {src:"",status:"pending",source:"product photo verification required"};
 }
-function finalMediaFor(p){
- var candidate=mediaCandidateFor(p);
- if(!candidate.src)return candidate;
- var duplicate=P.some(function(other){
-   return other&&other.id<p.id&&mediaCandidateFor(other).src===candidate.src;
+var __twinsFinalMediaById=null;
+function buildFinalMediaMap(){
+ if(__twinsFinalMediaById)return __twinsFinalMediaById;
+ __twinsFinalMediaById={};
+ var seen={};
+ P.forEach(function(p){
+   var candidate=mediaCandidateFor(p);
+   if(candidate.src&&seen[candidate.src]){
+     __twinsFinalMediaById[p.id]={src:"",status:"pending",source:"duplicate media blocked; product photo verification required"};
+     return;
+   }
+   if(candidate.src)seen[candidate.src]=true;
+   __twinsFinalMediaById[p.id]=candidate;
  });
- return duplicate?{src:"",status:"pending",source:"duplicate media blocked; product photo verification required"}:candidate;
+ return __twinsFinalMediaById;
+}
+function finalMediaFor(p){
+ if(!p)return {src:"",status:"pending",source:"product photo verification required"};
+ return buildFinalMediaMap()[p.id]||{src:"",status:"pending",source:"product photo verification required"};
 }
 function productMedia(p){return finalMediaFor(p)}
 function mediaPlaceholder(p){return "assets/media/twins-product-photo-pending.svg"}
