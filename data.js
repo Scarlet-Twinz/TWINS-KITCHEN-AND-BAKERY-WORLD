@@ -62,6 +62,23 @@ const B=[
 ["Bar / Lounge","Beverage · ice · chilling · service","Bar & Beverage","Cold Storage","Restaurant & Hotel","Serving Equipment"],
 ["Café","Coffee · pastry · refrigeration · front of house","Bar & Beverage","Bakery Equipment","Cold Storage","Restaurant & Hotel"]
 ];
+const SERVICE_ITEMS=[
+["Equipment discovery","Browse by equipment area, business type or specific product and build a shortlist before you contact Twins."],
+["Business planning","Use the business planner and project brief to describe the operation, capacity, space and utilities that matter to your equipment choices."],
+["Quotation preparation","Turn a cart, package or project brief into a structured quotation request instead of sending an unstructured shopping message."],
+["Technical discussion","For larger equipment, confirm dimensions, capacity, fuel or electrical requirements, access, ventilation and other installation considerations before purchase."],
+["Delivery discussion","Delivery and collection requirements depend on the equipment and destination. Include the location early so the logistics conversation is specific."],
+["After-sales conversation","For warranty, service, spare-parts or replacement questions, contact Twins with the product details and any model information available."]
+];
+const INDUSTRY_ITEMS=[
+["Restaurants & QSR","Cooking lines, refrigeration, preparation, holding and service equipment organised around menu throughput.","Restaurant"],
+["Bakeries","Mixing, proofing, baking, cooling, display and storage for bakery production.","Bakery"],
+["Hotels & hospitality","Kitchen, breakfast, beverage, cold storage, guest-facing furniture and service equipment.","Hotel"],
+["Catering & events","Mobile preparation, cooking, holding, transport and service equipment for event operations.","Catering Business"],
+["Bars & lounges","Beverage preparation, chilling, ice, coffee and service equipment.","Bar / Lounge"],
+["Cafés","Coffee, pastry, refrigeration and front-of-house equipment for compact service environments.","Café"]
+];
+
 const KITCHEN_PACKAGES=[
 {id:"restaurant-starter",name:"Restaurant Starter Kitchen",type:"Restaurant",size:"Starter operation",intro:"A planning bundle for a restaurant that needs the core cooking, preparation, storage and service workflow.",ids:[1,4,5,9,14,15],note:"Demo planning package — confirm exact equipment, dimensions, fuel/power and current pricing with Twins."},
 {id:"bakery-production",name:"Bakery Production Setup",type:"Bakery",size:"Production-focused",intro:"A bakery workflow built around mixing, baking, proofing, cold storage and customer-facing display.",ids:[2,3,5,6,10,18],note:"Demo planning package — final bakery setup should be sized around production volume and available space."},
