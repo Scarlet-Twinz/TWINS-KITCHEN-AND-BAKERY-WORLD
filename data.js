@@ -694,7 +694,7 @@ P.push(
 {id:520,n:"12 Head Bottle Filling Machine",c:"Water Treatment & Pure Water",p:null,i:"",tag:"Bottling",desc:"Multi-head bottle filling machine for water and other free-flowing liquids in small and medium bottling operations.",spec:"12 filling heads · 1000–2000 bottles/hour · 1.5 kW"},
 {id:521,n:"Sure Pure Water Packaging Machine",c:"Water Treatment & Pure Water",p:null,i:"",tag:"Pure Water",desc:"Automatic sachet-water packaging machine for filling, sealing and cutting pure-water sachets.",spec:"S-AS1000 · up to 2500 sachets/hour · 200–500ml · UV steriliser"},
 {id:522,n:"Complete Pure Water Production Machines",c:"Water Treatment & Pure Water",p:null,i:"",tag:"Complete Setup",desc:"Complete pure-water production package with filtration, UV sterilisation, pumps, micro-filter housings and testing equipment.",spec:"Pure water machine · filtration · UV · pumps · testing kit"}
-];
+);
 const PRODUCT_DETAIL_DEFAULTS={
 "Cooking Equipment":{material:"Stainless steel / model dependent",capacity:"Confirm exact model capacity",utility:"Confirm gas or electrical requirement",dimensions:"Confirm exact model dimensions",installation:"Confirm ventilation, gas/electrical and clearance requirements"},
 "Bakery Equipment":{material:"Food-service construction / model dependent",capacity:"Confirm production capacity",utility:"Confirm electrical requirement",dimensions:"Confirm exact model dimensions",installation:"Confirm power, clearance and workflow requirements"},
