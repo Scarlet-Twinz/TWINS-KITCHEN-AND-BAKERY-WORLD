@@ -163,6 +163,6 @@ function enhanceMedia(){
  }
 }
 document.addEventListener("DOMContentLoaded",function(){
- injectStoreEnhancements();renderHomeShelf();enhanceProduct();enhanceMedia();
+ if(document.getElementById("products")&&typeof phaseProducts==="function"){window.cards=cards5;phaseProducts();} injectStoreEnhancements();renderHomeShelf();enhanceProduct();enhanceMedia();
 });
 })();
