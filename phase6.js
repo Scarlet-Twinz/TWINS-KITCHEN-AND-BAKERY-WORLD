@@ -117,7 +117,7 @@ function expandCatalogue(){
      var name=variant+" "+base;
      if(P.some(function(p){return p.n===name}))name=name+" "+(catIndex+1);
      var id=next++;
-     var mediaIndex=(id+catIndex)%WEB_REFERENCE_MEDIA.length;
+     var mediaIndex=-1;
      var businesses=BUSINESS_LABELS.filter(function(b){return BUSINESS_MAP[b].indexOf(cat)>-1}).slice(0,5);
      P.push({
        id:id,n:name,c:cat,p:null,i:"",
@@ -128,8 +128,7 @@ function expandCatalogue(){
        businesses:businesses,use:businesses.slice(0,3).join(", "),
        condition:"New reference",
        availability:"Stock to confirm",
-       source:"Web research reference image",
-       media:{images:[WEB_REFERENCE_MEDIA[mediaIndex]],video:"",source:"Web research reference image"}
+       source:"Product photo verification required"
      });
      created++;
    });
