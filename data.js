@@ -57,7 +57,7 @@ const CATALOG_MEDIA_OVERRIDES={
   "commercial chest freezer":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=",
   "stainless wall shelf":"https://cdnimg.webstaurantstore.com/images/products/large/91751/3087559.jpg",
   "stainless chafing dish set":"https://m.media-amazon.com/images/I/71uJFsr6msL.jpg",
-  "bakery dough sheeter":"https://image.made-in-china.com/2f0j00SpkoQgvdEBbL/650mm-Commercial-Kitchen-Equipment-Full-Stainless-Steel-Pastry-Dough-Sheeter-for-Bakery.webp"
+  "bakery dough sheeter":"https://image.made-in-china.com/2f0j00SpkoQgvdEBbL/650mm-Commercial-Kitchen-Equipment-Full-Stainless-Steel-Pastry-Dough-Sheeter-for-Bakery.webp",
   "10-tray commercial convection oven":"https://www.rmachinery.com/wp-content/uploads/2019/11/convection-oven-1-3.jpg",
   "three-deck electric bakery oven":"https://image.made-in-china.com/202f0j00lsPYgiHWYaoF/Low-Price-Baking-Equipment-Automatic-Electric-Oven-with-Stainless-Steel.jpg",
   "rotary bakery oven":"https://www.fornifiorini.com/templates/yootheme/cache/be/forno-rotativo-rotor-bee36f2f.jpeg",
