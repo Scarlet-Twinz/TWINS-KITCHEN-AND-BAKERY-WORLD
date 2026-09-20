@@ -86,3 +86,27 @@ Business:
 Alaba International Market, Nigeria  
 **08033231712**  
 Open 24 hours
+
+
+## Architecture status
+
+The project now separates the static storefront from the planned production backend boundary.
+
+### Storefront
+- Data-driven catalogue in data.js
+- Shared rendering and interaction layer in app.js
+- Global responsive styling in styles.css
+- Real supplied Twins media under assets/media/
+- Quote-first catalogue pricing: current price is requested rather than hardcoded
+- Local browser workspace for cart, saved lists, project plans and quote drafts
+- Responsive navigation with equipment-area and business discovery menus
+- Runtime metadata, canonical URLs and LocalBusiness structured data
+- robots.txt, sitemap.xml and a static-site GitHub Actions validation workflow
+
+### Operations / admin
+- admin.html provides a non-public front-end operations workspace shell
+- Production admin authorization is intentionally not faked in the browser
+- backend/ contains the API, security, schema and migration contract
+
+### Backend boundary
+See backend/README.md, backend/openapi.yaml and backend/schema.sql. The backend is deliberately not claimed as deployed yet; it is the implementation contract for the next stage.
