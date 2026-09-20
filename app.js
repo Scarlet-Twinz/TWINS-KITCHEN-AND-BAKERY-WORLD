@@ -41,12 +41,22 @@ var FINAL_CATEGORY_MEDIA={
 "Kitchen Equipment":["https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"]
 };
 function finalMediaFor(p){
-var name=String(p.n||"");
-for(var i=0;i<FINAL_MEDIA_RULES.length;i++){if(FINAL_MEDIA_RULES[i][0].test(name))return {src:FINAL_MEDIA_RULES[i][1],status:"reference",source:"web product reference"}}
-var pool=FINAL_CATEGORY_MEDIA[p.c]||[];
-if(pool.length){var hash=0;for(var j=0;j<name.length;j++)hash=(hash*31+name.charCodeAt(j))>>>0;return {src:pool[hash%pool.length],status:"reference",source:"category reference pool"}}
-if(p.media&&p.media.images&&p.media.images.length)return {src:p.media.images[0],status:"reference",source:p.media.source||"catalogue reference"};
-return {src:"assets/media/twins-commercial-equipment-showroom-02.jpg",status:"reference",source:"Twins visual fallback"};
+ var name=String(p.n||"").toLowerCase();
+ var overrideKey=Object.keys(CATALOG_MEDIA_OVERRIDES||{}).find(function(k){return name.indexOf(k)>-1});
+ if(overrideKey)return {src:CATALOG_MEDIA_OVERRIDES[overrideKey],status:"reference",source:"verified product reference",sourceKey:overrideKey};
+ if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
+   return {src:p.media.images[0],status:"twins",source:p.media.source};
+ }
+ if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("verified product reference")===0){
+   return {src:p.media.images[0],status:"reference",source:p.media.source};
+ }
+ if(p.i&&p.source&&p.source!=="Web research reference image"){
+   return {src:p.i,status:"reference",source:p.source||"catalogue reference"};
+ }
+ if(p.i&&(!p.source||p.source==="")){
+   return {src:p.i,status:"reference",source:"catalogue reference"};
+ }
+ return {src:"",status:"pending",source:"product photo verification required"};
 }
 function productMedia(p){return finalMediaFor(p)}
 function mediaPlaceholder(p){return "assets/media/twins-commercial-equipment-showroom-02.jpg"}
