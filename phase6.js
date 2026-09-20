@@ -245,7 +245,11 @@ function recommendations6(){
  var id=Number(new URLSearchParams(location.search).get("id")),p=P.find(function(x){return x.id===id});if(!p)return;
  view(id);
  setTimeout(function(){
-   if(root.dataset.p6rec==="1")return;root.dataset.p6rec="1";
+   if(root.dataset.p6rec==="1")return;
+   var mainImg=root.querySelector("#p3main"),mainFlag=root.querySelector(".p3media .mediaflag");
+   if(mainImg&&typeof phase5Media==="function"){
+     var vm=phase5Media(p); if(vm&&vm.src){mainImg.src=vm.src;mainImg.alt=p.n+" reference image";if(mainFlag){mainFlag.textContent="REFERENCE IMAGE";mainFlag.classList.remove("pending");}}
+   }root.dataset.p6rec="1";
    var cats=BUSINESS_LABELS.filter(function(b){return (p.businesses||[]).indexOf(b)>-1}).concat([p.c]);
    var related=P.filter(function(x){return x.id!==p.id&&(x.c===p.c||cats.some(function(b){return BUSINESS_MAP[b]&&BUSINESS_MAP[b].indexOf(x.c)>-1}))}).slice(0,8);
    if(!related.length)return;
@@ -311,6 +315,7 @@ document.addEventListener("DOMContentLoaded",function(){
    else if(page==="bundles.html")packages6();
    else if(page==="marketplace.html")marketplace6();
    else if(page==="product.html")recommendations6();
+   nav6();
  }catch(e){console.error("Twins Phase 6 error",e)}
 });
 })();
