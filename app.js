@@ -40,10 +40,20 @@ var FINAL_CATEGORY_MEDIA={
 "Catering Supplies":["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
 "Kitchen Equipment":["https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"]
 };
+var __twinsOverrideById=null;
+function buildOverrideMap(){
+ if(__twinsOverrideById)return __twinsOverrideById;
+ __twinsOverrideById={};
+ Object.keys(CATALOG_MEDIA_OVERRIDES||{}).forEach(function(k){
+   var key=String(k).toLowerCase();
+   var p=P.find(function(x){return String(x.n||"").toLowerCase().indexOf(key)>-1});
+   if(p&&__twinsOverrideById[p.id]===undefined)__twinsOverrideById[p.id]=CATALOG_MEDIA_OVERRIDES[k];
+ });
+ return __twinsOverrideById;
+}
 function mediaCandidateFor(p){
- var name=String(p.n||"").toLowerCase();
- var overrideKey=Object.keys(CATALOG_MEDIA_OVERRIDES||{}).filter(function(k){return name.indexOf(k)>-1}).sort(function(a,b){return b.length-a.length})[0];
- if(overrideKey)return {src:CATALOG_MEDIA_OVERRIDES[overrideKey],status:"reference",source:"verified product reference",sourceKey:overrideKey};
+ var overrides=buildOverrideMap(),override=overrides[p.id];
+ if(override)return {src:override,status:"reference",source:"verified product reference",sourceKey:String(p.n||"")};
  if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
    return {src:p.media.images[0],status:"twins",source:p.media.source};
  }
