@@ -1,6 +1,6 @@
 var page=location.pathname.split('/').pop()||'index.html';
 function money(n){return '₦'+Number(n).toLocaleString('en-NG')}
-function whatsappUrl(text){return SITE_CONFIG.whatsappUrl+(text?'?text='+encodeURIComponent(text):'')}
+function whatsappUrl(text){return SITE_CONFIG.whatsappUrl+(text?'?text='+encodeURIComponent(text):'')}function apiBase(){return String(SITE_CONFIG.apiBase||'').replace(/\/$/,'')}function isNetworkError(e){return !e||!e.status}async function apiRequest(path,options){var base=apiBase();if(!base)throw new Error('API not configured');var opts=Object.assign({credentials:'include',headers:{'Content-Type':'application/json'}},options||{});var r=await fetch(base+path,opts);var data={};try{data=await r.json()}catch(e){}if(!r.ok){var err=new Error(data.detail||'Request failed');err.status=r.status;throw err}return data}
 function applySeo(){var map={
 'index.html':['Twins Kitchen & Bakery World | Commercial Kitchen & Bakery Equipment','Commercial kitchen, bakery, restaurant, hotel, catering and hospitality equipment from Twins Kitchen & Bakery World in Alaba, Nigeria.'],
 'products.html':['Commercial Equipment Store | Twins Kitchen & Bakery World','Browse commercial cooking, bakery, food preparation, cold storage, serving, catering and hospitality equipment.'],
@@ -172,13 +172,14 @@ return {reference:'TW-'+new Date().getFullYear()+'-'+Math.random().toString(36).
 function quoteMessage(q){
 return 'Hello Twins Kitchen & Bakery World. I would like a quotation.\n\nReference: '+q.reference+'\nName: '+q.name+'\nPhone: '+q.phone+'\nEmail: '+(q.email||'Not provided')+'\nBusiness: '+q.business+'\nProject stage: '+q.stage+'\nLocation: '+q.location+'\nCapacity / output: '+q.capacity+'\nAvailable space: '+q.space+'\nPower / fuel / water: '+q.utilities+'\nRequirements: '+q.requirements+'\nPackage: '+(q.packageName||'None')+'\nEquipment: '+(q.items.map(function(x){return x.name+' x'+x.quantity}).join(', ')||'No selected products')+'\n\nPlease confirm current price, availability, specifications, delivery and installation requirements.';
 }
-function prepareQuote(){
+async function prepareQuote(){
 var q=buildQuotePayload();
 if(!q.business&&!q.requirements&&!q.items.length){toast('Add a business type, requirement or equipment list');return null}
-var requests=get('twins_quote_requests',[]);requests.unshift(q);put('twins_quote_requests',requests.slice(0,20));return q;
+try{var remote=await apiRequest('/api/quotes',{method:'POST',body:JSON.stringify(q)});q=Object.assign(q,remote.quote||remote);q.remote=true}catch(e){if(!isNetworkError(e)){toast(e.message||'Could not prepare the quotation request');return null}var requests=get('twins_quote_requests',[]);requests.unshift(q);put('twins_quote_requests',requests.slice(0,20));q.remote=false}
+return q;
 }
-function sendQuoteEmail(){var q=prepareQuote();if(!q)return;location.href=emailUrl('Quotation request — '+(q.business||'Equipment enquiry'),quoteMessage(q))}
-function sendQuote(e){e.preventDefault();var q=prepareQuote();if(!q)return;toast('Request '+q.reference+' prepared');setTimeout(function(){location.href=whatsappUrl(quoteMessage(q))},250)}
+async function sendQuoteEmail(){var q=await prepareQuote();if(!q)return;location.href=emailUrl('Quotation request — '+(q.business||'Equipment enquiry'),quoteMessage(q))}
+async function sendQuote(e){e.preventDefault();var q=await prepareQuote();if(!q)return;toast('Request '+q.reference+' prepared');setTimeout(function(){location.href=whatsappUrl(quoteMessage(q))},250)}
 function dashboard(){
 var u=get('twins_user',null);if(!u){location.href='login.html';return}
 var c=cart().reduce(function(a,x){return a+x.q},0),sv=saved().length,v=viewed().slice(0,4).map(function(id){return P.find(function(p){return p.id==id})}).filter(Boolean),plan=get('twins_business_plan',null),project=get('twins_project_plan',null),cmp=compare().length,lists=savedLists(),quotes=get('twins_quote_requests',[]);
@@ -206,19 +207,18 @@ if(!email||!pass){toast('Enter your email and password');return}
 if(signup){
 var pass2=document.getElementById('pass2').value||'';
 if(!name.trim()){toast('Enter your name');return}
-if(pass.length<6){toast('Use at least 6 characters');return}
+if(pass.length<8){toast('Use at least 8 characters');return}
 if(pass!==pass2){toast('Passwords do not match');return}
-var passwordHash=await hashPassword(pass);
-put('twins_user',{name:name.trim(),email:email});
-put('twins_demo_auth',{email:email,passwordHash:passwordHash});
-location.href='dashboard.html';
+try{var remote=await apiRequest('/api/auth/signup',{method:'POST',body:JSON.stringify({name:name.trim(),email:email,password:pass})});put('twins_user',{id:remote.user.id,name:remote.user.name,email:remote.user.email,remote:true,role:remote.user.role});localStorage.removeItem('twins_demo_auth');location.href='dashboard.html';return}catch(e){if(!isNetworkError(e)){toast(e.message||'Account creation failed');return}}
+var passwordHash=await hashPassword(pass);put('twins_user',{name:name.trim(),email:email,remote:false});put('twins_demo_auth',{email:email,passwordHash:passwordHash});location.href='dashboard.html';
 }else{
+try{var remote=await apiRequest('/api/auth/login',{method:'POST',body:JSON.stringify({email:email,password:pass})});put('twins_user',{id:remote.user.id,name:remote.user.name,email:remote.user.email,remote:true,role:remote.user.role});localStorage.removeItem('twins_demo_auth');location.href='dashboard.html';return}catch(e){if(!isNetworkError(e)){toast(e.message||'Sign in failed');return}}
 var savedUser=get('twins_user',null),demo=get('twins_demo_auth',null),passwordHash=await hashPassword(pass);
 if(savedUser&&savedUser.email===email&&demo&&demo.passwordHash===passwordHash){location.href='dashboard.html';return}
-toast('No matching demo account found. Create an account first.');
+toast('Backend unavailable. Create a local demo account first.');
 }
 }
-function logout(){localStorage.removeItem('twins_user');localStorage.removeItem('twins_demo_auth');location.href='index.html'}
+async function logout(){try{if(get('twins_user',null)?.remote)await apiRequest('/api/auth/logout',{method:'POST'})}catch(e){}localStorage.removeItem('twins_user');localStorage.removeItem('twins_demo_auth');location.href='index.html'}
 function guides(){document.getElementById('guides').innerHTML=head()+'<section class="page"><div class="wrap"><span class="eyebrow darkey">TWINS BUYING DESK</span><h1>Buying guides & planning resources</h1><p class="muted">Practical information to help you ask better questions before committing to commercial equipment.</p></div></section><section class="section"><div class="wrap guidegrid">'+BUYING_GUIDES.map(function(g,i){return '<article class="guidecard"><span class="eyebrow darkey">'+g[2]+' · 0'+(i+1)+'</span><h2>'+g[0]+'</h2><p>'+g[1]+'</p><a href="'+g[3]+'">Use this in your planning →</a></article>'}).join('')+'</div></section><section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">IMPORTANT</span><h2>Verify the exact equipment before purchase.</h2><p class="muted">Commercial equipment can differ by model in dimensions, utilities, capacity and installation requirements.</p></div><a class="btn red" href="quote.html">Start an equipment request →</a></div></div></section>'+foot()+'<div id="toast"></div>'}
 function resources(){document.getElementById('resources').innerHTML=head()+'<section class="page resourcehero"><div class="wrap"><span class="eyebrow darkey">TWINS RESOURCE CENTRE</span><h1>Plan the operation before you buy the equipment.</h1><p class="muted">A central place for buying guides, setup planning, quotation preparation and practical equipment information.</p></div></section><section class="section"><div class="wrap"><div class="resourcegrid">'+RESOURCE_CARDS.map(function(x,i){return '<a class="resourcecard" href="'+x[2]+'"><span class="eyebrow darkey">0'+(i+1)+'</span><h2>'+x[0]+'</h2><p>'+x[1]+'</p><b>'+x[3]+'</b></a>'}).join('')+'</div></div></section><section class="section soft"><div class="wrap"><div class="resourcefeature"><div><span class="eyebrow darkey">EQUIPMENT PLANNING</span><h2>Commercial equipment is a system, not a pile of machines.</h2><p class="muted">Start with what the business needs to prepare, cook, bake, chill, store, serve and move. Then narrow down the equipment.</p><div class="resourcechecks"><span>01 · Business type</span><span>02 · Workflow</span><span>03 · Capacity</span><span>04 · Space</span><span>05 · Utilities</span><span>06 · Delivery</span></div></div><img src="assets/media/twins-commercial-equipment-showroom-02.jpg" alt="Commercial kitchen planning"></div></div></section>'+foot()+'<div id="toast"></div>'}
 function showroom(){
