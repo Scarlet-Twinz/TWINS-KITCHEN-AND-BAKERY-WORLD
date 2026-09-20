@@ -103,7 +103,7 @@ function mediaFor6(p,index){
  return {src:"",status:"pending",source:"product photo verification required"};
 }
 
-/* Scale the catalogue from the existing dataset to 1,075 structured references.
+/* Scale the catalogue from the existing 530-item dataset to 1,030 structured references.
    The current data.js catalogue may already contain IDs above 500, so generated IDs
    must begin after the highest existing ID to prevent collisions.
    Every generated entry is clearly marked as a catalogue/reference item and does not claim stock. */
