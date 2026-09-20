@@ -143,3 +143,23 @@
 .realbadge{position:absolute;left:10px;bottom:10px;background:#d71920;color:#fff;border-radius:999px;padding:6px 8px;font-size:8px;font-weight:900;letter-spacing:.08em;z-index:2}.realmediahead{display:flex;justify-content:space-between;gap:25px;align-items:end;margin-bottom:22px}.realmediahead h2{font-size:34px;margin:8px 0}.realmediahead p{max-width:700px}.realmediagrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.realmediacard{display:block;background:#fff;border:1px solid #ddd;border-radius:16px;overflow:hidden;transition:.2s}.realmediacard:hover{transform:translateY(-3px);border-color:#d71920;box-shadow:0 14px 30px #0000000c}.realmediaimage{height:190px;background:#111;overflow:hidden}.realmediaimage img,.realmediaimage video{width:100%;height:100%;display:block;object-fit:cover}.realmediacard>div:last-child{padding:15px}.realmediacard small,.realmediacard b,.realmediacard span{display:block}.realmediacard small{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#999;font-weight:900}.realmediacard b{font-size:12px;margin:6px 0;line-height:1.35}.realmediacard span{font-size:9px;color:#d71920;font-weight:900}@media(max-width:900px){.realmediagrid{grid-template-columns:repeat(2,1fr)}.realmediahead{align-items:start}}@media(max-width:560px){.realmediahead{display:block}.realmediahead h2{font-size:29px}.realmediahead .textlink{display:inline-block;margin-top:8px}.realmediagrid{grid-template-columns:1fr 1fr}.realmediaimage{height:150px}}
 
 @media(max-width:800px){.mediafilters{grid-template-columns:1fr 1fr}.mediaresultcount{grid-column:1/-1}}@media(max-width:560px){.mediafilters{grid-template-columns:1fr}.mediaresultcount{grid-column:auto}}
+
+/* Phase 1–4 storefront polish */
+.mainphoto{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.mainphoto img{width:100%;height:100%;object-fit:contain}
+.galleryarrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:28px;line-height:1;cursor:pointer}
+.galleryarrow.prev{left:12px}.galleryarrow.next{right:12px}
+.gallerymeta{display:flex;justify-content:space-between;gap:12px;margin:10px 0 4px}
+.thumbs{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 4px}
+.thumbs button{flex:0 0 72px;width:72px;height:72px;padding:0;border:2px solid transparent;background:#fff;border-radius:10px;overflow:hidden;cursor:pointer}
+.thumbs button.active{border-color:#d71920}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.categorymediahead{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:22px}
+.categorymediagrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.categorymediacard{background:#fff;border:1px solid #e9e9e9;border-radius:14px;overflow:hidden;display:block}
+.categorymediacard>div{aspect-ratio:4/3;background:#f4f4f4;overflow:hidden}
+.categorymediacard img,.categorymediacard video{width:100%;height:100%;object-fit:cover;display:block}
+.categorymediacard b,.categorymediacard small{display:block;padding:0 14px}
+.categorymediacard b{padding-top:13px}.categorymediacard small{padding-bottom:14px;color:#777}
+@media(max-width:800px){.categorymediagrid{grid-template-columns:repeat(2,1fr)}.categorymediahead{align-items:start;flex-direction:column}.gallerymeta{flex-direction:column;gap:4px}}
+@media(max-width:520px){.categorymediagrid{grid-template-columns:1fr}.thumbs button{flex-basis:62px;width:62px;height:62px}}
