@@ -40,6 +40,9 @@ var FINAL_CATEGORY_MEDIA={
 "Catering Supplies":["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
 "Kitchen Equipment":["https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"]
 };
+/* Phase Six strict media gate: these supplied/local mappings were audited as visually mismatched to their product titles.
+   They must remain pending until an exact product photo is sourced; never silently reuse a nearby product image. */
+var PHASE_SIX_MEDIA_BLOCKLIST={54:"One-Bag Bakery Oven is not represented by the supplied deck-oven stack image.",76:"Commercial Chest Freezer - Large is not represented by the supplied ice-cream-machine image.",77:"Commercial Undercounter Refrigerator is not represented by the supplied refrigerated-display-case image.",86:"Stainless Wall Shelf - 4ft is not represented by the supplied retail-shelf image.",88:"Heavy-Duty 4-Tier Storage Rack is not represented by the supplied retail-shelf image."};
 var __twinsOverrideById=null;
 function buildOverrideMap(){
  if(__twinsOverrideById)return __twinsOverrideById;
@@ -55,6 +58,7 @@ function buildOverrideMap(){
  return __twinsOverrideById;
 }
 function mediaCandidateFor(p){
+ if(PHASE_SIX_MEDIA_BLOCKLIST[p.id])return {src:"",status:"pending",source:"strict media audit blocked mismatched supplied image"};
  var overrides=buildOverrideMap(),override=overrides[p.id];
  if(override)return {src:override,status:"reference",source:"verified product reference",sourceKey:String(p.n||"")};
  if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
