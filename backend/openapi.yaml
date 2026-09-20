@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Twins Kitchen & Bakery World API
+  version: 0.1.0
+  description: Production API contract for the static storefront migration.
+servers:
+  - url: https://api.example.com
+paths:
+  /api/catalogue:
+    get:
+      summary: List active catalogue products
+      responses:
+        '200':
+          description: Product collection
+  /api/products/{id}:
+    get:
+      summary: Get a product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Product }
+        '404': { description: Product not found }
+  /api/auth/signup:
+    post:
+      summary: Create a customer account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthPayload'
+      responses:
+        '201': { description: Account created }
+        '409': { description: Account already exists }
+  /api/auth/login:
+    post:
+      summary: Authenticate a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthPayload'
+      responses:
+        '200': { description: Authenticated session }
+        '401': { description: Invalid credentials }
+  /api/quotes:
+    post:
+      summary: Create a quote request
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quote'
+      responses:
+        '201': { description: Quote created }
+        '400': { description: Invalid request }
+  /api/quotes/me:
+    get:
+      summary: List the current user's quote requests
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Quote collection }
+  /api/admin/products:
+    patch:
+      summary: Update catalogue data
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Updated product }
+        '403': { description: Admin access required }
+  /api/admin/quotes/{id}:
+    patch:
+      summary: Update quote status
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Updated quote }
+        '403': { description: Admin access required }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: twins_session
+  schemas:
+    AuthPayload:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    Quote:
+      type: object
+      required: [name, phone]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        business: { type: string }
+        projectStage: { type: string }
+        location: { type: string }
+        capacity: { type: string }
+        requirements: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [productId, quantity]
+            properties:
+              productId: { type: string }
+              quantity: { type: integer, minimum: 1 }
