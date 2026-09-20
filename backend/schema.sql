@@ -3,6 +3,7 @@
 
 create table users (
   id uuid primary key,
+  name text not null,
   email text unique not null,
   phone text,
   password_hash text not null,
@@ -57,6 +58,7 @@ create table quotes (
   space text,
   utilities text,
   requirements text,
+  package_name text,
   status text not null default 'Draft' check (status in ('Draft','Prepared','Sent to Twins','In review','Quoted','Closed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -97,3 +99,4 @@ create table audit_logs (
 create index if not exists idx_quotes_user_created on quotes(user_id, created_at desc);
 create index if not exists idx_quote_items_quote on quote_items(quote_id);
 create index if not exists idx_products_active on products(active);
+create index if not exists idx_quotes_status_created on quotes(status, created_at desc);
