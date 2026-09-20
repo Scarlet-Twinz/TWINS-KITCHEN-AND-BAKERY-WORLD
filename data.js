@@ -141,3 +141,21 @@ const MEDIA_LIBRARY=[
 {id:"prep-food",type:"image",title:"Food preparation workflow",category:"Food Preparation",src:"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1800&q=90",alt:"Food preparation"}
 ];
 const PROJECT_STAGES=["Idea / research","Site preparation","Equipment selection","Quotation stage","Ready to purchase","Replacing equipment"];
+
+const QUOTE_STATUSES=["Draft","Prepared","Sent to Twins"];
+const BUYING_GUIDES=[
+["Restaurant equipment checklist","Map cooking, preparation, refrigeration, holding, service and storage before choosing individual machines.","Restaurant","build-your-business.html?type=Restaurant"],
+["Bakery equipment planning","Think through mixing, proofing, baking, cooling, display and storage. Production volume and available space should shape the equipment list.","Bakery","build-your-business.html?type=Bakery"],
+["Commercial equipment specification checklist","Confirm dimensions, capacity, voltage or fuel, water/drain requirements where applicable, installation needs and delivery access.","Buying","quote.html"],
+["How to build an equipment request","A useful enquiry includes business type, location, expected capacity, equipment list, timing and known utility constraints.","Buying","quote.html"],
+["Choosing equipment by workflow","Map preparation, cooking, storage and service so equipment supports the full operating sequence.","Planning","build-your-business.html"],
+["Delivery and installation planning","Large equipment can involve special delivery, access and installation considerations. Confirm exact requirements before finalizing a purchase.","Buying","delivery.html"]
+];
+const RESOURCE_CARDS=[
+["Buying guides","Practical checklists for equipment selection, specification and project planning.","guides.html","Open buying guides →"],
+["Kitchen packages","Starting equipment maps for restaurants, bakeries, cafés, bars and catering operations.","bundles.html","Explore packages →"],
+["Business planner","Choose an operation and build a starting equipment path around its workflow.","build-your-business.html","Build a business plan →"],
+["Quotation desk","Send Twins one structured request with your business context and equipment list.","quote.html","Prepare a request →"],
+["Delivery planning","Information to confirm before moving large equipment into a location.","delivery.html","Read delivery notes →"],
+["Frequently asked questions","Quick answers about pricing, availability, enquiries and the current static storefront.","faq.html","Read FAQs →"]
+];
