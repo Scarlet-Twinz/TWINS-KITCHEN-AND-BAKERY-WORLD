@@ -62,3 +62,12 @@ Still required before treating the API as production-ready:
 - seed/synchronize the catalogue and supplied media into PostgreSQL
 - add server-side catalogue mutations, inventory, orders, payments and delivery records
 - add admin quote status mutation and audit-log UI
+
+
+## First staff/admin account
+
+After PostgreSQL is configured, create an admin without putting the password in source control:
+
+`python create_admin.py "Twins Admin" admin@example.com "use-a-real-password"`
+
+Run this from the `backend/` directory with `DATABASE_URL` set. The script creates the account if it does not exist or promotes an existing account to the `admin` role.
