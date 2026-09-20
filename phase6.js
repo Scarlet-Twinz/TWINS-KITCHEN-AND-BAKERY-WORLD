@@ -174,7 +174,7 @@ function card6(p){
  var src=esc6(m.src||"assets/media/twins-product-photo-pending.svg");
  return '<article class="prod p6card">'+
   '<div class="prodimg"><a href="product.html?id='+p.id+'"><img loading="lazy" decoding="async" src="'+src+'" alt="'+esc6(p.n)+' reference image" onerror="this.onerror=null;this.src=\'assets/media/twins-commercial-equipment-showroom-02.jpg\'"></a>'+
-  '<span class="badge">'+esc6(p.tag||"Equipment")+'</span><span class="mediaflag">'+(m.status==="twins"?"TWINS MEDIA":"REFERENCE IMAGE")+'</span>'+
+  '<span class="badge">'+esc6(p.tag||"Equipment")+'</span><span class="mediaflag">'+(m.status==="twins"?"TWINS MEDIA":(m.status==="pending"?"PHOTO PENDING":"REFERENCE IMAGE"))+'</span>'+
   '<button class="icon save '+(savedNow?"active":"")+'" aria-label="Save '+esc6(p.n)+'" onclick="toggleSave('+p.id+');return false">♡</button></div>'+
   '<div class="prodbody"><small class="muted">'+esc6(p.c)+'</small><a href="product.html?id='+p.id+'"><h3>'+esc6(p.n)+'</h3></a>'+
   '<p class="desc">'+esc6(p.desc)+'</p><div class="p6tags"><span>Quote on request</span><span>'+esc6(p.availability||"Stock to confirm")+'</span></div>'+
