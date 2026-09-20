@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Twins Kitchen & Bakery World API
-  version: 0.1.0
+  version: 0.2.0
   description: Production API contract for the static storefront migration.
 servers:
   - url: https://api.example.com
@@ -12,17 +12,6 @@ paths:
       responses:
         '200':
           description: Product collection
-  /api/products/{id}:
-    get:
-      summary: Get a product
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string }
-      responses:
-        '200': { description: Product }
-        '404': { description: Product not found }
   /api/auth/signup:
     post:
       summary: Create a customer account
@@ -73,20 +62,13 @@ paths:
       security: [{ sessionCookie: [] }]
       responses:
         '200': { description: Quote collection }
-  /api/admin/products:
-    patch:
-      summary: Update catalogue data
+  /api/admin/quotes:
+    get:
+      summary: List recent quote requests for staff
       security: [{ sessionCookie: [] }]
       responses:
-        '200': { description: Updated product }
-        '403': { description: Admin access required }
-  /api/admin/quotes/{id}:
-    patch:
-      summary: Update quote status
-      security: [{ sessionCookie: [] }]
-      responses:
-        '200': { description: Updated quote }
-        '403': { description: Admin access required }
+        '200': { description: Quote collection }
+        '403': { description: Staff access required }
 components:
   securitySchemes:
     sessionCookie:
@@ -98,6 +80,7 @@ components:
       type: object
       required: [email, password]
       properties:
+        name: { type: string, minLength: 2 }
         email: { type: string, format: email }
         password: { type: string, minLength: 8 }
     Quote:
@@ -108,7 +91,8 @@ components:
         email: { type: string, format: email }
         phone: { type: string }
         business: { type: string }
-        projectStage: { type: string }
+        stage: { type: string }
+        packageName: { type: string }
         location: { type: string }
         capacity: { type: string }
         space: { type: string }
@@ -118,7 +102,7 @@ components:
           type: array
           items:
             type: object
-            required: [productId, quantity]
+            required: [id, quantity]
             properties:
-              productId: { type: string }
+              id: { type: integer }
               quantity: { type: integer, minimum: 1 }
