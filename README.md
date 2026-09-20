@@ -6,7 +6,7 @@ A commerce-style static storefront for **Twins Kitchen**, designed around profes
 
 - Large responsive storefront homepage
 - Searchable equipment catalogue
-- 280 structured catalogue products
+- 1,075 structured catalogue references (575 base records + 500 Phase 6 generated references)
 - Category discovery
 - Business-type equipment planner
 - Project planning brief with saved project context
@@ -78,7 +78,7 @@ The storefront does not need to be thrown away when that happens. The current UI
 
 ## Current demo data
 
-Product names and specifications are structured demonstration data until Twins confirms the exact commercial catalogue. Pricing is intentionally quote-first because market and supplier prices can change. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
+Product names and specifications are structured catalogue/reference data until Twins confirms the exact commercial catalogue. The storefront deliberately distinguishes verified/supplied media from items marked `PHOTO PENDING`. Pricing is intentionally quote-first because market and supplier prices can change. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
 
 Business:
 
