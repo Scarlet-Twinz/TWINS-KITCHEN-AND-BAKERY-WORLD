@@ -69,6 +69,15 @@ const CATALOG_MEDIA_OVERRIDES={
   "commercial dough divider":"https://image.made-in-china.com/202f0j00yJNiOLYFptcn/Commercial-Electric-Dough-Divider-Bakery-Equipment.webp",
   "45kg commercial ice maker":"https://media.bunnings.com.au/api/public/content/daa515912e5243c7bf25c1dbdfbdf46a?t=w100dpr1&v=f21b6a36",
   "commercial bread slicer":"https://image.made-in-china.com/155f0j00zLAGPpHIZFcN/Bakery-Equipment-31-Blades-Commercial-Bread-Slicer.webp",
+
+  "commercial convection oven":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_thumb-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&timestamp=1755658326000",
+  "stainless steel work table":"https://img.yfisher.com/m6454/1769604399100-kaesid-heavy-duty-stainless-steel-utility-table-1/png100-t3-scale100.webp",
+  "commercial upright refrigerator":"https://www.nextdaycatering.co.uk/377591-large_default/commercial-upright-refrigerator-600l-single-door-stainless-steel-cabinet-655x855x2090mm-stalwart-da-nord22.jpg",
+  "commercial stainless sink station":"https://cdnimg.webstaurantstore.com/images/products/large/114718/2899097.jpg",
+  "commercial shawarma grill":"https://system4.ua/images/product/product_32435_168969/600",
+  "commercial coffee machine":"https://canmac.co.uk/cdn/shop/files/MIA5_6-1200x1200_1024x1024.jpg?v=1756647383",
+  "commercial meat slicer":"https://www.walmart.com/ip/KWS-MS-12ES-Metal-Collection-Commercial-420W-Electric-Meat-Slicer-10-Inch-304-Stainless-Steel-Blade-Extended-Back-Space-Frozen-Meat-Cheese-Food-Slice/138006845",
+  "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg"
 };
 const PREMIUM_MEDIA_LIBRARY={
 "commercial 6-burner stainless range":"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1400&q=90",
