@@ -167,22 +167,34 @@ document.getElementById('dashboard').innerHTML='<div class="dash"><div class="da
 function auth(signup){
 var user=get('twins_user',null);
 if(!signup&&user){location.href='dashboard.html';return}
-document.getElementById('auth').innerHTML='<main class="auth"><div class="authbox"><div class="visual"><span class="eyebrow">TWINS KITCHEN & BAKERY WORLD</span><h1>'+(signup?'Start building your business.':'Welcome back.')+'</h1><p>Save equipment, compare products and build your buying list from one customer workspace.</p><div class="authbullets"><span>✓ Save equipment for later</span><span>✓ Compare products side by side</span><span>✓ Keep a business equipment plan</span><span>✓ Prepare quotation requests faster</span></div></div><div class="form"><a class="muted" href="index.html">← Back to store</a><h1>'+(signup?'Create your customer account':'Sign in to your workspace')+'</h1>'+(signup?'<div class="field"><label>Full name</label><input id="name" autocomplete="name" placeholder="Your name"></div>':'')+'<div class="field"><label>Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><input id="pass" type="password" autocomplete="'+(signup?'new-password':'current-password')+'" placeholder="Password"></div>'+(signup?'<div class="field"><label>Confirm password</label><input id="pass2" type="password" autocomplete="new-password" placeholder="Repeat password"></div>':'')+'<button class="btn red full" onclick="submitAuth('+(signup?'true':'false')+')">'+(signup?'Create account':'Sign in')+' →</button><p class="muted">'+(signup?'Already have an account? ':'New to Twins? ')+'<a class="redtext" href="'+(signup?'login.html':'signup.html')+'">'+(signup?'Sign in':'Create an account')+'</a></p><p class="tiny muted">Demo mode: this static storefront stores the demo account only in this browser. Real authentication will be connected when the backend is added.</p></div></div></main>'}
-function submitAuth(signup){
-var email=(document.getElementById('email').value||'').trim(),pass=document.getElementById('pass').value||'',name=(document.getElementById('name')||{}).value||'Customer';
+document.getElementById('auth').innerHTML='<main class="auth"><div class="authbox"><div class="visual"><span class="eyebrow">TWINS KITCHEN & BAKERY WORLD</span><h1>'+(signup?'Start building your business.':'Welcome back.')+'</h1><p>Save equipment, compare products and build your buying list from one customer workspace.</p><div class="authbullets"><span>✓ Save equipment for later</span><span>✓ Compare products side by side</span><span>✓ Keep a business equipment plan</span><span>✓ Prepare quotation requests faster</span></div></div><div class="form"><a class="muted" href="index.html">← Back to store</a><h1>'+(signup?'Create your customer account':'Sign in to your workspace')+'</h1>'+(signup?'<div class="field"><label>Full name</label><input id="name" autocomplete="name" placeholder="Your name"></div>':'')+'<div class="field"><label>Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><div class="passwordrow"><input id="pass" type="password" autocomplete="'+(signup?'new-password':'current-password')+'" placeholder="Password"><button type="button" class="passwordtoggle" onclick="togglePassword(\'pass\',this)">Show</button></div></div>'+(signup?'<div class="field"><label>Confirm password</label><div class="passwordrow"><input id="pass2" type="password" autocomplete="new-password" placeholder="Repeat password"><button type="button" class="passwordtoggle" onclick="togglePassword(\'pass2\',this)">Show</button></div></div>':'')+'<button class="btn red full" onclick="submitAuth('+(signup?'true':'false')+')">'+(signup?'Create account':'Sign in')+' →</button><p class="muted">'+(signup?'Already have an account? ':'New to Twins? ')+'<a class="redtext" href="'+(signup?'login.html':'signup.html')+'">'+(signup?'Sign in':'Create an account')+'</a></p><div class="authnotice"><b>Static storefront mode</b><span>Your demo account is stored in this browser. Production authentication, email verification and password recovery belong in the backend phase.</span></div></div></div></main>'
+}
+function togglePassword(id,button){
+var input=document.getElementById(id);if(!input)return;
+var show=input.type==='password';input.type=show?'text':'password';button.textContent=show?'Hide':'Show';
+}
+async function hashPassword(value){
+if(window.crypto&&crypto.subtle){
+var bytes=new TextEncoder().encode(value),digest=await crypto.subtle.digest('SHA-256',bytes);
+return Array.from(new Uint8Array(digest)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+}
+return value;
+}
+async function submitAuth(signup){
+var email=(document.getElementById('email').value||'').trim().toLowerCase(),pass=document.getElementById('pass').value||'',name=(document.getElementById('name')||{}).value||'Customer';
 if(!email||!pass){toast('Enter your email and password');return}
 if(signup){
 var pass2=document.getElementById('pass2').value||'';
 if(!name.trim()){toast('Enter your name');return}
-if(pass.length<6){toast('Use at least 6 characters for the demo password');return}
+if(pass.length<6){toast('Use at least 6 characters');return}
 if(pass!==pass2){toast('Passwords do not match');return}
+var passwordHash=await hashPassword(pass);
 put('twins_user',{name:name.trim(),email:email});
-put('twins_demo_auth',{email:email,password:pass});
+put('twins_demo_auth',{email:email,passwordHash:passwordHash});
 location.href='dashboard.html';
 }else{
-var savedUser=get('twins_user',null);
-var demo=get('twins_demo_auth',null);
-if(savedUser&&savedUser.email===email&&(!demo||demo.password===pass)){location.href='dashboard.html';return}
+var savedUser=get('twins_user',null),demo=get('twins_demo_auth',null),passwordHash=await hashPassword(pass);
+if(savedUser&&savedUser.email===email&&demo&&demo.passwordHash===passwordHash){location.href='dashboard.html';return}
 toast('No matching demo account found. Create an account first.');
 }
 }
