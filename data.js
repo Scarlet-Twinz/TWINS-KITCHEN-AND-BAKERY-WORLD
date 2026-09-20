@@ -5,7 +5,7 @@ const OWNER_PROFILE={name:"Ikechukwu Umeh",role:"Founder",origin:"Anambra State,
 const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "60":"https://arabic.hargsun.com/photo/pl161596929-quick_mixing_spiral_dough_maker_for_efficient_dough_preparation.jpg",
   "86":"https://cdnimg.webstaurantstore.com/images/products/large/91751/3087559.jpg",
-  "143":"https://www.desertcart.in/products/268754168-phenyx-pro-wireless-microphone-system-metal-wireless-mic-set-handheld",
+  "143":"https://m.media-amazon.com/images/I/61IfQOEsQpL._SL1500_.jpg",
   "144":"https://lasoundmanagement.com/wp-content/uploads/2023/05/Pioneer-DJ-DJM-900NXS2-4-Channel-Club-Standard-DJ-Mixer.webp",
   "145":"https://etha.de/media/uploads/pioneer-ddj-flx4-top.webp",
   "164":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=",
