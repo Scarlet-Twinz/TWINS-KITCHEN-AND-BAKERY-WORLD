@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded",function(){
 /* Phase 6 final visual verification pass. Runs after the existing renderers so every page
    uses the same media policy and broken remote images recover to a local visual. */
 function finalizeMedia6(){
-  var fallback="assets/media/twins-commercial-equipment-showroom-02.jpg";
+  var fallback="assets/media/twins-product-photo-pending.svg";
   document.querySelectorAll("img").forEach(function(img){
     img.setAttribute("decoding","async");
     if(!img.getAttribute("loading"))img.setAttribute("loading","lazy");
