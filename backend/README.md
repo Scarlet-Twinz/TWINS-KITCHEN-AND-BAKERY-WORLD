@@ -1,41 +1,42 @@
-# Twins Kitchen & Bakery World — Backend Architecture
+# Twins Kitchen & Bakery World — Backend
 
-The storefront is intentionally static today. This directory defines the production boundary for the next implementation without pretending browser localStorage is a real backend.
+The storefront is still deployable as a static site, but its customer authentication and quotation workflow now have a real FastAPI/PostgreSQL integration path. When the API is unreachable, the storefront falls back to its existing browser-local planning mode.
 
-## Responsibilities
-- Authentication and session management
-- Users, roles and admin authorization
-- Product/category catalogue API
-- Media metadata and asset references
-- Quote/RFQ persistence and status workflow
-- Saved equipment lists and project briefs
-- Inventory/availability data when the business is ready to maintain it
-- Orders, payments and delivery records when those workflows are introduced
-- Audit logs for administrative changes
+## Local setup
 
-## Suggested stack
-- API: Node.js + TypeScript (Fastify or NestJS) or Python + FastAPI
-- Database: PostgreSQL
-- Object storage: S3-compatible storage for product/media files
-- Cache/queues: Redis when operational volume requires it
-- Email: Resend
-- Messaging: WhatsApp link/deep-link from the storefront
+1. Create a PostgreSQL database and run `schema.sql`.
+2. Copy `.env.example` to `.env`.
+3. Set `DATABASE_URL`, a long random `SESSION_SECRET`, and the exact Live Server origin in `FRONTEND_ORIGINS`.
+4. Install `requirements.txt`.
+5. Run `uvicorn main:app --reload --port 8000` from `backend/`.
+6. Open the storefront through Live Server.
+7. Keep `SITE_CONFIG.apiBase` pointed at the deployed API when moving beyond localhost.
 
-## Deployment boundary
-The frontend can remain a static deployment. The API should live behind HTTPS on a separate origin such as api.example.com, with CORS restricted to the production storefront origin.
+## Connected API
 
-## Security requirements
-- Passwords must be hashed with Argon2id or bcrypt server-side; never store passwords in browser localStorage.
-- Use short-lived sessions/access tokens and secure session cookies where appropriate.
-- Enforce authorization server-side for every admin endpoint.
-- Validate all request bodies on the server.
-- Rate-limit authentication and quote endpoints.
-- Keep secrets in environment variables or a secrets manager.
-- Record admin mutations in an audit log.
+- `GET /api/health`
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/account/me`
+- `GET /api/catalogue`
+- `POST /api/quotes`
+- `GET /api/quotes/me`
 
-## Migration strategy
-1. Keep data.js as the static catalogue during development.
-2. Import approved catalogue records into PostgreSQL.
-3. Add /api/catalogue, /api/products/:id, /api/quotes, /api/project-plans and /api/account.
-4. Replace localStorage persistence one workflow at a time.
-5. Add admin authorization before exposing mutation endpoints.
+## Database boundary
+
+PostgreSQL is the source of truth for production accounts and RFQs. The browser should not become the authoritative store for passwords, quotes, inventory or orders.
+
+## Production hardening still required
+
+- HTTPS and Secure cookies.
+- Email verification and password recovery.
+- CSRF protection for cookie-authenticated state-changing requests.
+- Rate limiting and abuse controls.
+- Approved password-hashing policy and secret rotation.
+- Catalogue/media synchronization and product APIs.
+- Admin authorization, product mutations and audit logs.
+- Resend notifications.
+- Inventory, orders, payments and delivery records.
+
+The API uses parameterized Psycopg queries rather than concatenating user input into SQL.
