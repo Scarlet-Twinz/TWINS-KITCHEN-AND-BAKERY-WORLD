@@ -3,6 +3,8 @@ const MARKETPLACE_CONFIG={name:"Twins Marketplace",description:"A moderated comm
 const OWNER_PROFILE={name:"Ikechukwu Umeh",role:"Founder",origin:"Anambra State, Nigeria",base:"Lagos, Nigeria",delivery:"Nigeria and across Africa",story:"Ikechukwu Umeh opened Twins Kitchen with a practical idea: make it easier for people building food and hospitality businesses to find the equipment they need, understand the workflow around it and have a direct conversation before committing to a purchase. With roots in Anambra State and the business based in Lagos, the company is positioned around real commercial equipment enquiries from restaurants, bakeries, cafés, hotels, catering businesses and other food-service operators. The aim is simple — make equipment buying clearer, more personal and more useful, from the first idea through the final specification."};
 
 const CATALOG_MEDIA_OVERRIDES_BY_ID={
+  "192":"assets/media/twins-planetary-food-mixer.jpg",
+  "197":"assets/media/twins-spiral-mixer.jpg",
   "60":"assets/media/twins-spiral-mixer.jpg",
   "181":"assets/media/twins-commercial-cooking-range-production.jpg",
   "193":"assets/media/twins-planetary-food-mixer.jpg",
