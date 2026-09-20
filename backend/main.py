@@ -78,17 +78,17 @@ def signup(payload:AuthPayload,response:Response):
     uid=uuid.uuid4(); ph=bcrypt.hashpw(payload.password.encode(),bcrypt.gensalt()).decode()
     try:
         with db() as conn:
-            conn.execute("insert into users (id,email,phone,password_hash,role) values (%s,%s,%s,%s,'customer')",(uid,str(payload.email).lower(),None,ph));conn.commit()
+            conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph));conn.commit()
     except psycopg.errors.UniqueViolation:raise HTTPException(status_code=409,detail="An account with this email already exists")
     response.set_cookie("twins_session",sign_session(str(uid),"customer"),httponly=True,secure=False,samesite="lax",max_age=604800,path="/")
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
 def login(payload:AuthPayload,response:Response):
-    with db() as conn:row=conn.execute("select id,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
-    if not row or not bcrypt.checkpw(payload.password.encode(),row[2].encode()):raise HTTPException(status_code=401,detail="Invalid email or password")
-    response.set_cookie("twins_session",sign_session(str(row[0]),row[3]),httponly=True,secure=False,samesite="lax",max_age=604800,path="/")
-    return {"user":{"id":str(row[0]),"name":str(payload.email).split("@")[0],"email":row[1],"role":row[3]}}
+    with db() as conn:row=conn.execute("select id,name,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
+    if not row or not bcrypt.checkpw(payload.password.encode(),row[3].encode()):raise HTTPException(status_code=401,detail="Invalid email or password")
+    response.set_cookie("twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=False,samesite="lax",max_age=604800,path="/")
+    return {"user":{"id":str(row[0]),"name":row[1],"email":row[2],"role":row[4]}}
 
 @app.post("/api/auth/logout")
 def logout(response:Response):
@@ -97,9 +97,9 @@ def logout(response:Response):
 @app.get("/api/account/me")
 def me(request:Request):
     session=require_session(request)
-    with db() as conn:row=conn.execute("select id,email,role,created_at from users where id=%s",(session["sub"],)).fetchone()
+    with db() as conn:row=conn.execute("select id,name,email,role,created_at from users where id=%s",(session["sub"],)).fetchone()
     if not row:raise HTTPException(status_code=401,detail="Account not found")
-    return {"user":{"id":str(row[0]),"email":row[1],"role":row[2],"createdAt":row[3].isoformat()}}
+    return {"user":{"id":str(row[0]),"name":row[1],"email":row[2],"role":row[3],"createdAt":row[4].isoformat()}}
 
 @app.get("/api/catalogue")
 def catalogue():
