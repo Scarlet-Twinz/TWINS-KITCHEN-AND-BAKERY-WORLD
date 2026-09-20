@@ -31,7 +31,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={"48":"https://coffeemachineemporium.com.au/
   "42":"https://cdnimg.webstaurantstore.com/images/products/large/558979/2022241.jpg",
   "47":"https://www.tasse-coffee.com/cdn/shop/files/nuova-simonelli-appia-life-compact-commercial-double-head-espresso-machine.jpg",
   "50":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f3.jpg?format=webp&format=webp&timestamp=1755658315000",
-  "59":"https://www.perthcommercialkitchens.com.au/wp-content/uploads/2024/09/Kalor-30L-Planetary-Mixer.jpg",
+  "59":"https://perthcommercialfridges.b-cdn.net/wp-content/uploads/2021/12/planetary-mixer-KAL-PM10-KAL-PM20-KAL-PM30.jpg.webp",
   "99":"https://img.vevorstatic.com/us/FSJQS810QSJ10L001V1/goods_img_big-v8/food-processor-m100-1.1.jpg?format=webp&timestamp=1631147940000",
   "101":"https://cmcsolution.co.id/wp-content/uploads/2024/05/J-80-1.webp",
   "138":"https://image.itmedia.co.jp/fav/articles/2306/18/tf_soundbar_02.jpg",
