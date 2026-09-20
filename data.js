@@ -67,6 +67,14 @@ const CATALOG_MEDIA_OVERRIDES={
   "heavy-duty double fryer":"https://www.mm-gastroshop.de/media/catalog/product/1/6/162651_3.jpg?height=700&width=700",
   "commercial pasta cooker":"https://ifea.com.au/wp-content/uploads/2014/10/Italgi-pasta-cooker-CP900-900x1366.jpg",
   "double-bowl stainless sink table":"https://ml68s3tzebcb.i.optimole.com/cb%3A9WfF.24555/w%3A1080/h%3A1080/q%3Amauto/g%3Asm/f%3Abest/id%3Abadbbcb51b5e785f46a4f269377a02e8/https%3A/www.kwcommercial.com.au/dsbd7-2400l-left-inlet-double-sink.jpg",
+  "20l planetary mixer":"https://krdcatering.co.uk/cdn/shop/files/BH10CBH20CBH30CBH15C_2_7d0c5176-eaf9-4eff-a738-9a8c70d903f0.jpg?v=1777816156&width=1080",
+  "20l spiral dough mixer":"https://www.bigw.com.au/medias/sys_master/images/images/h0f/hb4/119151648604190.jpg",
+  "30l spiral dough mixer":"https://image.made-in-china.com/202f0j00QcKlbPkBHqYz/30L-Industrial-spiral-Dough-Mixer-Kneading-Machines-Commercial-Bread-Dough-Mixer.webp",
+  "40l spiral dough mixer":"https://image.made-in-china.com/3f2j00uckWbRZsACpq/40L-16kg-Commercial-Bakery-Dough-Mixing-Machine-Vertical-Spiral-Mixer.webp",
+  "50l spiral dough mixer":"https://image.made-in-china.com/229f0j00KtTfyGQbIWkp/-mp4.webp",
+  "commercial dough divider":"https://image.made-in-china.com/202f0j00yJNiOLYFptcn/Commercial-Electric-Dough-Divider-Bakery-Equipment.webp",
+  "45kg commercial ice maker":"https://media.bunnings.com.au/api/public/content/daa515912e5243c7bf25c1dbdfbdf46a?t=w100dpr1&v=f21b6a36",
+  "commercial bread slicer":"https://image.made-in-china.com/155f0j00zLAGPpHIZFcN/Bakery-Equipment-31-Blades-Commercial-Bread-Slicer.webp",
 };
 const PREMIUM_MEDIA_LIBRARY={
 "commercial 6-burner stainless range":"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1400&q=90",
