@@ -325,4 +325,34 @@ document.addEventListener("DOMContentLoaded",function(){
    nav6();
  }catch(e){console.error("Twins Phase 6 error",e)}
 });
+/* Phase 6 final visual verification pass. Runs after the existing renderers so every page
+   uses the same media policy and broken remote images recover to a local visual. */
+function finalizeMedia6(){
+  var fallback="assets/media/twins-commercial-equipment-showroom-02.jpg";
+  document.querySelectorAll("img").forEach(function(img){
+    img.setAttribute("decoding","async");
+    if(!img.getAttribute("loading"))img.setAttribute("loading","lazy");
+    img.addEventListener("error",function(){if(this.src.indexOf(fallback)===-1){this.onerror=null;this.src=fallback;}},{once:true});
+  });
+  document.querySelectorAll(".prod, .p6card").forEach(function(card){
+    var link=card.querySelector("a[href^='product.html?id=']");
+    var img=card.querySelector("img");
+    if(!link||!img||typeof finalMediaFor!=="function")return;
+    var id=Number(new URL(link.href,location.href).searchParams.get("id"));
+    var p=P.find(function(x){return x.id===id});
+    if(!p)return;
+    var m=finalMediaFor(p);
+    if(m&&m.src){img.src=m.src;img.alt=p.n+" reference image";}
+    var flag=card.querySelector(".mediaflag");
+    if(flag){flag.textContent=m&&m.status==="twins"?"TWINS MEDIA":"REFERENCE IMAGE";flag.classList.remove("pending");}
+    card.classList.remove("pending");
+  });
+  var main=document.querySelector("#p3main");
+  if(main&&typeof finalMediaFor==="function"){
+    var id=Number(new URLSearchParams(location.search).get("id")),p=P.find(function(x){return x.id===id});
+    if(p){var m=finalMediaFor(p);if(m&&m.src)main.src=m.src;main.alt=p.n+" reference image";}
+  }
+}
+document.addEventListener("DOMContentLoaded",function(){setTimeout(finalizeMedia6,0);});
+
 })();
