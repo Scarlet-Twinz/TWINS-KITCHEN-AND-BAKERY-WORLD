@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]})}
-function media(p){var m=productMedia(p);return {src:m.src||mediaPlaceholder(p),status:m.status}}
+function media(p){var key=String(p.n||"").toLowerCase(),premium=typeof PREMIUM_MEDIA_LIBRARY!=="undefined"&&PREMIUM_MEDIA_LIBRARY[key];if(premium)return {src:premium,status:"reference"};var m=productMedia(p);return {src:m.src||mediaPlaceholder(p),status:m.status}}
 function specText(p){return String(p.spec||p.description||p.desc||"Specifications available on request.")}
 function related(p){return P.filter(function(x){return x.id!==p.id&&(x.c===p.c||String(x.n).toLowerCase().split(" ").some(function(w){return w.length>4&&String(p.n).toLowerCase().includes(w)}))}).slice(0,4)}
 function phaseProduct(){
