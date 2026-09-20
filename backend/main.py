@@ -125,7 +125,7 @@ def catalogue():
 
 
 @app.get("/api/marketplace/listings")
-def marketplace_listings(category:str|None=None,limit:int=Field(default=50,ge=1,le=100)):
+def marketplace_listings(category:str|None=None,limit:int=50):
     with db() as conn:
         rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,sp.display_name,sp.verification_status
         from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
