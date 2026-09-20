@@ -45,4 +45,8 @@ The intended deployment has three pieces:
 
 The frontend talks to the API through `SITE_CONFIG.apiBase`. No database credentials belong in the frontend.
 
+### One-time GitHub Pages setting
+
+The repository now contains the Pages workflow, but GitHub still requires the repository Pages source to be enabled. In **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**. GitHub documents this as the required setup for a custom Pages workflow. After that, pushes to `main` will run the validation and storefront deployment workflow.
+
 The backend is not claimed as deployed until a real database, API host, HTTPS domain and environment secrets are configured.
