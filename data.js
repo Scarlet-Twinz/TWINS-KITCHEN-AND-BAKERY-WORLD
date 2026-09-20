@@ -15,7 +15,12 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={"6":"https://homemygarden.com.au/cdn/shop/f
   "501":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/05/Reverse-Osmosis-Machine-5000L.jpg",
   "503":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2024/11/pure-water-machine-4.webp",
   "504":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/04/automatic-Bottle-Water-Machine-XGF-8-8-3.webp",
-  "505":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/05/water-chiller-2HP.jpg"};
+  "505":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/05/water-chiller-2HP.jpg",
+  "134":"https://m.media-amazon.com/images/I/81vVpVHnzSL._AC_.jpg",
+  "135":"https://m.media-amazon.com/images/I/513rwRNOoWL._AC_SL1000_.jpg",
+  "136":"https://m.media-amazon.com/images/I/71Am8lvWpoL._AC_SL1500_.jpg",
+  "137":"https://m.media-amazon.com/images/I/516ksW3LvlL._AC_.jpg",
+  "138":"https://m.media-amazon.com/images/I/61zfFTCG2HL._AC_SL1500_.jpg"};
 const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
   "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
