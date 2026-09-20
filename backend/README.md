@@ -40,3 +40,25 @@ PostgreSQL is the source of truth for production accounts and RFQs. The browser 
 - Inventory, orders, payments and delivery records.
 
 The API uses parameterized Psycopg queries rather than concatenating user input into SQL.
+
+
+## Current backend boundary
+
+Implemented in the current API:
+- customer signup/login/logout with signed HTTP-only sessions
+- account lookup
+- quote persistence with quote items and project/package context
+- authenticated customer quote history
+- staff/admin quote read endpoint
+- configurable secure cookies for HTTPS deployment
+- schema upgrade statements for the account name and quote package fields
+
+Still required before treating the API as production-ready:
+- deploy PostgreSQL and the FastAPI service
+- set a strong production SESSION_SECRET and COOKIE_SECURE=true behind HTTPS
+- add CSRF protection, rate limiting and abuse controls
+- add email verification and password recovery
+- connect Resend for actual enquiry notifications and delivery status
+- seed/synchronize the catalogue and supplied media into PostgreSQL
+- add server-side catalogue mutations, inventory, orders, payments and delivery records
+- add admin quote status mutation and audit-log UI
