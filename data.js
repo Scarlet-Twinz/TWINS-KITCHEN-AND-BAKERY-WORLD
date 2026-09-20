@@ -24,7 +24,19 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={"48":"https://coffeemachineemporium.com.au/
   "162":"https://tiimg.tistatic.com/fp/1/008/101/150-liters-300-watts-power-long-lasting-stainless-steel-water-cooler-264.jpg",
   "163":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD732/2507/23/products/44bca5b6ca-6d87.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100%2Fresize%2Cm_lfit%2Ch_640%2Cw_640",
   "165":"https://www.webstaurantstore.com/images/products/large/190504/903619.jpg",
-  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"};
+  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
+  "4":"https://i5.walmartimages.com/asr/5dac02af-64d4-4744-8a6f-828dc807c171.69e379764896f6b933af40a8a238734c.jpeg",
+  "7":"https://m.media-amazon.com/images/I/61lWjllZmoL._AC_SL1500_.jpg",
+  "41":"https://sunshinecoastcoffeemachines.com.au/cdn/shop/files/Expobar_Office_Control_1_group_Coffee_Machine_1e7e5269-54f2-4240-a02e-c08da2728693.webp?v=1740021844&width=900",
+  "42":"https://cdnimg.webstaurantstore.com/images/products/large/558979/2022241.jpg",
+  "47":"https://www.tasse-coffee.com/cdn/shop/files/nuova-simonelli-appia-life-compact-commercial-double-head-espresso-machine.jpg",
+  "50":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f3.jpg?format=webp&format=webp&timestamp=1755658315000",
+  "59":"https://www.perthcommercialkitchens.com.au/wp-content/uploads/2024/09/Kalor-30L-Planetary-Mixer.jpg",
+  "99":"https://img.vevorstatic.com/us/FSJQS810QSJ10L001V1/goods_img_big-v8/food-processor-m100-1.1.jpg?format=webp&timestamp=1631147940000",
+  "101":"https://cmcsolution.co.id/wp-content/uploads/2024/05/J-80-1.webp",
+  "138":"https://image.itmedia.co.jp/fav/articles/2306/18/tf_soundbar_02.jpg",
+  "141":"https://bizweb.dktcdn.net/thumb/1024x1024/100/451/485/products/amply-denon-avr-x550bt-3.jpg?v=1662783320500",
+};
 const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
   "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
