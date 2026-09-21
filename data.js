@@ -217,7 +217,11 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "206":"https://cdnimg.webstaurantstore.com/images/products/large/14908/2870030.jpg",
   "220":"https://middleby-cdn.com/PhotoFeature/QUALSERV_UCRE336-SS61A.png?update_date=1778086214",
   "222":"https://assets.williams-refrigeration.com/files/prod_gi_gal_1500471839_ee28dcaee2.png",
-  "223":"https://www.husky-international.com/wp-content/uploads/2024/12/Main-Image-08-600x600.png",};const CATALOG_MEDIA_OVERRIDES={
+  "223":"https://www.husky-international.com/wp-content/uploads/2024/12/Main-Image-08-600x600.png",
+  "118":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/P/230175_1736320665.jpg",
+  "150":"https://d21d281c1yd2en.cloudfront.net/media/product_images/high-end-american-fitness-snooker-table-6-feets-d4b6-1280x1280.jpeg",
+  "151":"https://pictures-nigeria.jijistatic.net/145478090_NjIwLTYyMC0wMDRlZTVjMjhh.webp",
+};const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
   "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
   "commercial juice extractor":"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp",
