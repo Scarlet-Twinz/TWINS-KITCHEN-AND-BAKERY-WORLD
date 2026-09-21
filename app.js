@@ -49,7 +49,7 @@ function buildOverrideMap(){
  __twinsOverrideById={};
  P.forEach(function(p){
    var name=String(p.n||"").toLowerCase().trim();
-   var matches=Object.keys(CATALOG_MEDIA_OVERRIDES||{}).filter(function(k){
+   var matches=Object.keys(typeof CATALOG_MEDIA_OVERRIDES!=="undefined"?CATALOG_MEDIA_OVERRIDES:{}).filter(function(k){
      var key=String(k).toLowerCase().trim();
      return key&&name.indexOf(key)>-1;
    }).sort(function(a,b){return b.length-a.length});
