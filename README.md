@@ -104,9 +104,15 @@ The project now separates the static storefront from the planned production back
 - robots.txt, sitemap.xml and a static-site GitHub Actions validation workflow
 
 ### Operations / admin
-- admin.html provides a non-public front-end operations workspace shell
-- Production admin authorization is intentionally not faked in the browser
-- backend/ contains the API, security, schema and migration contract
+- admin.html is the dedicated internal operations console entry point
+- admin.css contains the admin-only visual system and responsive layout
+- admin.js provides the complete admin navigation and workspace surfaces
+- Admin access is denied unless the browser has a server-authenticated staff/admin session
+- Current admin modules: Overview, Catalogue, Inventory, Quotes, Orders, Customers & Staff, Payments, Delivery, Marketplace Moderation, Audit Log and Settings
+- Catalogue and quotation views can consume the existing data/API without modifying storefront data.js
+- Inventory, Orders, Payments, Delivery and Audit Log have explicit integration surfaces reserved for backend persistence
+- Payments intentionally stop at a gateway-ready operations surface; merchant credentials and webhooks are not hardcoded into the frontend
+- Production admin authorization remains server-side in backend/
 
 ### Backend boundary
 See backend/README.md, backend/openapi.yaml and backend/schema.sql. The backend is deliberately not claimed as deployed yet; it is the implementation contract for the next stage.
@@ -119,3 +125,26 @@ The repository now includes a separate community marketplace layer: `marketplace
 ## Payments
 
 The intended production flow is quote-first for variable Twins equipment pricing. Once confirmed prices/inventory exist, customer checkout can use a Nigerian/African payment gateway such as Paystack or Flutterwave. Seller memberships and promoted listings can use the same gateway, with payment confirmation handled by server-side webhooks rather than trusting browser state.
+
+
+## Admin implementation status
+
+The admin frontend is now mapped as a complete operations workspace. The interface is intentionally separated from the public storefront so administrative navigation, tables, detail drawers, status indicators and responsive behaviour do not depend on storefront rendering.
+
+### Available admin areas
+
+1. **Overview** — catalogue/area KPIs, recent server quote requests and operational shortcuts.
+2. **Catalogue** — searchable/filterable product management surface using the current data-driven catalogue without mutating data.js.
+3. **Inventory** — stock, availability and adjustment workspace reserved for server inventory records.
+4. **Quotes** — server-persisted quotation requests with customer/project detail inspection.
+5. **Orders** — order lifecycle and fulfilment workspace reserved for the backend order service.
+6. **Customers & Staff** — account and role boundary documentation inside the admin console.
+7. **Payments** — gateway-ready transaction workspace; Paystack/Flutterwave credentials and webhooks are intentionally deferred.
+8. **Delivery** — dispatch, destination, status and completion workspace reserved for backend delivery records.
+9. **Marketplace** — community-listing moderation surface kept separate from official Twins catalogue stock.
+10. **Audit Log** — operational/security event surface reserved for server-written audit records.
+11. **Settings** — API, payment and production-readiness configuration surface.
+
+### Backend integration boundary
+
+The frontend admin workspace is complete as an operations UI, but server-side mutations remain the source of truth. Do not implement catalogue, inventory, order, payment or delivery authority in browser localStorage. Those modules should connect to authenticated FastAPI endpoints and PostgreSQL tables when the production backend work begins.
