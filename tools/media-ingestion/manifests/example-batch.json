@@ -1,0 +1,17 @@
+{
+  "batchId": "example-not-for-production",
+  "candidates": [
+    {
+      "productId": "PENDING_PRODUCT_ID",
+      "url": "https://example.com/product.jpg",
+      "mediaType": "image",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://example.com/product-page",
+        "sourceName": "Example source",
+        "checkedAt": "2026-09-21T12:00:00Z"
+      },
+      "notes": "Template only; explicitly unverified so it will be rejected."
+    }
+  ]
+}
