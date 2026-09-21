@@ -75,12 +75,13 @@ The API uses parameterized Psycopg queries rather than concatenating user input 
 ## Current backend boundary
 
 Implemented in the current API:
-- customer signup/login/logout with signed HTTP-only sessions
+- customer signup/login/logout with opaque random HTTP-only server-side sessions
 - account lookup
 - quote persistence with quote items and project/package context
 - authenticated customer quote history
 - staff/admin quote read endpoint
 - configurable secure cookies for HTTPS deployment with production startup enforcement
+- server-side session revocation on logout and database-backed session expiry
 - production request hardening: CORS/Origin checks, rate limiting, security headers and no-store responses
 - schema upgrade statements for the account name and quote package fields
 
