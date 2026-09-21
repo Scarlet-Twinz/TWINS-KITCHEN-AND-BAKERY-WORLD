@@ -149,20 +149,9 @@ function existingCandidate(product, data, rules) {
 }
 
 function computeMediaState(data, rules = readExistingRules()) {
-  const raw = data.P.map(product => ({ product, candidate: existingCandidate(product, data, rules) }));
-  const seen = new Set();
-  const resolved = [];
-  for (const item of raw) {
-    if (item.candidate.src && seen.has(item.candidate.src)) {
-      resolved.push({
-        product: item.product,
-        candidate: { src: "", status: "pending", source: "duplicate media blocked; product photo verification required" }
-      });
-    } else {
-      if (item.candidate.src) seen.add(item.candidate.src);
-      resolved.push(item);
-    }
-  }
+  // Existing catalogue mappings are authoritative, including legacy duplicate assignments.
+  // Duplicate blocking applies only to newly submitted candidates in validateManifest().
+  const resolved = data.P.map(product => ({ product, candidate: existingCandidate(product, data, rules) }));
   const valid = resolved.filter(x => x.candidate.src);
   return {
     products: data.P,
@@ -207,7 +196,7 @@ function validateManifest(manifest, state) {
     if (state.blocklist[id]) { reject(candidate, "product is blocked by the existing media validation rule"); continue; }
     if (!url) { reject(candidate, "missing candidate URL"); continue; }
     if (!verification || typeof verification !== "object") { reject(candidate, "missing required verification information"); continue; }
-    if (verification.verified !== true) { reject(candidate, "candidate is not VERIFIED"); continue; }
+    if (verification.verified !== true) { reject(candidate, "candidate is unverified / not VERIFIED"); continue; }
     if (!verification.sourceUrl || !isUrl(verification.sourceUrl)) { reject(candidate, "missing or invalid verification source URL"); continue; }
     if (!verification.checkedAt || Number.isNaN(Date.parse(verification.checkedAt))) { reject(candidate, "missing or invalid verification timestamp"); continue; }
     if (state.mappedIds.has(id)) { reject(candidate, "product already has a valid media mapping"); continue; }
