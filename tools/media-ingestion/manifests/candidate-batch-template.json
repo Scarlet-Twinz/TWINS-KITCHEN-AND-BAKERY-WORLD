@@ -11,7 +11,7 @@
       "productName": "Planetary Mixer 20L",
       "category": "Bakery Equipment",
       "productType": "Expanded catalogue",
-      "candidateUrl": "https://supplier.example/product-image.jpg",
+      "url": "https://supplier.example/product-image.jpg",
       "sourceUrl": "https://supplier.example/product-page",
       "sourceProvider": "Supplier name",
       "status": "CANDIDATE",
