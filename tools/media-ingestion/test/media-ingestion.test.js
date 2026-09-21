@@ -16,6 +16,9 @@ test("loads the current catalogue and reports pending products", () => {
   assert.ok(state.counts.catalogue > 0);
   assert.ok(state.counts.pending >= 0);
   assert.equal(state.counts.catalogue, data.P.length);
+  assert.equal(state.counts.catalogue, 530);
+  const ids = data.P.map(p => String(p.id));
+  assert.equal(new Set(ids).size, 530);
 });
 
 test("legacy duplicate assignments in CATALOG_MEDIA_OVERRIDES_BY_ID are preserved", () => {
