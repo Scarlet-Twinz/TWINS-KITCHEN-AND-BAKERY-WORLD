@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "batchId": "verified-batch-001",
+  "generatedAt": "2026-09-21T16:54:16.349Z",
+  "status": "VERIFIED",
+  "catalogue": {
+    "population": 530,
+    "canonical": true
+  },
+  "sourceCandidateManifest": "tools/media-ingestion/manifests/candidate-batch-001.json",
+  "sourceVerificationManifest": "tools/media-ingestion/manifests/verification-batch-001.json",
+  "candidates": [
+    {
+      "productId": "118",
+      "productName": "GOtv Decoder",
+      "url": "https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/P/230175_1736320665.jpg",
+      "sourceUrl": "https://www.konga.com/product/gotv-decoder-antenna-6635358",
+      "sourceProvider": "Konga",
+      "status": "VERIFIED",
+      "verification": {
+        "verified": true,
+        "sourceUrl": "https://www.konga.com/product/gotv-decoder-antenna-6635358",
+        "sourceName": "Konga",
+        "verifiedAt": "2026-09-21T16:29:34.700Z"
+      },
+      "notes": "The candidate image URL resolves and visibly shows a GOtv decoder. The accessible Konga product page is explicitly 'Gotv Decoder + Antenna', product code 6635358, and its description states that the unit is a GOtv decoder with an outdoor antenna. The catalogue record is the generic product 'GOtv Decoder' with no model/capacity/configuration that conflicts with this evidence."
+    },
+    {
+      "productId": "150",
+      "productName": "Snooker Table 6ft",
+      "url": "https://d21d281c1yd2en.cloudfront.net/media/product_images/high-end-american-fitness-snooker-table-6-feets-d4b6-1280x1280.jpeg",
+      "sourceUrl": "https://zit.ng/products/high-end-american-fitness-snooker-table-6-feets/",
+      "sourceProvider": "Zit Nigeria",
+      "status": "VERIFIED",
+      "verification": {
+        "verified": true,
+        "sourceUrl": "https://zit.ng/products/high-end-american-fitness-snooker-table-6-feets/",
+        "sourceName": "Zit Nigeria",
+        "verifiedAt": "2026-09-21T16:29:34.700Z"
+      },
+      "notes": "The candidate image URL resolves and visibly shows a snooker/pool table. The accessible Zit product page explicitly names the product 'High-End American Fitness Snooker Table (6 feets)' and displays the same product-image family. The distinguishing 6-foot attribute directly matches the catalogue name 'Snooker Table 6ft'."
+    },
+    {
+      "productId": "151",
+      "productName": "Snooker Table 7ft",
+      "url": "https://pictures-nigeria.jijistatic.net/145478090_NjIwLTYyMC0wMDRlZTVjMjhh.webp",
+      "sourceUrl": "https://jiji.ng/lagos-island-west/sports-bicycles-and-fitness/7ft-nigeria-made-classic-special-snooker-table-djhLWWoUy8bFTj5gO0EdrMFu.html",
+      "sourceProvider": "Jiji",
+      "status": "VERIFIED",
+      "verification": {
+        "verified": true,
+        "sourceUrl": "https://jiji.ng/lagos-island-west/sports-bicycles-and-fitness/7ft-nigeria-made-classic-special-snooker-table-djhLWWoUy8bFTj5gO0EdrMFu.html",
+        "sourceName": "Jiji",
+        "verifiedAt": "2026-09-21T16:29:34.700Z"
+      },
+      "notes": "The candidate image URL resolves and visibly shows a snooker table. The accessible Jiji listing explicitly identifies '7ft Nigeria Made Classic Special Snooker Table' and lists table type 7 ft. The distinguishing 7-foot attribute directly matches the catalogue name 'Snooker Table 7ft'."
+    },
+    {
+      "productId": "167",
+      "productName": "Microwave Oven 30L",
+      "url": "https://pictures-nigeria.jijistatic.net/152890953_NjIwLTYyMC1jM2VlM2JlMmIw.webp",
+      "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
+      "sourceProvider": "Jiji",
+      "status": "VERIFIED",
+      "verification": {
+        "verified": true,
+        "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
+        "sourceName": "Jiji",
+        "verifiedAt": "2026-09-21T16:29:34.700Z"
+      },
+      "notes": "The candidate image URL resolves and visibly shows the LG microwave pictured in the listing. The accessible Jiji page explicitly identifies LG 3032jas 1350W 30L Microwave Oven and provides 30L capacity, 1350W power, model-specific description and product dimensions. The catalogue name 'Microwave Oven 30L' directly matches the distinguishing 30L attribute."
+    }
+  ]
+}
