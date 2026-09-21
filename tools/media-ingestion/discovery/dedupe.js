@@ -1,4 +1,4 @@
 const {normalizeUrl}=require('../validator');
 function buildExistingUrlSet(state){return new Set(state.resolved.filter(x=>x.candidate.src).map(x=>normalizeUrl(x.candidate.src)).filter(Boolean));}
-function checkDuplicate(url,existingUrls,seenUrls){const n=normalizeUrl(url);if(!n||!/^(https?):\\/\\//i.test(n))return {ok:false,reason:'invalid or fabricated URL'};if(existingUrls.has(n))return {ok:false,reason:'URL already assigned to an existing product'};if(seenUrls.has(n))return {ok:false,reason:'duplicate URL within discovery run'};return {ok:true,url:n};}
+function checkDuplicate(url,existingUrls,seenUrls){const n=normalizeUrl(url);if(!n||!/^(https?):\/\//i.test(n))return {ok:false,reason:'invalid or fabricated URL'};if(existingUrls.has(n))return {ok:false,reason:'URL already assigned to an existing product'};if(seenUrls.has(n))return {ok:false,reason:'duplicate URL within discovery run'};return {ok:true,url:n};}
 module.exports={buildExistingUrlSet,checkDuplicate};
