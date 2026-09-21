@@ -211,22 +211,36 @@ def signup(payload:AuthPayload,response:Response):
     uid=uuid.uuid4(); ph=bcrypt.hashpw(payload.password.encode(),bcrypt.gensalt()).decode()
     try:
         with db() as conn:
-            conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph));conn.commit()
+            conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph))
+            token=create_session(conn,str(uid))
+            conn.commit()
     except psycopg.errors.UniqueViolation:raise HTTPException(status_code=409,detail="An account with this email already exists")
-    token=create_session(conn,str(uid))
-        response.set_cookie(SESSION_COOKIE,token,httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
+    response.set_cookie(SESSION_COOKIE,token,httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
 def login(payload:AuthPayload,response:Response):
-    with db() as conn:row=conn.execute("select id,name,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
-    if not row or not bcrypt.checkpw(payload.password.encode(),row[3].encode()):raise HTTPException(status_code=401,detail="Invalid email or password")
-    response.set_cookie("__Host-twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
+    with db() as conn:
+        row=conn.execute("select id,name,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
+        if not row or not bcrypt.checkpw(payload.password.encode(),row[3].encode()):
+            raise HTTPException(status_code=401,detail="Invalid email or password")
+        token=create_session(conn,str(row[0]))
+        conn.commit()
+    response.set_cookie(SESSION_COOKIE,token,httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(row[0]),"name":row[1],"email":row[2],"role":row[4]}}
 
 @app.post("/api/auth/logout")
-def logout(response:Response):
-    response.delete_cookie(SESSION_COOKIE,path="/");response.headers["Clear-Site-Data"]="cache, cookies";response.headers["Cache-Control"]="no-store";return {"ok":True}
+def logout(request:Request,response:Response):
+    token=request.cookies.get(SESSION_COOKIE)
+    if token:
+        token_hash=hashlib.sha256(token.encode()).hexdigest()
+        with db() as conn:
+            conn.execute("update user_sessions set revoked_at=now() where token_hash=%s and revoked_at is null",(token_hash,))
+            conn.commit()
+    response.delete_cookie(SESSION_COOKIE,path="/")
+    response.headers["Clear-Site-Data"]="cache, cookies"
+    response.headers["Cache-Control"]="no-store"
+    return {"ok":True}
 
 @app.get("/api/account/me")
 def me(request:Request):
