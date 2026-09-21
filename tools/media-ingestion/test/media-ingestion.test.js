@@ -120,3 +120,68 @@ test("apply changes only the override block and becomes idempotent", () => {
   assert.match(secondValidation.rejected[0].reason, /already has a valid media mapping/);
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
+
+
+test("pending manifest is deterministic and contains exactly the current pending population", () => {
+  const first = buildPendingManifest(loadCatalogue(), readExistingRules());
+  const second = buildPendingManifest(loadCatalogue(), readExistingRules());
+  assert.deepEqual(first, second);
+  assert.equal(first.counts.catalogue, 530);
+  assert.equal(first.counts.assigned, 223);
+  assert.equal(first.counts.pending, 307);
+  assert.equal(first.products.length, 307);
+  assert.equal(new Set(first.products.map(x => x.productId)).size, 307);
+  assert.ok(first.products.every(x => x.currentMediaStatus === "PENDING"));
+});
+
+test("candidate schema requires a VERIFIED status before acceptance", () => {
+  const state = computeMediaState(loadCatalogue(), readExistingRules());
+  const pending = state.pending[0];
+  const result = validateManifest([{
+    productId: String(pending.id),
+    url: "https://example.test/candidate.jpg",
+    status: "CANDIDATE",
+    verification: {
+      verified: false,
+      sourceUrl: "https://example.test/source",
+      checkedAt: "2026-09-21T00:00:00Z"
+    }
+  }], state);
+  assert.equal(result.accepted.length, 0);
+  assert.match(result.rejected[0].reason, /not VERIFIED/);
+});
+
+test("rejects missing source and missing verification", () => {
+  const state = computeMediaState(loadCatalogue(), readExistingRules());
+  const pending = state.pending[0];
+  const result = validateManifest([
+    { productId: String(pending.id), url: "https://example.test/a.jpg", status: "VERIFIED", verification: { verified: true, checkedAt: "2026-09-21T00:00:00Z" } },
+    { productId: String(pending.id), url: "https://example.test/b.jpg", status: "VERIFIED" }
+  ], state);
+  assert.equal(result.accepted.length, 0);
+  assert.equal(result.rejected.length, 2);
+  assert.ok(result.rejected.every(x => /verification/.test(x.reason)));
+});
+
+test("normalizes URLs before duplicate detection", () => {
+  const state = computeMediaState(loadCatalogue(), readExistingRules());
+  const [a, b] = state.pending;
+  const make = (id, url) => ({
+    productId: String(id),
+    url,
+    status: "VERIFIED",
+    verification: { verified: true, sourceUrl: "https://example.test/source", checkedAt: "2026-09-21T00:00:00Z" }
+  });
+  const result = validateManifest([
+    make(a.id, "https://Example.test:443/image.jpg#view"),
+    make(b.id, "https://example.test/image.jpg")
+  ], state);
+  assert.equal(result.accepted.length, 1);
+  assert.ok(result.rejected.some(x => /duplicate URL/.test(x.reason)));
+});
+
+test("candidate generation never writes data.js", () => {
+  const before = fs.readFileSync(DATA, "utf8");
+  buildPendingManifest(loadCatalogue(), readExistingRules());
+  assert.equal(fs.readFileSync(DATA, "utf8"), before);
+});
