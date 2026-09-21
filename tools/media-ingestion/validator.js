@@ -38,21 +38,29 @@ function extractObjectPairs(source, declaration) {
 
 function extractCatalogue(dataPath) {
   const source = fs.readFileSync(dataPath, "utf8");
-  const declaration = source.indexOf("const P=");
-  if (declaration < 0) throw new Error("Catalogue declaration P was not found in data.js");
+  const declarations = [...source.matchAll(/const\\s+P\\s*=\\s*\\[/g)];
+  if (!declarations.length) throw new Error("Catalogue declaration P was not found in data.js");
+
+  // data.js currently contains a duplicated catalogue declaration. The canonical
+  // catalogue is the first P declaration; only P.push() calls before the next P
+  // declaration belong to that catalogue. Never collect pushes globally.
+  const declaration = declarations[0].index;
+  const nextDeclaration = declarations[1]?.index ?? source.length;
   const arrayOpen = source.indexOf("[", declaration);
+  if (arrayOpen < 0 || arrayOpen >= nextDeclaration) throw new Error("Canonical catalogue array was not found");
   const arrayClose = balanced(source, arrayOpen, "[", "]");
-  let program = "const P=" + source.slice(arrayOpen, arrayClose + 1) + ";\n";
-  const pushRe = /P\.push\s*\(/g;
+  let program = "const P=" + source.slice(arrayOpen, arrayClose + 1) + ";\\n";
+  const catalogueRegion = source.slice(arrayClose + 1, nextDeclaration);
+  const pushRe = /P\\.push\\s*\\(/g;
   let match;
-  while ((match = pushRe.exec(source))) {
-    const open = source.indexOf("(", match.index);
-    const close = balanced(source, open, "(", ")");
-    program += "P.push" + source.slice(open, close + 1) + ";\n";
+  while ((match = pushRe.exec(catalogueRegion))) {
+    const open = catalogueRegion.indexOf("(", match.index);
+    const close = balanced(catalogueRegion, open, "(", ")");
+    program += "P.push" + catalogueRegion.slice(open, close + 1) + ";\\n";
     pushRe.lastIndex = close + 1;
   }
   const context = {};
-  vm.runInNewContext(program + "\nglobalThis.__P__=P;", context, { filename: dataPath, timeout: 15000 });
+  vm.runInNewContext(program + "\\nglobalThis.__P__=P;", context, { filename: dataPath, timeout: 15000 });
   if (!Array.isArray(context.__P__)) throw new Error("Could not evaluate catalogue P");
   return context.__P__;
 }
