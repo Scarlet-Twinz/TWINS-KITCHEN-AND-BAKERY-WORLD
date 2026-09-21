@@ -32,8 +32,8 @@ test("legacy duplicate assignments in CATALOG_MEDIA_OVERRIDES_BY_ID are preserve
   const state = computeMediaState(data, readExistingRules());
   // Existing duplicate assignments are intentionally preserved; uniqueMedia is
   // therefore lower than the assigned population by the legacy duplicate count.
-  assert.equal(state.counts.verified, 223);
-  assert.equal(state.counts.uniqueMedia, 206);
+  assert.equal(state.counts.verified, 226);
+  assert.equal(state.counts.uniqueMedia, 209);
   assert.equal(state.counts.duplicates, 17);
 });
 
@@ -132,10 +132,10 @@ test("pending manifest is deterministic and contains exactly the current pending
   const second = buildPendingManifest(loadCatalogue(), readExistingRules());
   assert.deepEqual(first, second);
   assert.equal(first.counts.catalogue, 530);
-  assert.equal(first.counts.assigned, 223);
-  assert.equal(first.counts.pending, 307);
-  assert.equal(first.products.length, 307);
-  assert.equal(new Set(first.products.map(x => x.productId)).size, 307);
+  assert.equal(first.counts.assigned, 226);
+  assert.equal(first.counts.pending, 304);
+  assert.equal(first.products.length, 304);
+  assert.equal(new Set(first.products.map(x => x.productId)).size, 304);
   assert.ok(first.products.every(x => x.currentMediaStatus === "PENDING"));
 });
 
