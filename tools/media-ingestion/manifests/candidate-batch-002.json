@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "batchId": "candidate-batch-002",
+  "generatedAt": "2026-09-21",
+  "status": "CANDIDATE",
+  "catalogue": {
+    "population": 530,
+    "canonical": true,
+    "sourceManifest": "tools/media-ingestion/manifests/pending-catalogue.json"
+  },
+  "batchSize": 25,
+  "processedProductIds": [
+    "54",
+    "76",
+    "77",
+    "86",
+    "88",
+    "108",
+    "139",
+    "160",
+    "161",
+    "164",
+    "168",
+    "169",
+    "173",
+    "174",
+    "175",
+    "178",
+    "183",
+    "188",
+    "189",
+    "190",
+    "191",
+    "193",
+    "195",
+    "197",
+    "199"
+  ],
+  "candidates": [
+    {
+      "productId": "54",
+      "productName": "One-Bag Bakery Oven",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://pictures-nigeria.jijistatic.net/200773317_NjIwLTc3NC0xZmUzYjk2MzJh.webp",
+      "sourceUrl": "https://jiji.ng/ojo/restaurant-and-catering-equipment/one-bag-oven-wYH0859P8OO20T4rwgFWVfg7.html",
+      "sourceProvider": "Jiji",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://jiji.ng/ojo/restaurant-and-catering-equipment/one-bag-oven-wYH0859P8OO20T4rwgFWVfg7.html",
+        "sourceName": "Jiji",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "76",
+      "productName": "Commercial Chest Freezer - Large",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/V/O/126611_1615923199.jpg",
+      "sourceUrl": "https://www.konga.com/product/snowsea-double-door-chest-freezer-bd-600-grey-5176620",
+      "sourceProvider": "Konga",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.konga.com/product/snowsea-double-door-chest-freezer-bd-600-grey-5176620",
+        "sourceName": "Konga",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "77",
+      "productName": "Commercial Undercounter Refrigerator",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://admiralcraft.com/cdn/shop/files/jqoblsvpwix0p7xprrb9_1200x.jpg?v=1772359500",
+      "sourceUrl": "https://admiralcraft.com/products/u-star-solid-door-undercounter-refrigerator-48-2-door",
+      "sourceProvider": "Admiral Craft",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://admiralcraft.com/products/u-star-solid-door-undercounter-refrigerator-48-2-door",
+        "sourceName": "Admiral Craft",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "88",
+      "productName": "Heavy-Duty 4-Tier Storage Rack",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www.nextdaycatering.co.uk/363822-large_default/commercial-shelving-unit-4-tier-800kg-shelf-width-1960mm-depth-610mm-black-wire-stalwart-da-kit99.jpg",
+      "sourceUrl": "https://www.nextdaycatering.co.uk/product/229750/commercial-shelving-unit-4-tier-800kg-shelf-width-1960mm-depth-610mm-black-wire-stalwart-da-kit99",
+      "sourceProvider": "Next Day Catering",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.nextdaycatering.co.uk/product/229750/commercial-shelving-unit-4-tier-800kg-shelf-width-1960mm-depth-610mm-black-wire-stalwart-da-kit99",
+        "sourceName": "Next Day Catering",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "108",
+      "productName": "Stainless Wall Cabinet",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://cdnimg.webstaurantstore.com/images/products/large/566057/3115309.jpg",
+      "sourceUrl": "https://www.webstaurantstore.com/regency-60-stainless-steel-wall-cabinet-with-sliding-doors/600WCS1560.html",
+      "sourceProvider": "WebstaurantStore",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.webstaurantstore.com/regency-60-stainless-steel-wall-cabinet-with-sliding-doors/600WCS1560.html",
+        "sourceName": "WebstaurantStore",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "160",
+      "productName": "Game Room Seating",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www.spotonbilliards.com/cdn/shop/files/SPEC-CAPRGB_jpg.webp?v=1768271600&width=1500",
+      "sourceUrl": "https://www.spotonbilliards.com/products/ram-game-room-spectator-chair-cappuccino",
+      "sourceProvider": "Spot On Billiards",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.spotonbilliards.com/products/ram-game-room-spectator-chair-cappuccino",
+        "sourceName": "Spot On Billiards",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "175",
+      "productName": "Electric Iron",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://iziway.cm/images/uploaded/catalog/Petit-electromenager/binatone-fer-a-repasser-a-sec-di106-1200w-blanc-12-mois-garantis-iziwaycameroun.jpeg",
+      "sourceUrl": "https://iziway.cm/fer-a-repasser-a-sec-binatone-di108-1200w-blanc-garantie-12-mois",
+      "sourceProvider": "Iziway",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://iziway.cm/fer-a-repasser-a-sec-binatone-di108-1200w-blanc-garantie-12-mois",
+        "sourceName": "Iziway",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "178",
+      "productName": "6-Burner Gas Range",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www.serhsequipments.com/cdnassets/20706200_G9F6_T.jpg",
+      "sourceUrl": "https://www.serhsequipments.com/cocina-6-fuegos-a-gas-hornomaxi-mod-g9f6t",
+      "sourceProvider": "SERHS Equipments",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.serhsequipments.com/cocina-6-fuegos-a-gas-hornomaxi-mod-g9f6t",
+        "sourceName": "SERHS Equipments",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "183",
+      "productName": "Double Fryer",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www.costco.com.au/medias/sys_master/images/h31/hbb/102876098068510.jpg",
+      "sourceUrl": "https://www.costco.com.au/Appliances/Kitchen-Appliances/Air-Fryers-Deep-Fryers/Devanti-Electric-Commercial-Chip-Cooker-Deep-Fryer-Twin-Frying-Basket-Countertop-20L-CDF-DR20-DOUBLE-SI/p/134647",
+      "sourceProvider": "Costco Australia",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.costco.com.au/Appliances/Kitchen-Appliances/Air-Fryers-Deep-Fryers/Devanti-Electric-Commercial-Chip-Cooker-Deep-Fryer-Twin-Frying-Basket-Countertop-20L-CDF-DR20-DOUBLE-SI/p/134647",
+        "sourceName": "Costco Australia",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "189",
+      "productName": "Bain Marie Cooking Station",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://bymart.co.zm/cdn/shop/files/bain-marie-front_400x400_crop_center.png?v=1774963127",
+      "sourceUrl": "https://bymart.co.zm/collections/deep-fryers",
+      "sourceProvider": "BYMART Investments",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://bymart.co.zm/collections/deep-fryers",
+        "sourceName": "BYMART Investments",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "190",
+      "productName": "Commercial Stock Pot",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://bfasset.costco-static.com/U447IH35/as/3kbj3q2qnpjtv4vksx7vxpv/1040545-847__1?auto=webp&canvas=1024%2C1024&fit=bounds&format=jpg&height=1024&width=1024",
+      "sourceUrl": "https://www.costco.com/p/-/tramontina-38-quart-stock-pot-with-lid/100365409",
+      "sourceProvider": "Costco",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.costco.com/p/-/tramontina-38-quart-stock-pot-with-lid/100365409",
+        "sourceName": "Costco",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "191",
+      "productName": "Soup Kettle",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://icacateringeagleus.com/cdn/shop/files/422ed98f-85ff-4963-a892-cb73bc93c9a5-silver-electric-andrew-james-s-20240622150802091.jpg?v=1776105156",
+      "sourceUrl": "https://icacateringeagleus.com/products/restaurant-00013-sk-silver",
+      "sourceProvider": "Catering Eagle",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://icacateringeagleus.com/products/restaurant-00013-sk-silver",
+        "sourceName": "Catering Eagle",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "193",
+      "productName": "Planetary Mixer 20L",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://t4all.pl/58-large_default/planetary-mixer-20l-400v-mixer-for-cakes-creams-eggs-with-belt-gear.jpg",
+      "sourceUrl": "https://t4all.pl/en/planetary-mixers/16-planetary-mixer-20l-400v-mixer-for-cakes-creams-eggs-with-belt-gear.html",
+      "sourceProvider": "T4ALL",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://t4all.pl/en/planetary-mixers/16-planetary-mixer-20l-400v-mixer-for-cakes-creams-eggs-with-belt-gear.html",
+        "sourceName": "T4ALL",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    },
+    {
+      "productId": "199",
+      "productName": "Spiral Mixer 40L",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www.fridgefreezerdirect.co.uk/media/catalog/product/cache/549c946026c641114bf18d601fc75202/2/7/271017.png",
+      "sourceUrl": "https://www.fridgefreezerdirect.co.uk/hamoki-hm-40-40-litre-spiral-mixer",
+      "sourceProvider": "Fridge Freezer Direct",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.fridgefreezerdirect.co.uk/hamoki-hm-40-40-litre-spiral-mixer",
+        "sourceName": "Fridge Freezer Direct",
+        "checkedAt": "2026-09-21",
+        "requirementsSatisfied": false
+      },
+      "notes": "Discovery-only candidate; requires independent verification before promotion to VERIFIED or apply."
+    }
+  ],
+  "pendingProducts": [
+    {
+      "productId": "86",
+      "productName": "Stainless Wall Shelf - 4ft",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "139",
+      "productName": "Home Theatre Speaker Set",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "164",
+      "productName": "Chest Freezer Home/Shop",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "168",
+      "productName": "Electric Cooker",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "169",
+      "productName": "Standing Fan",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "173",
+      "productName": "Blender",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "174",
+      "productName": "Toaster",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "188",
+      "productName": "Rice Cooker 20L",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "195",
+      "productName": "Planetary Mixer 40L",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
+      "productId": "197",
+      "productName": "Spiral Mixer 20L",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    }
+  ],
+  "summary": {
+    "productsProcessed": 25,
+    "candidatesFound": 14,
+    "productsWithNoCandidate": 10,
+    "duplicateUrlsRejected": 0,
+    "candidatesRequiringFurtherVerification": 14,
+    "productsRemainingPendingAfterBatch": 304,
+    "batchProductsStillPending": 10
+  },
+  "notes": "Discovery-only research batch. No media mapping was applied. CANDIDATE does not mean VERIFIED. Existing media mappings were not modified."
+}
