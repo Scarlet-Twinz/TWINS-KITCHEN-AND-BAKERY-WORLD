@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "batchId": "verification-batch-002",
+  "generatedAt": "2026-09-21T21:36:00.000Z",
+  "sourceCandidateManifest": "tools/media-ingestion/manifests/candidate-batch-002.json",
+  "catalogue": {
+    "population": 530,
+    "canonical": true
+  },
+  "verificationPolicy": "Independent web verification only. No catalogue or media mappings modified.",
+  "candidatesReviewed": [
+    {
+      "productId": "54",
+      "productName": "One-Bag Bakery Oven",
+      "candidateImageUrl": "https://pictures-nigeria.jijistatic.net/200773317_NjIwLTc3NC0xZmUzYjk2MzJh.webp",
+      "sourceUrl": "https://jiji.ng/ojo/restaurant-and-catering-equipment/one-bag-oven-wYH0859P8OO20T4rwgFWVfg7.html",
+      "sourceProvider": "Jiji",
+      "result": "VERIFIED",
+      "evidence": "The Jiji listing is accessible and explicitly titled 'One Bag Oven'. Its page image is the same stainless multi-deck bakery oven shown by the candidate image URL. The catalogue product is the same product type and has no model/capacity/dimension constraint that conflicts with the evidence.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "76",
+      "productName": "Commercial Chest Freezer - Large",
+      "candidateImageUrl": "https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/V/O/126611_1615923199.jpg",
+      "sourceUrl": "https://www.konga.com/product/snowsea-double-door-chest-freezer-bd-600-grey-5176620",
+      "sourceProvider": "Konga",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The Konga product is independently identifiable as Snowsea Double Door Chest Freezer BD-600 Grey, product code 5176620, and is consistent with the catalogue's large commercial chest-freezer type. However, the candidate direct image URL could not be independently fetched by the verification browser, so the direct-image validity and image-to-source linkage requirement are not fully satisfied. The source page itself returned 403 to direct fetch, although the current Konga listing is independently discoverable in search.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "77",
+      "productName": "Commercial Undercounter Refrigerator",
+      "candidateImageUrl": "https://admiralcraft.com/cdn/shop/files/jqoblsvpwix0p7xprrb9_1200x.jpg?v=1772359500",
+      "sourceUrl": "https://admiralcraft.com/products/u-star-solid-door-undercounter-refrigerator-48-2-door",
+      "sourceProvider": "Admiral Craft",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The previously accessible Admiral Craft page identifies a U-Star two-solid-door undercounter refrigerator, 11.9 cu ft, SKU USUCRF-48, 48-inch configuration, which matches the catalogue product type. The candidate image URL now returns 404, and a current direct fetch of the source page also returns 404. Because the direct image URL is not currently valid and the source page is no longer directly accessible, verification cannot be completed.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "88",
+      "productName": "Heavy-Duty 4-Tier Storage Rack",
+      "candidateImageUrl": "https://www.nextdaycatering.co.uk/363822-large_default/commercial-shelving-unit-4-tier-800kg-shelf-width-1960mm-depth-610mm-black-wire-stalwart-da-kit99.jpg",
+      "sourceUrl": "https://www.nextdaycatering.co.uk/product/229750/commercial-shelving-unit-4-tier-800kg-shelf-width-1960mm-depth-610mm-black-wire-stalwart-da-kit99",
+      "sourceProvider": "Next Day Catering",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies Stalwart DA-KIT99 commercial shelving as 4-tier, 1960mm wide, 610mm deep, 1830mm high, with up to 800kg per shelf. The candidate image resolves and visibly shows the same black four-tier heavy-duty rack form. These attributes match the catalogue product type and distinguishing 4-tier configuration.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "108",
+      "productName": "Stainless Wall Cabinet",
+      "candidateImageUrl": "https://cdnimg.webstaurantstore.com/images/products/large/566057/3115309.jpg",
+      "sourceUrl": "https://www.webstaurantstore.com/regency-60-stainless-steel-wall-cabinet-with-sliding-doors/600WCS1560.html",
+      "sourceProvider": "WebstaurantStore",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies the Regency 60-inch NSF stainless steel wall cabinet with sliding doors, item 600WCS1560, and provides product images including the stainless wall cabinet configuration. The candidate image resolves and visibly shows that same cabinet configuration. The catalogue is generic and contains no conflicting model or dimensions.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "160",
+      "productName": "Game Room Seating",
+      "candidateImageUrl": "https://www.spotonbilliards.com/cdn/shop/files/SPEC-CAPRGB_jpg.webp?v=1768271600&width=1500",
+      "sourceUrl": "https://www.spotonbilliards.com/products/ram-game-room-spectator-chair-cappuccino",
+      "sourceProvider": "Spot On Billiards",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies the Ram Game Room Spectator Chair - Cappuccino and displays the same spectator-chair configuration shown in the candidate image. The catalogue product is generic 'Game Room Seating', so the specific chair is a direct product-type match with no conflicting catalogue attribute.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "175",
+      "productName": "Electric Iron",
+      "candidateImageUrl": "https://iziway.cm/images/uploaded/catalog/Petit-electromenager/binatone-fer-a-repasser-a-sec-di106-1200w-blanc-12-mois-garantis-iziwaycameroun.jpeg",
+      "sourceUrl": "https://iziway.cm/fer-a-repasser-a-sec-binatone-di108-1200w-blanc-garantie-12-mois",
+      "sourceProvider": "Iziway",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The source page is accessible and explicitly identifies a Binatone DI108 dry iron, with the product page image family labeled DI108. The candidate image URL is valid and shows a Binatone dry iron, but its filename explicitly identifies DI106 while the source page identifies model DI108. That model discrepancy is contradictory evidence, so the candidate is not upgraded to VERIFIED.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "178",
+      "productName": "6-Burner Gas Range",
+      "candidateImageUrl": "https://www.serhsequipments.com/cdnassets/20706200_G9F6_T.jpg",
+      "sourceUrl": "https://www.serhsequipments.com/cocina-6-fuegos-a-gas-hornomaxi-mod-g9f6t",
+      "sourceProvider": "SERHS Equipments",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies 'COCINA 6 FUEGOS A GAS + HORNOMAXI MOD G9F6+T', model G9F6+T, natural gas, 1200mm width, 900mm depth and 900mm height. The candidate image resolves and visibly shows a six-burner commercial gas range with oven, matching the source product image and the catalogue's 6-burner configuration. The page notes photographs can be illustrative, but the candidate is the source's own product image and the structured product identity is consistent.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "183",
+      "productName": "Double Fryer",
+      "candidateImageUrl": "https://www.costco.com.au/medias/sys_master/images/h31/hbb/102876098068510.jpg",
+      "sourceUrl": "https://www.costco.com.au/Appliances/Kitchen-Appliances/Air-Fryers-Deep-Fryers/Devanti-Electric-Commercial-Chip-Cooker-Deep-Fryer-Twin-Frying-Basket-Countertop-20L-CDF-DR20-DOUBLE-SI/p/134647",
+      "sourceProvider": "Costco Australia",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The Costco Australia source page is accessible and explicitly identifies the Devanti CDF-DR20-DOUBLE-SI twin deep fryer: 20 litres, twin baskets, 6000W total, 3000W per basket, stainless steel, with matching dimensions and model number. However, the candidate direct image URL could not be independently fetched by the verification browser, so the direct-image validity and exact image-to-source linkage cannot be fully established.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "189",
+      "productName": "Bain Marie Cooking Station",
+      "candidateImageUrl": "https://bymart.co.zm/cdn/shop/files/bain-marie-front_400x400_crop_center.png?v=1774963127",
+      "sourceUrl": "https://bymart.co.zm/collections/deep-fryers",
+      "sourceProvider": "BYMART Investments",
+      "result": "VERIFIED",
+      "evidence": "The retained source URL is an accessible BYMART collection page that explicitly lists the Commercial 2-Tank Gas Bain Marie Food Warmer. Following that listing leads to the product page, which identifies a two-tank gas bain marie/food warmer, two independent water-bath wells, two included GN pans, three utensil holders and stainless construction. The candidate image URL resolves and visibly shows the same two-tank stainless bain-marie configuration. This is sufficient to identify the candidate as a bain marie cooking station.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "190",
+      "productName": "Commercial Stock Pot",
+      "candidateImageUrl": "https://bfasset.costco-static.com/U447IH35/as/3kbj3q2qnpjtv4vksx7vxpv/1040545-847__1?auto=webp&canvas=1024%2C1024&fit=bounds&format=jpg&height=1024&width=1024",
+      "sourceUrl": "https://www.costco.com/p/-/tramontina-38-quart-stock-pot-with-lid/100365409",
+      "sourceProvider": "Costco",
+      "result": "VERIFIED",
+      "evidence": "The Costco source page explicitly identifies the Tramontina 38 Quart Stock Pot with Lid, item 1040545, and describes it as a commercial 18/8 stainless-steel stock pot with lid. The candidate image resolves and visibly shows the same stainless stock pot and lid. The 38-quart capacity directly fits the catalogue's generic Commercial Stock Pot entry.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "191",
+      "productName": "Soup Kettle",
+      "candidateImageUrl": "https://icacateringeagleus.com/cdn/shop/files/422ed98f-85ff-4963-a892-cb73bc93c9a5-silver-electric-andrew-james-s-20240622150802091.jpg?v=1776105156",
+      "sourceUrl": "https://icacateringeagleus.com/products/restaurant-00013-sk-silver",
+      "sourceProvider": "Catering Eagle",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies Silver Soup Kettle 10L, model 00013, with stainless inner pot, silver finish and electric operation. The candidate image URL resolves and visibly shows the same cylindrical silver electric soup kettle. The product type and distinguishing model/capacity attributes directly match the catalogue name 'Soup Kettle'.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "193",
+      "productName": "Planetary Mixer 20L",
+      "candidateImageUrl": "https://t4all.pl/58-large_default/planetary-mixer-20l-400v-mixer-for-cakes-creams-eggs-with-belt-gear.jpg",
+      "sourceUrl": "https://t4all.pl/en/planetary-mixers/16-planetary-mixer-20l-400v-mixer-for-cakes-creams-eggs-with-belt-gear.html",
+      "sourceProvider": "T4ALL",
+      "result": "VERIFIED",
+      "evidence": "The T4ALL source page explicitly identifies a Planetary mixer 20L 400V, model B20F, with 20-litre bowl capacity and 400V voltage. The candidate image URL resolves and visibly shows the same planetary mixer configuration with bowl and attachments. The 20L capacity and planetary mixer type directly match the catalogue product.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    },
+    {
+      "productId": "199",
+      "productName": "Spiral Mixer 40L",
+      "candidateImageUrl": "https://www.fridgefreezerdirect.co.uk/media/catalog/product/cache/549c946026c641114bf18d601fc75202/2/7/271017.png",
+      "sourceUrl": "https://www.fridgefreezerdirect.co.uk/hamoki-hm-40-40-litre-spiral-mixer",
+      "sourceProvider": "Fridge Freezer Direct",
+      "result": "VERIFIED",
+      "evidence": "The source page explicitly identifies the Hamoki HM-40 40 Litre Spiral Mixer, SKU 271017, with 40-litre capacity, 480x860x760mm dimensions, 2.2kW power and stainless bowl. The candidate image URL resolves and visibly shows the same Hamoki spiral mixer configuration. The 40L capacity and HM-40 model directly match the catalogue product.",
+      "verifiedAt": "2026-09-21T21:36:00.000Z",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T21:36:00.000Z"
+    }
+  ],
+  "summary": {
+    "candidatesReviewed": 14,
+    "verified": 10,
+    "rejected": 0,
+    "needsReview": 4,
+    "duplicateConflicts": 0,
+    "inaccessibleOrFailedSources": [
+      {
+        "productId": "76",
+        "type": "source-page-and-candidate-image",
+        "detail": "Direct Konga source fetch returned 403 and candidate Cloudinary image could not be independently fetched; product page was independently identifiable in current search."
+      },
+      {
+        "productId": "77",
+        "type": "source-page-and-candidate-image",
+        "detail": "Current Admiral Craft source fetch returned 404 and candidate image URL returned 404."
+      },
+      {
+        "productId": "183",
+        "type": "candidate-image",
+        "detail": "Costco Australia product page was accessible, but the candidate direct image URL returned an internal fetch error."
+      }
+    ],
+    "inaccessibleUrlProductIds": [
+      "76",
+      "77",
+      "183"
+    ],
+    "mappingsApplied": 0
+  },
+  "notes": "Independent verification completed for exactly the 14 CANDIDATE products in candidate-batch-002.json. The 11 PENDING products were not verified. The original candidate manifest was not modified. No data.js, app.js, validator.js, collector.js or existing media mappings were modified. No apply or dry-run was executed. Candidate image URL uniqueness was checked against the repository search results and the candidate set; no duplicate conflict was found."
+}
