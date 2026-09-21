@@ -20,7 +20,7 @@ function pendingRecord(product, candidate) {
 
 function buildPendingManifest(data = loadCatalogue(), rules = readExistingRules()) {
   const state = computeMediaState(data, rules);
-  return {
+  const manifest = {
     schemaVersion: 1,
     catalogue: {
       population: state.counts.catalogue,
@@ -37,6 +37,10 @@ function buildPendingManifest(data = loadCatalogue(), rules = readExistingRules(
       .map(product => pendingRecord(product, state.resolved.find(x => x.product.id === product.id)?.candidate || { src: "" }))
       .sort((a, b) => Number(a.productId) - Number(b.productId))
   };
+
+  // Materialize a plain JSON value so repeated builds cannot retain VM-origin
+  // object prototypes from independently loaded catalogue evaluations.
+  return JSON.parse(JSON.stringify(manifest));
 }
 
 function writePendingManifest(output = DEFAULT_PENDING_MANIFEST) {
