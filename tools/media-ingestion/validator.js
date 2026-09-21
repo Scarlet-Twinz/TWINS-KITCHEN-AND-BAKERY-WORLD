@@ -132,7 +132,7 @@ function existingCandidate(product, data, rules) {
   const id = String(product.id);
   if (rules.blocklist[id]) return { src: "", status: "pending", source: rules.blocklist[id] };
 
-  const idOverride = getIdMapValue(data.CATALOG_MEDIA_OVERRIDES_BY_ID, id);
+  const idOverride = getIdMapValue(data.byId, id);
   if (idOverride) return { src: idOverride, status: "reference", source: "verified product reference" };
 
   if (product.media?.images?.length && String(product.media.source || "").startsWith("supplied Twins")) {
