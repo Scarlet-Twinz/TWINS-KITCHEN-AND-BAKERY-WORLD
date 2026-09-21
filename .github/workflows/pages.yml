@@ -39,14 +39,26 @@ jobs:
         run: |
           mkdir site
           rsync -a             --exclude='.git'             --exclude='.github'             --exclude='backend'             --exclude='scripts'             --exclude='docker-compose.yml'             --exclude='DEPLOYMENT.md'             --exclude='README.md'             --exclude='*.md'             ./ site/
+      - name: Check Pages configuration
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            echo "GitHub Pages is enabled; deployment will run."
+          else
+            echo "enabled=false" >> "${GITHUB_OUTPUT}"
+            echo "GitHub Pages is not enabled for this repository; deployment is skipped and the validated site artifact is still produced."
+          fi
       - name: Configure Pages
+        if: steps.pages.outputs.enabled == 'true'
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
       - name: Deploy
+        if: steps.pages.outputs.enabled == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
