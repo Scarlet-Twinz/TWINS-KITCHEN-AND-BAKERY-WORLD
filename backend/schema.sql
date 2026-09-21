@@ -262,6 +262,20 @@ create index if not exists idx_orders_user_created on orders(user_id,created_at 
 create index if not exists idx_order_items_order on order_items(order_id);
 create index if not exists idx_deliveries_status_created on deliveries(status,created_at desc);
 
+-- Server-side authentication sessions. The browser only receives an opaque random token.
+create table if not exists user_sessions (
+  id uuid primary key,
+  user_id uuid not null references users(id) on delete cascade,
+  token_hash text unique not null,
+  expires_at timestamptz not null,
+  last_seen_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  revoked_at timestamptz
+);
+
+create index if not exists idx_user_sessions_user_active on user_sessions(user_id,expires_at desc) where revoked_at is null;
+create index if not exists idx_user_sessions_expiry on user_sessions(expires_at) where revoked_at is null;
+
 -- Phase 4 production hardening.
 create index if not exists idx_users_email_lower on users(lower(email));
 create index if not exists idx_seller_profiles_verification on seller_profiles(verification_status,seller_status);
