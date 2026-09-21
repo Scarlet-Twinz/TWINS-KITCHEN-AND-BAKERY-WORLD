@@ -412,8 +412,17 @@ function deny() {
     '<main style="min-height:100vh;display:grid;place-items:center;padding:20px"><div class="panel" style="max-width:520px;text-align:center"><span class="eyebrow">TWINS ADMIN</span><h1>Staff access required</h1><p class="muted">Sign in with a server-authenticated staff or admin account to open the operations workspace.</p><a class="btn red" href="login.html">Sign in</a></div></main>';
 }
 
-window.addEventListener("load", function () {
-  if (isAdmin()) renderShell();
-  else deny();
+window.addEventListener("load", async function () {
+  try {
+    var session = await request("/api/account/me");
+    var role = session && session.user && session.user.role;
+    if (role === "admin" || role === "staff") {
+      currentUser = Object.assign({}, session.user, {remote:true});
+      localStorage.setItem("twins_user", JSON.stringify(currentUser));
+      renderShell();
+      return;
+    }
+  } catch (e) {}
+  deny();
 });
 })();
