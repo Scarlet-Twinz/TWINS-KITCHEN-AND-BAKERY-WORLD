@@ -79,22 +79,34 @@ def validate_production_security():
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
     return psycopg.connect(settings.database_url)
-def sign_session(user_id:str,role:str)->str:
-    if not settings.session_secret:
-        raise HTTPException(status_code=503,detail="Session security is not configured")
-    payload={"sub":user_id,"role":role,"iat":int(datetime.now(timezone.utc).timestamp()),"exp":int((datetime.now(timezone.utc)+timedelta(hours=8)).timestamp())}
-    raw=base64.urlsafe_b64encode(json.dumps(payload,separators=(",",":")).encode()).decode().rstrip("=")
-    sig=hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()
-    return raw+"."+sig
+def create_session(conn,user_id:str)->str:
+    token=secrets.token_urlsafe(32)
+    token_hash=hashlib.sha256(token.encode()).hexdigest()
+    expires_at=datetime.now(timezone.utc)+timedelta(hours=8)
+    conn.execute("insert into user_sessions (id,user_id,token_hash,expires_at) values (%s,%s,%s,%s)",(uuid.uuid4(),uuid.UUID(user_id),token_hash,expires_at))
+    return token
+
 def read_session(request:Request)->dict[str,Any]|None:
+    if not settings.session_secret:
+        return None
     token=request.cookies.get(SESSION_COOKIE)
-    if not token or "." not in token:return None
-    raw,sig=token.rsplit(".",1)
-    if not hmac.compare_digest(sig,hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()):return None
+    if not token or len(token)<40:
+        return None
+    token_hash=hashlib.sha256(token.encode()).hexdigest()
     try:
-        data=json.loads(base64.urlsafe_b64decode((raw+"="*(-len(raw)%4)).encode()))
-        return data if int(data.get("exp",0))>=int(datetime.now(timezone.utc).timestamp()) else None
-    except Exception:return None
+        with db() as conn:
+            row=conn.execute("""select s.user_id,u.role,s.expires_at
+                                from user_sessions s
+                                join users u on u.id=s.user_id
+                                where s.token_hash=%s and s.revoked_at is null and s.expires_at>now()""",(token_hash,)).fetchone()
+            if not row:
+                return None
+            conn.execute("update user_sessions set last_seen_at=now() where token_hash=%s",(token_hash,))
+            conn.commit()
+        return {"sub":str(row[0]),"role":row[1],"exp":int(row[2].timestamp())}
+    except Exception:
+        return None
+
 def require_session(request:Request):
     s=read_session(request)
     if not s:raise HTTPException(status_code=401,detail="Authentication required")
@@ -201,7 +213,8 @@ def signup(payload:AuthPayload,response:Response):
         with db() as conn:
             conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph));conn.commit()
     except psycopg.errors.UniqueViolation:raise HTTPException(status_code=409,detail="An account with this email already exists")
-    response.set_cookie(SESSION_COOKIE,sign_session(str(uid),"customer"),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
+    token=create_session(conn,str(uid))
+        response.set_cookie(SESSION_COOKIE,token,httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
