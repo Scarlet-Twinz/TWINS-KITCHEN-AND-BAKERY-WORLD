@@ -1035,6 +1035,14 @@ const RESOURCE_CARDS=[
   "195":"https://d91ztqmtx7u1k.cloudfront.net/ClientContent/Images/Catalogue/stainless-steel-ss-double-pl-20240702124808762.jpeg",
   "208":"https://static.wixstatic.com/media/c323a8_2533d6b5a94542cbaa397558594b4fb2~mv2.jpg/v1/fit/w_1450%2Ch_590%2Cq_90%2Cenc_avif%2Cquality_auto/c323a8_2533d6b5a94542cbaa397558594b4fb2~mv2.jpg",
   "216":"https://ueeshop.ly200-cdn.com/u_file/UPBH/UPBH018/2512/05/products/6-1149414a8c.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100",
+
+  "190":"https://kitchessence.com/wp-content/uploads/2023/08/ab5759e7-c4aa-4533-bfbc-94e00306eef3-150x150.png",
+  "203":"https://pictures-nigeria.jijistatic.net/194717031_NjIwLTYyMC1jNDNjM2IzMWRk.webp",
+  "217":"https://img.chinax.com/nimg/db/22/dee38b10dcaf19b8c43865cda4c7-200x200-1.jpg",
+  "224":"https://img.chinax.com/nimg/89/a3/db98ab20a756376fd8f187823c27-200x200-1/commercial_220v_240v_salad_bar_fridge_r134a_salad_counter_chiller_2_steel_doors.jpg",
+  "229":"https://restaurantequipmentxpress.com/cdn/shop/files/Stainless_Steel_Table_6ft_693655cb-e3a6-48a9-8432-28215c617bb1.png?v=1742539485&width=1445",
+  "230":"https://yavolo.co.uk/products/images/1/800X800/bdc0de249d476caf89e393a74f171bd4.jpg",
+  "233":"https://cdnimg.webstaurantstore.com/images/products/large/671060/3157109.jpg",
 };
 const MARKETPLACE_CONFIG={name:"Twins Marketplace",description:"A moderated community marketplace alongside the official Twins catalogue.",sellerModel:"Verified seller listings",paymentModel:"Seller membership and promotion payments will connect to a production payment gateway after merchant credentials are configured.",buyerProtection:"Community listings begin as enquiry-first. Twins-owned catalogue checkout can use a payment gateway once prices and inventory are production-ready."};
 const OWNER_PROFILE={name:"Ikechukwu Umeh",role:"Founder",origin:"Anambra State, Nigeria",base:"Lagos, Nigeria",delivery:"Nigeria and across Africa",story:"Ikechukwu Umeh opened Twins Kitchen with a practical idea: make it easier for people building food and hospitality businesses to find the equipment they need, understand the workflow around it and have a direct conversation before committing to a purchase. With roots in Anambra State and the business based in Lagos, the company is positioned around real commercial equipment enquiries from restaurants, bakeries, cafés, hotels, catering businesses and other food-service operators. The aim is simple — make equipment buying clearer, more personal and more useful, from the first idea through the final specification."};
