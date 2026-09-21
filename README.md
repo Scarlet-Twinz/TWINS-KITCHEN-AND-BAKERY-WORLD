@@ -17,7 +17,7 @@ A commerce-style static storefront for **Twins Kitchen**, designed around profes
 - Persistent cart with quantity controls and reusable saved equipment lists
 - Quotation request flow
 - WhatsApp enquiry flow
-- Customer login/signup demo
+- Customer login/signup with real backend sessions when the API is configured; localhost-only demo auth for static development
 - Customer dashboard
 - FAQ and delivery information
 - Contact, directions and business information
@@ -110,7 +110,7 @@ The project now separates the static storefront from the planned production back
 - Admin access is denied unless the browser has a server-authenticated staff/admin session
 - Current admin modules: Overview, Catalogue, Inventory, Quotes, Orders, Customers & Staff, Payments, Delivery, Marketplace Moderation, Audit Log and Settings
 - Catalogue and quotation views can consume the existing data/API without modifying storefront data.js
-- Inventory, Orders, Payments, Delivery and Audit Log have explicit integration surfaces reserved for backend persistence
+- Inventory, Orders, Delivery and Audit Log are connected to the backend persistence layer; Payments remain gateway-ready until merchant credentials and webhooks are configured
 - Payments intentionally stop at a gateway-ready operations surface; merchant credentials and webhooks are not hardcoded into the frontend
 - Production admin authorization remains server-side in backend/
 
@@ -137,12 +137,12 @@ The admin frontend is now mapped as a complete operations workspace. The interfa
 2. **Catalogue** — searchable/filterable product management surface using the current data-driven catalogue without mutating data.js.
 3. **Inventory** — stock, availability and adjustment workspace reserved for server inventory records.
 4. **Quotes** — server-persisted quotation requests with customer/project detail inspection.
-5. **Orders** — order lifecycle and fulfilment workspace reserved for the backend order service.
+5. **Orders** — order lifecycle and fulfilment workspace backed by the backend order service.
 6. **Customers & Staff** — account and role boundary documentation inside the admin console.
 7. **Payments** — gateway-ready transaction workspace; Paystack/Flutterwave credentials and webhooks are intentionally deferred.
-8. **Delivery** — dispatch, destination, status and completion workspace reserved for backend delivery records.
+8. **Delivery** — dispatch, destination, status and completion workspace backed by backend delivery records.
 9. **Marketplace** — community-listing moderation surface kept separate from official Twins catalogue stock.
-10. **Audit Log** — operational/security event surface reserved for server-written audit records.
+10. **Audit Log** — operational/security event surface backed by server-written audit records.
 11. **Settings** — API, payment and production-readiness configuration surface.
 
 ### Backend integration boundary
