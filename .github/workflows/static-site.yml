@@ -14,8 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Validate JavaScript and local HTML references
         run: node scripts/validate-site.mjs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: python -m pip install --disable-pip-version-check -r backend/requirements.txt
+
+      - name: Compile backend Python
+        run: python -m compileall -q backend
+
+      - name: Import backend application
+        working-directory: backend
+        env:
+          SESSION_SECRET: ci-only-secret-for-import-validation-0123456789
+          APP_ENV: development
+        run: python -c "import main; assert main.app.title == 'Twins Kitchen & Bakery World API'; assert '__Host-twins_session' in main.__dict__.get('settings').model_dump_json() or '__Host-twins_session' in open('main.py', encoding='utf-8').read(); print('Backend import validation passed.')"
