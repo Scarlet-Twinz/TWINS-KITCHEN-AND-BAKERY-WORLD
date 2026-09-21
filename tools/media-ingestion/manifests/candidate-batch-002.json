@@ -304,6 +304,12 @@
       "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
     },
     {
+      "productId": "161",
+      "productName": "Scoreboard Display",
+      "status": "PENDING",
+      "reason": "No sufficiently trustworthy direct-image match was retained without guessing."
+    },
+    {
       "productId": "164",
       "productName": "Chest Freezer Home/Shop",
       "status": "PENDING",
@@ -355,11 +361,11 @@
   "summary": {
     "productsProcessed": 25,
     "candidatesFound": 14,
-    "productsWithNoCandidate": 10,
+    "productsWithNoCandidate": 11,
     "duplicateUrlsRejected": 0,
     "candidatesRequiringFurtherVerification": 14,
     "productsRemainingPendingAfterBatch": 304,
-    "batchProductsStillPending": 10
+    "batchProductsStillPending": 11
   },
   "notes": "Discovery-only research batch. No media mapping was applied. CANDIDATE does not mean VERIFIED. Existing media mappings were not modified."
 }
