@@ -170,7 +170,9 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "527":"assets/media/twins-cold-food-display-counter-02.jpg",
   "528":"assets/media/twins-commercial-dehydrator.jpg",
   "529":"assets/media/twins-supermarket-shelf-white.jpg",
-  "530":"assets/media/twins-supermarket-shelf-blue.jpg"
+  "530":"assets/media/twins-supermarket-shelf-blue.jpg",
+  "129":"https://www.hb-digital.de/media/image/product/178/lg/sat-verteiler-d4fv-4-fach-sat-kabel-splitter.jpg",
+  "141":"https://www.appliancesonline.com.au/ak/5/7/d/8/57d81360c084361e7e32889fb95c399cb8dc79fa_Pioneer_51_Channel_Atmos_Network_AV_Receiver_with_Bluetooth_Black_VSX832_hero_high-high.jpeg"
 };
 const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
