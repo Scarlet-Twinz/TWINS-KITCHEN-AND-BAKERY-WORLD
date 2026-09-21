@@ -1,0 +1,3086 @@
+{
+  "schemaVersion": 1,
+  "catalogue": {
+    "population": 530,
+    "canonical": true,
+    "generatedFrom": "data.js canonical P population",
+    "generatedBy": "tools/media-ingestion/collector.js"
+  },
+  "counts": {
+    "catalogue": 530,
+    "assigned": 223,
+    "pending": 307
+  },
+  "products": [
+    {
+      "productId": "54",
+      "name": "One-Bag Bakery Oven",
+      "category": "Bakery Equipment",
+      "type": "Bakery",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "76",
+      "name": "Commercial Chest Freezer - Large",
+      "category": "Cold Storage",
+      "type": "Cold Storage",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "77",
+      "name": "Commercial Undercounter Refrigerator",
+      "category": "Cold Storage",
+      "type": "Cold Storage",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "86",
+      "name": "Stainless Wall Shelf - 4ft",
+      "category": "Storage",
+      "type": "Storage",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "88",
+      "name": "Heavy-Duty 4-Tier Storage Rack",
+      "category": "Storage",
+      "type": "Storage",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "108",
+      "name": "Stainless Wall Cabinet",
+      "category": "Storage",
+      "type": "Storage",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "118",
+      "name": "GOtv Decoder",
+      "category": "Satellite & TV",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "139",
+      "name": "Home Theatre Speaker Set",
+      "category": "Entertainment & Leisure",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "150",
+      "name": "Snooker Table 6ft",
+      "category": "Games & Recreation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "151",
+      "name": "Snooker Table 7ft",
+      "category": "Games & Recreation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "160",
+      "name": "Game Room Seating",
+      "category": "Games & Recreation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "161",
+      "name": "Scoreboard Display",
+      "category": "Games & Recreation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "164",
+      "name": "Chest Freezer Home/Shop",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "167",
+      "name": "Microwave Oven 30L",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "168",
+      "name": "Electric Cooker",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "169",
+      "name": "Standing Fan",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "173",
+      "name": "Blender",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "174",
+      "name": "Toaster",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "175",
+      "name": "Electric Iron",
+      "category": "Home & General Appliances",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "178",
+      "name": "6-Burner Gas Range",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "183",
+      "name": "Double Fryer",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "188",
+      "name": "Rice Cooker 20L",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "189",
+      "name": "Bain Marie Cooking Station",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "190",
+      "name": "Commercial Stock Pot",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "191",
+      "name": "Soup Kettle",
+      "category": "Cooking Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "193",
+      "name": "Planetary Mixer 20L",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "195",
+      "name": "Planetary Mixer 40L",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "197",
+      "name": "Spiral Mixer 20L",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "199",
+      "name": "Spiral Mixer 40L",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "200",
+      "name": "Spiral Mixer 50L",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "203",
+      "name": "Dough Moulder",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "205",
+      "name": "Tray Rack 20-Level",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "207",
+      "name": "Dough Sheeter 500mm",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "208",
+      "name": "Dough Sheeter 650mm",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "209",
+      "name": "Proofer 16-Tray",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "210",
+      "name": "Proofer 32-Tray",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "211",
+      "name": "Deck Oven 1 Deck",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "212",
+      "name": "Deck Oven 2 Deck",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "213",
+      "name": "Deck Oven 3 Deck",
+      "category": "Bakery Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "216",
+      "name": "Triple Door Chiller",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "217",
+      "name": "Four Door Chiller",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "219",
+      "name": "Chest Freezer Large",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "221",
+      "name": "Undercounter Freezer",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "224",
+      "name": "Salad Counter Chiller",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "225",
+      "name": "Pizza Prep Chiller",
+      "category": "Cold Storage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "229",
+      "name": "Prep Table 4ft",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "230",
+      "name": "Prep Table 6ft",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "233",
+      "name": "Three Compartment Sink",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "236",
+      "name": "Under-counter Dishwasher",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "237",
+      "name": "Hood Dishwasher",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "238",
+      "name": "Pot Washer",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "239",
+      "name": "Mobile Prep Cart",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "240",
+      "name": "Stainless Pot Rack",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "241",
+      "name": "Ingredient Bin",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "242",
+      "name": "Kitchen Utility Cart",
+      "category": "Kitchen Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "243",
+      "name": "Bain Marie 4 Pan",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "245",
+      "name": "Bain Marie 8 Pan",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "247",
+      "name": "Food Warmer 6 Pan",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "248",
+      "name": "Food Warmer 10 Pan",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "249",
+      "name": "Hot Food Counter",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "250",
+      "name": "Cold Food Counter",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "252",
+      "name": "Soup Warmer",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "253",
+      "name": "Plate Warmer",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "254",
+      "name": "Mobile Serving Counter",
+      "category": "Serving Equipment",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "255",
+      "name": "Commercial Espresso Machine 1 Group",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "258",
+      "name": "Coffee Grinder",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "259",
+      "name": "Coffee Brewer",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "260",
+      "name": "Coffee Warmer",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "261",
+      "name": "Juice Extractor",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "262",
+      "name": "Citrus Juicer",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "263",
+      "name": "Frappe Blender",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "264",
+      "name": "Milkshake Machine",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "265",
+      "name": "Slush Machine",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "266",
+      "name": "Ice Crusher",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "267",
+      "name": "Bar Ice Bin",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "268",
+      "name": "Glass Washer",
+      "category": "Bar & Beverage",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "270",
+      "name": "Vegetable Cutter",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "271",
+      "name": "Meat Grinder",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "273",
+      "name": "Sausage Stuffer",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "274",
+      "name": "Vacuum Sealer",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "277",
+      "name": "Chicken Plucker",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "278",
+      "name": "Grain Milling Machine",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "279",
+      "name": "Stick Blender",
+      "category": "Food Preparation",
+      "type": "Expanded catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "281",
+      "name": "Commercial Commercial Gas Burner",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "282",
+      "name": "Heavy-Duty Electric Hot Plate",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "283",
+      "name": "Professional Countertop Griddle",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "284",
+      "name": "Stainless Commercial Rice Cooker",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "285",
+      "name": "Digital Electric Tilting Pan",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "286",
+      "name": "Automatic Soup Kettle",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "287",
+      "name": "Compact Stock Pot Burner",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "288",
+      "name": "Industrial Commercial Pasta Cooker",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "289",
+      "name": "Premium Steam Cooking Cabinet",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "290",
+      "name": "High-Capacity Charcoal Grill Station",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "291",
+      "name": "Countertop Electric Salamander",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "292",
+      "name": "Commercial Commercial Crepe Maker",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "293",
+      "name": "Heavy-Duty Waffle Maker",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "294",
+      "name": "Professional Contact Grill",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "295",
+      "name": "Stainless Hot Dog Roller",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "296",
+      "name": "Digital Commercial Toaster",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "297",
+      "name": "Automatic Tilting Braising Pan",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "298",
+      "name": "Compact Cooking Kettle",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "299",
+      "name": "Industrial Induction Cooker",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "300",
+      "name": "Premium Range Hood Controller",
+      "category": "Cooking Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "301",
+      "name": "High-Capacity Dough Divider",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "302",
+      "name": "Countertop Dough Rounder",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "303",
+      "name": "Commercial Bread Slicer",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "304",
+      "name": "Heavy-Duty Planetary Mixer",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "305",
+      "name": "Professional Spiral Mixer",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "306",
+      "name": "Stainless Dough Moulder",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "307",
+      "name": "Digital Bread Proofer",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "308",
+      "name": "Automatic Deck Oven",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "310",
+      "name": "Industrial Pastry Oven",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "311",
+      "name": "Premium Baking Tray Rack",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "312",
+      "name": "High-Capacity Cooling Rack",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "313",
+      "name": "Countertop Baking Work Table",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "314",
+      "name": "Commercial Cake Decorating Station",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "315",
+      "name": "Heavy-Duty Dough Retarder",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "316",
+      "name": "Professional Bread Bag Sealer",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "317",
+      "name": "Stainless Bakery Depositor",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "318",
+      "name": "Digital Cake Depositor",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "319",
+      "name": "Automatic Pastry Sheeter",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "320",
+      "name": "Compact Bakery Packaging Machine",
+      "category": "Bakery Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "321",
+      "name": "Industrial Preparation Table",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "322",
+      "name": "Premium Pot Wash Sink",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "323",
+      "name": "High-Capacity Three Compartment Sink",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "324",
+      "name": "Countertop Hand Wash Station",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "325",
+      "name": "Commercial Pre-Rinse Faucet",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "326",
+      "name": "Heavy-Duty Wall Shelf",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "327",
+      "name": "Professional Ingredient Bin",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "328",
+      "name": "Stainless Kitchen Trolley",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "329",
+      "name": "Digital Utility Cart",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "330",
+      "name": "Automatic Plate Rack",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "331",
+      "name": "Compact Knife Rack",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "332",
+      "name": "Industrial Waste Bin Station",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "333",
+      "name": "Premium Mobile Prep Bench",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "334",
+      "name": "High-Capacity Kitchen Pass Counter",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "335",
+      "name": "Countertop Stainless Cabinet",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "336",
+      "name": "Commercial Corner Work Table",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "337",
+      "name": "Heavy-Duty Under-Counter Cabinet",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "338",
+      "name": "Professional Dish Landing Table",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "339",
+      "name": "Stainless Kitchen Floor Drain",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "340",
+      "name": "Digital Service Counter",
+      "category": "Kitchen Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "341",
+      "name": "Automatic Upright Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "342",
+      "name": "Compact Glass Door Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "343",
+      "name": "Industrial Chest Freezer",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "344",
+      "name": "Premium Under Counter Freezer",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "345",
+      "name": "High-Capacity Bottle Cooler",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "346",
+      "name": "Countertop Back Bar Cooler",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "347",
+      "name": "Commercial Blast Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "348",
+      "name": "Heavy-Duty Blast Freezer",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "349",
+      "name": "Professional Cold Room Panel",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "350",
+      "name": "Stainless Cold Room Door",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "351",
+      "name": "Digital Refrigerated Prep Table",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "352",
+      "name": "Automatic Ice Storage Bin",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "353",
+      "name": "Compact Display Freezer",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "354",
+      "name": "Industrial Cake Display Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "355",
+      "name": "Premium Meat Display Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "356",
+      "name": "High-Capacity Fish Display Chiller",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "357",
+      "name": "Countertop Cold Beverage Cooler",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "358",
+      "name": "Commercial Milk Cooler",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "359",
+      "name": "Heavy-Duty Wine Cooler",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "360",
+      "name": "Professional Refrigerated Counter",
+      "category": "Cold Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "361",
+      "name": "Stainless Dining Table",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "362",
+      "name": "Digital Dining Chair",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "363",
+      "name": "Automatic Bar Stool",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "364",
+      "name": "Compact Banquet Chair",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "365",
+      "name": "Industrial Reception Desk",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "366",
+      "name": "Premium Hotel Trolley",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "367",
+      "name": "High-Capacity Luggage Trolley",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "368",
+      "name": "Countertop Room Service Trolley",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "369",
+      "name": "Commercial Buffet Table",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "370",
+      "name": "Heavy-Duty Outdoor Dining Set",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "371",
+      "name": "Professional Restaurant Booth",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "372",
+      "name": "Stainless High Table",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "373",
+      "name": "Digital Waiting Bench",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "374",
+      "name": "Automatic Host Stand",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "375",
+      "name": "Compact Service Cart",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "376",
+      "name": "Industrial Banquet Trolley",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "377",
+      "name": "Premium Hotel Housekeeping Cart",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "378",
+      "name": "High-Capacity Conference Table",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "379",
+      "name": "Countertop Conference Chair",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "380",
+      "name": "Commercial Outdoor Umbrella",
+      "category": "Restaurant & Hotel",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "381",
+      "name": "Heavy-Duty Commercial Blender",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "382",
+      "name": "Professional Juice Extractor",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "383",
+      "name": "Stainless Citrus Juicer",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "384",
+      "name": "Digital Ice Crusher",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "386",
+      "name": "Compact Coffee Grinder",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "387",
+      "name": "Industrial Espresso Machine",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "388",
+      "name": "Premium Coffee Brewer",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "389",
+      "name": "High-Capacity Milk Frother",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "390",
+      "name": "Countertop Hot Water Boiler",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "391",
+      "name": "Commercial Tea Urn",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "392",
+      "name": "Heavy-Duty Drink Dispenser",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "393",
+      "name": "Professional Juice Dispenser",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "394",
+      "name": "Stainless Slush Machine",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "395",
+      "name": "Digital Cocktail Mixer",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "396",
+      "name": "Automatic Bar Sink",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "397",
+      "name": "Compact Bar Counter",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "398",
+      "name": "Industrial Bottle Cooler",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "399",
+      "name": "Premium Cup Sealer",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "400",
+      "name": "High-Capacity Water Dispenser",
+      "category": "Bar & Beverage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "401",
+      "name": "Countertop Meat Mincer",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "402",
+      "name": "Commercial Bone Saw",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "403",
+      "name": "Heavy-Duty Vegetable Cutter",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "404",
+      "name": "Professional Food Processor",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "405",
+      "name": "Stainless Food Chopper",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "406",
+      "name": "Digital Potato Peeler",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "407",
+      "name": "Automatic Garlic Peeler",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "408",
+      "name": "Compact Onion Cutter",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "409",
+      "name": "Industrial Sausage Filler",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "410",
+      "name": "Premium Meat Tenderizer",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "411",
+      "name": "High-Capacity Chicken Cutter",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "412",
+      "name": "Countertop Poultry Plucker",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "413",
+      "name": "Commercial Fish Scaler",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "414",
+      "name": "Heavy-Duty Fish Cutter",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "415",
+      "name": "Professional Grain Mill",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "416",
+      "name": "Stainless Flour Sifter",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "417",
+      "name": "Digital Food Dehydrator",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "418",
+      "name": "Automatic Vacuum Sealer",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "419",
+      "name": "Compact Weighing Scale",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "420",
+      "name": "Industrial Packaging Sealer",
+      "category": "Food Preparation",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "421",
+      "name": "Premium Heavy Duty Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "422",
+      "name": "High-Capacity Mobile Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "423",
+      "name": "Countertop Wall Shelf",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "424",
+      "name": "Commercial Ingredient Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "425",
+      "name": "Heavy-Duty Pan Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "426",
+      "name": "Professional Tray Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "427",
+      "name": "Stainless Storage Cabinet",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "428",
+      "name": "Digital Dry Store Cabinet",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "429",
+      "name": "Automatic Bin Storage System",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "430",
+      "name": "Compact Plastic Crate Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "431",
+      "name": "Industrial Bakery Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "432",
+      "name": "Premium Dish Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "433",
+      "name": "High-Capacity Cup Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "434",
+      "name": "Countertop Bottle Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "435",
+      "name": "Commercial Retail Shelf",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "436",
+      "name": "Heavy-Duty Gondola Shelf",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "437",
+      "name": "Professional Warehouse Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "438",
+      "name": "Stainless Lockable Cabinet",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "439",
+      "name": "Digital Mobile Storage Cart",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "440",
+      "name": "Automatic Under Shelf Rack",
+      "category": "Storage",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "441",
+      "name": "Compact Food Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "442",
+      "name": "Industrial Bain Marie",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "443",
+      "name": "Premium Chafing Dish",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "444",
+      "name": "High-Capacity Heated Display Case",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "445",
+      "name": "Countertop Cold Display Counter",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "446",
+      "name": "Commercial Popcorn Machine",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "447",
+      "name": "Heavy-Duty Cotton Candy Machine",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "448",
+      "name": "Professional Hot Dog Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "449",
+      "name": "Stainless Food Display Cabinet",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "450",
+      "name": "Digital Plate Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "451",
+      "name": "Automatic Tray Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "452",
+      "name": "Compact Soup Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "453",
+      "name": "Industrial Countertop Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "454",
+      "name": "Premium Buffet Warmer",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "455",
+      "name": "High-Capacity Serving Trolley",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "456",
+      "name": "Countertop Food Holding Cabinet",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "457",
+      "name": "Commercial Heat Lamp",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "458",
+      "name": "Heavy-Duty Display Stand",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "459",
+      "name": "Professional Service Station",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "460",
+      "name": "Stainless Condiment Station",
+      "category": "Serving Equipment",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "461",
+      "name": "Digital Catering Chafing Dish",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "462",
+      "name": "Automatic Insulated Food Carrier",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "463",
+      "name": "Compact Catering Box",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "464",
+      "name": "Industrial Service Trolley",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "465",
+      "name": "Premium Transport Cart",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "466",
+      "name": "High-Capacity Banquet Table",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "467",
+      "name": "Countertop Folding Chair",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "468",
+      "name": "Commercial Catering Table",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "469",
+      "name": "Heavy-Duty Portable Gas Cooker",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "470",
+      "name": "Professional Catering Warmer",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "471",
+      "name": "Stainless Food Pan Set",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "472",
+      "name": "Digital Serving Tray",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "473",
+      "name": "Automatic Disposable Cup Dispenser",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "475",
+      "name": "Industrial Event Beverage Station",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "476",
+      "name": "Premium Catering Cooler",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "477",
+      "name": "High-Capacity Thermal Carrier",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "478",
+      "name": "Countertop Mobile Buffet Station",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "479",
+      "name": "Commercial Catering Utensil Set",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "480",
+      "name": "Heavy-Duty Event Service Cart",
+      "category": "Catering Supplies",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "481",
+      "name": "Professional GOtv Decoder",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "482",
+      "name": "Stainless GOtv Subscription Package",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "483",
+      "name": "Digital DStv Decoder",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "484",
+      "name": "Automatic DStv Subscription Package",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "485",
+      "name": "Compact Satellite Dish",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "486",
+      "name": "Industrial HD Satellite Dish",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "487",
+      "name": "Premium Satellite LNB",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "488",
+      "name": "High-Capacity Twin LNB",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "489",
+      "name": "Countertop Quad LNB",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "490",
+      "name": "Commercial Satellite Finder",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "491",
+      "name": "Heavy-Duty Coaxial Cable Roll",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "492",
+      "name": "Professional Satellite Receiver",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "493",
+      "name": "Stainless HDMI Cable",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "494",
+      "name": "Digital HDMI Splitter",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "495",
+      "name": "Automatic TV Wall Mount",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "496",
+      "name": "Compact Smart TV",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "497",
+      "name": "Industrial LED TV",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "498",
+      "name": "Premium Android TV Box",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "499",
+      "name": "High-Capacity TV Signal Booster",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "500",
+      "name": "Countertop Remote Control",
+      "category": "Satellite & TV",
+      "type": "Catalogue",
+      "capacity": "",
+      "model": "",
+      "specification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "507",
+      "name": "1 Ton Commercial Reverse Osmosis Water Treatment Plant",
+      "category": "Water Treatment & Pure Water",
+      "type": "Pure Water",
+      "capacity": "",
+      "model": "",
+      "specification": "1 ton class · commercial RO · confirm exact membrane configuration",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "508",
+      "name": "500 LPH Dual-Stage Reverse Osmosis System",
+      "category": "Water Treatment & Pure Water",
+      "type": "Pure Water",
+      "capacity": "",
+      "model": "",
+      "specification": "500 LPH · dual-stage filtration · stainless frame",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "509",
+      "name": "High-Capacity Commercial Water Purification Plant",
+      "category": "Water Treatment & Pure Water",
+      "type": "Water Treatment",
+      "capacity": "",
+      "model": "",
+      "specification": "High-capacity treatment · RO · UV/ozone options · confirm final configuration",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "510",
+      "name": "Complete Bottle Water Machine Setup",
+      "category": "Water Treatment & Pure Water",
+      "type": "Complete Setup",
+      "capacity": "",
+      "model": "",
+      "specification": "Turnkey bottled-water line · confirm production capacity and included machines",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "522",
+      "name": "Complete Pure Water Production Machines",
+      "category": "Water Treatment & Pure Water",
+      "type": "Complete Setup",
+      "capacity": "",
+      "model": "",
+      "specification": "Pure water machine · filtration · UV · pumps · testing kit",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "526",
+      "name": "Commercial Double-Deck Bakery Oven Stack",
+      "category": "Bakery Equipment",
+      "type": "Bakery",
+      "capacity": "",
+      "model": "",
+      "specification": "Double-deck configuration · commercial baking · confirm power and deck capacity",
+      "currentMediaStatus": "PENDING"
+    },
+    {
+      "productId": "528",
+      "name": "Commercial Food Dehydrator - Stainless Cabinet",
+      "category": "Food Preparation",
+      "type": "Food Prep",
+      "capacity": "",
+      "model": "",
+      "specification": "Commercial dehydrator · cabinet format · confirm tray capacity and temperature range",
+      "currentMediaStatus": "PENDING"
+    }
+  ]
+}
