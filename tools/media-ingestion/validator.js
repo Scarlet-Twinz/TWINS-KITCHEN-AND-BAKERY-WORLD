@@ -142,6 +142,15 @@ function existingCandidate(product, data, rules) {
     return { src: normalizeUrl(product.media.images[0]), status: "reference", source: product.media.source };
   }
   if (isLocalMedia(product.i)) return { src: normalizeUrl(product.i), status: "twins", source: "local Twins catalogue media" };
+
+  // Preserve standalone legacy product.i media, but do not double-count a URL
+  // already represented by an existing ID override. New mappings remain governed
+  // by validateManifest() duplicate checks.
+  const directMedia = normalizeUrl(product.i);
+  const existingOverrideUrls = new Set(Object.values(data.byId || {}).map(normalizeUrl));
+  if (isUrl(directMedia) && !existingOverrideUrls.has(directMedia)) {
+    return { src: directMedia, status: "reference", source: "existing catalogue media" };
+  }
   if (product.i && product.media?.images?.includes(product.i) && String(product.media.source || "").startsWith("verified product reference")) {
     return { src: normalizeUrl(product.i), status: "reference", source: product.media.source };
   }
