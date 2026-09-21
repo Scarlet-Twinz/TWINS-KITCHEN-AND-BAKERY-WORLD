@@ -22,7 +22,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "144":"https://lasoundmanagement.com/wp-content/uploads/2023/05/Pioneer-DJ-DJM-900NXS2-4-Channel-Club-Standard-DJ-Mixer.webp",
   "145":"https://etha.de/media/uploads/pioneer-ddj-flx4-top.webp",
   "164":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=",
-  "178":"https://maquipan.com.mx/img/productos/461/1.jpg",
+  "178":"https://cdnimg.webstaurantstore.com/images/products/large/4958/2981064.jpg",
   "179":"https://www.chr-restauration.com/prodimages/cat-chr/materiel-de-cuisine-traditionnelle-00000146/714-ligne-de-cuisson-diamond-profondeur-600-20200402155507.jpg",
   "185":"https://ifea.com.au/wp-content/uploads/2014/10/Italgi-pasta-cooker-CP900-900x1366.jpg",
   "192":"assets/media/twins-planetary-food-mixer.jpg",
@@ -61,12 +61,12 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "510":"https://enterprisepropackmachines.com.ng/wp-content/uploads/2025/04/automatic-Bottle-Water-Machine-XGF-8-8-3.webp",
   "2":"https://www.bigw.com.au/medias/sys_master/images/images/h0f/hb4/119151648604190.jpg",
   "52":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD034/2409/11/products/92fa0227bd.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100",
-  "54":"https://www.fornifiorini.com/templates/yootheme/cache/be/forno-rotativo-rotor-bee36f2f.jpeg",
+  "54":"https://img.everychina.com/nimg/d0/82/6c2696600e742dc901dcee88c9f1-600x600-0/one_tray_bakery_deck_oven_mechanical_temperature_controller_with_timer_temperature_can_get_300_c.jpg",
   "69":"https://gw.alicdn.com/imgextra/i2/2200634836130/O1CN01wMZPsm1v9apbMMwtV_%21%212200634836130.jpg_540x540.jpg",
   "81":"https://i5.walmartimages.com/seo/GRIDMANN-48-x-24-Inch-Stainless-Steel-Table-w-Backsplash-and-Undershelf-NSF-Commercial-Kitchen-Work-Prep-Table_d308841a-6998-4638-a411-953c268788b4.b019aa7fb08630379a32033c9f65eb3d.jpeg?odnBg=FFFFFF&odnHeight=573&odnWidth=573",
   "83":"https://unclewiener.com/cdn/shop/files/94-single-bowl-stainless-steel-sink-table-commercial-prep-station-with-undershelf-ss1724lss1724r-9509183.png?v=1778242387&width=1946",
-  "103":"https://cdnimg.webstaurantstore.com/images/products/large/226322/1025341.jpg",
-  "107":"https://i5.walmartimages.com/asr/ca3cb10e-ff82-45ae-9aa7-69585f2da0ff.3da4c638d939c45c8facd978ac065b5e.jpeg",
+  "103":"https://maxigel.ro/media/catalog/product/cache/2/image/9df78eab33525d08d6e5fb8d27136e95/e/c/echipament_professional_cu_functionalitati_multiple_si_dimensiuni_reduse_4_module_storcator-citrice-blender-aparat-frappe-si-aparat-spart-gheata-14560004.jpg",
+  "107":"https://inwfile.com/s-dj/qe28or.jpg",
   "108":"https://cdnimg.webstaurantstore.com/images/products/xxl/565845/2109219.jpg",
   "164":"https://maxx-cold.com/cdn/shop/files/vergnj69iqmpledx5xhh_800x.jpg?v=1766909172",
   "167":"https://assets.katomcdn.com/q_auto%2Cf_auto/v1720039511/products/141/141-WMO120/141-wmo120.jpg",
@@ -173,8 +173,39 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "530":"assets/media/twins-supermarket-shelf-blue.jpg",
   "129":"https://www.hb-digital.de/media/image/product/178/lg/sat-verteiler-d4fv-4-fach-sat-kabel-splitter.jpg",
   "141":"https://www.appliancesonline.com.au/ak/5/7/d/8/57d81360c084361e7e32889fb95c399cb8dc79fa_Pioneer_51_Channel_Atmos_Network_AV_Receiver_with_Bluetooth_Black_VSX832_hero_high-high.jpeg"
-};
-const CATALOG_MEDIA_OVERRIDES={
+,
+  "131":"https://i.ebayimg.com/images/g/wa8AAOSwbjxnM0R9/s-l1200.jpg"
+,
+  "148":"https://cdn11.bigcommerce.com/s-1gjhifmkdp/images/stencil/1280x1280/products/4475/10350/CHR-12103411901-90-7311-2__92782.1520526954.jpg?c=2%3Fimbypass%3Don"
+,
+  "149":"https://i.ebayimg.com/images/g/efUAAOSw7n5khrrr/s-l960.jpg"
+,
+  "159":"https://diversionesbago.com/cdn/shop/files/white-Photoroom_6ba4ea2e-acc3-431d-919d-d77a117338ce.jpg?v=1754448064&width=720"
+,
+  "170":"https://static-01.daraz.com.bd/p/f0f3299d65f2772665b4162fc68381d0.jpg"
+,
+  "171":"https://image.made-in-china.com/202f0j00irBkEeYGqUpS/12000BTU-Air-Conditioner-with-Golden-Fin-and-WiFi-Control.webp"
+,
+  "172":"https://marcelbd.com/image/cache/catalog/Washing%20machine/MWM-AFT80W/mwm-aft80w-700x700.png"
+,
+  "194":"https://cubosupplies.com/cdn/shop/files/4_mpm30-wk_40_3739.jpg?v=1719533669&width=1200"
+,
+  "196":"https://www.wyposazenie-sklepowe.pl/546718-large_default/mikser-planetarny-60-l-yg-03029.jpg"
+,
+  "202":"https://www.sinco.ca/cdn/shop/files/Roundi35_25dabbe6-e3f3-4cb2-854e-25dcb628eda1_600x600_crop_center.webp?v=1740759270"
+,
+  "218":"https://www.commercialglassfreezer.com/photo/ps34502537-four_glass_door_upright_display_freezer_comercial_refrigeration_equipment.jpg"
+,
+  "232":"https://image.made-in-china.com/2f0j00SULeEwunCroD/Commercial-Kitchen-Sink-Heavy-Duty-Sink-Bench-for-Restaurant-Industrial-Kitchen-Equipment-Durable-and-Easy-to-Clean-Stainless-Steel-Design-Space-Saving-Utility.webp"
+,
+  "235":"https://hosteleria10.com/recursos/fotos/edenox-lavamanos-lp-44-01.jpg"
+,
+  "244":"https://catereq.co.uk/image/cache/catalog/CaterEq/M406_1-1500x1500.jpg"
+,
+  "256":"https://tmwardcoffee.com/cdn/shop/files/NETTUNO-07-MAIN-1000x1000-03_1200x630.jpg?v=1761123650"
+,
+  "257":"https://timscoffee.com/wp-content/uploads/2023/12/unic-aura-front-600x600.png"
+};const CATALOG_MEDIA_OVERRIDES={
   "commercial meat slicer":"https://www.silverchef.com.au/cdn/shop/files/250ES-10.webp?v=1687136912",
   "commercial food processor":"https://swanwickfoodservice.com/media/catalog/product/6/0/603366.jpg",
   "commercial juice extractor":"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp",
