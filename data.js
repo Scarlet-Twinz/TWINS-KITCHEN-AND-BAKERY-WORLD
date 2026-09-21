@@ -214,9 +214,6 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "130":"https://cdn-reichelt.de/resize/600%2F-/web/xxl_ws/E910%2FEASYFIND_320030_01.png?resize=600%252F-&type=ProductXxl",
   "158":"https://www.holloway.com.ng/cdn/shop/files/FOOSBALLTABLE.jpg?v=1762522014&width=850",
   "176":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/O/E/236861_1775124193.jpg",
-
-  "115":"https://www.dstv.com/media/vqkb3alj/7s-hd-single-view.png",
-  "150":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/S/H/187923_1726269197.jpg",
   "206":"https://cdnimg.webstaurantstore.com/images/products/large/14908/2870030.jpg",
   "220":"https://middleby-cdn.com/PhotoFeature/QUALSERV_UCRE336-SS61A.png?update_date=1778086214",
   "222":"https://assets.williams-refrigeration.com/files/prod_gi_gal_1500471839_ee28dcaee2.png",
@@ -333,6 +330,13 @@ const PREMIUM_MEDIA_LIBRARY={
 "restaurant dining chair set":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=90",
 "commercial gas fryer":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=90",
 "commercial coffee machine":"https://cdnimg.webstaurantstore.com/images/products/large/448775/1659944.jpg"
+  "236":"https://i5.walmartimages.com/seo/High-Temp-Undercounter-Commercial-Dishwasher-Glasswasher-Built-in-Booster-Built-in-Detergent-Rinse-Aid-Pumps-30-Racks-hr-208-240V_c89ebab0-d2c7-49db-8837-783563f1f395.5ed9f3356cc3be8452980b5bf2087120.png?odnBg=FFFFFF&odnHeight=640&odnWidth=640"
+  "237":"https://pictures-nigeria.jijistatic.net/205378533_NjIwLTExMzgtNjI2MTRiMmVjNw.webp"
+  "238":"https://phoenixfoodequipment.com/cdn/shop/files/Hobart-PW-10-High-Temp-Hood-Type-Pot-Pan-Washer-3_800x.webp?v=1696482648"
+  "239":"https://deqonline.com/cdn/shop/files/140_1.jpg?v=1707877015"
+  "240":"https://cdnimg.webstaurantstore.com/images/products/extra_large/204222/1854570.jpg"
+  "241":"https://www.howdybrewer.com/cdn/shop/files/e629b9e81a97f7878d457e5a89ed166a359a1714_6c61e17a-331c-47b5-a2d0-9ce0bea12cd5.jpg?v=1757527578&width=800"
+  "242":"https://m.media-amazon.com/images/I/71iDt4dyEAL._AC_SL1500_.jpg"
 };
 const P=[
 {id:1,n:"Commercial 6-Burner Stainless Range",c:"Cooking Equipment",p:null,i:"",tag:"Popular",desc:"Heavy-duty cooking range for busy commercial kitchens.",spec:"6 burners · stainless body · commercial duty"},
