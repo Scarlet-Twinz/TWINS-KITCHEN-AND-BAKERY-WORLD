@@ -56,6 +56,20 @@ paths:
       responses:
         '200': { description: Account }
         '401': { description: Authentication required }
+  /api/orders/me:
+    get:
+      summary: List the current user's orders
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Order collection}
+        '401': {description: Authentication required}
+  /api/admin/quotes/{reference}:
+    patch:
+      summary: Update quotation status
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Quote updated}
+        '403': {description: Staff access required}
   /api/quotes/me:
     get:
       summary: List the current user's quote requests
