@@ -99,6 +99,32 @@ class QuotePayload(BaseModel):
     packageName:str|None=None
     items:list[QuoteItem]=Field(default_factory=list,max_length=100)
     itemCount:int=Field(default=0,ge=0,le=10000)
+class InventoryAdjustmentPayload(BaseModel):
+    productId:int
+    delta:int
+    reason:str=Field(min_length=3,max_length=240)
+
+class OrderCreatePayload(BaseModel):
+    quoteReference:str=Field(min_length=4,max_length=80)
+    notes:str|None=None
+
+class OrderStatusPayload(BaseModel):
+    status:str=Field(min_length=3,max_length=40)
+
+class DeliveryCreatePayload(BaseModel):
+    orderId:str
+    recipientName:str=Field(min_length=2,max_length=120)
+    phone:str=Field(min_length=5,max_length=40)
+    address:str=Field(min_length=5,max_length=300)
+    city:str|None=None
+    state:str|None=None
+    country:str="Nigeria"
+    notes:str|None=None
+
+class DeliveryStatusPayload(BaseModel):
+    status:str=Field(min_length=3,max_length=40)
+    trackingReference:str|None=None
+
 
 @app.get("/api/health")
 def health():
@@ -262,3 +288,186 @@ def admin_quotes(request:Request):
     with db() as conn:
         rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0) from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
     return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
+
+
+def write_audit(conn, actor_user_id, action, entity_type=None, entity_id=None, metadata=None):
+    conn.execute(
+        "insert into audit_logs (actor_user_id,action,entity_type,entity_id,metadata) values (%s,%s,%s,%s,%s)",
+        (actor_user_id, action, entity_type, entity_id, json.dumps(metadata or {}))
+    )
+
+@app.get("/api/admin/inventory")
+def admin_inventory(request:Request):
+    actor=require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select i.id,p.legacy_catalogue_id,p.name,i.quantity,i.reserved_quantity,
+                   i.reorder_level,i.status,i.updated_at
+            from inventory i join products p on p.id=i.product_id
+            order by p.legacy_catalogue_id
+            limit 200
+        """).fetchall()
+    return {"inventory":[
+        {"id":str(r[0]),"productId":r[1],"name":r[2],"quantity":r[3],
+         "reservedQuantity":r[4],"reorderLevel":r[5],"status":r[6],
+         "updatedAt":r[7].isoformat()}
+        for r in rows
+    ]}
+
+@app.post("/api/admin/inventory/adjust",status_code=201)
+def adjust_inventory(payload:InventoryAdjustmentPayload,request:Request):
+    actor=require_admin(request)
+    with db() as conn:
+        product=conn.execute("select id,name from products where legacy_catalogue_id=%s and active=true",(payload.productId,)).fetchone()
+        if not product: raise HTTPException(status_code=404,detail="Product not found")
+        row=conn.execute("select id,quantity,reserved_quantity from inventory where product_id=%s for update",(product[0],)).fetchone()
+        if not row:
+            iid=uuid.uuid4()
+            new_quantity=payload.delta
+            if new_quantity<0: raise HTTPException(status_code=400,detail="Inventory cannot start below zero")
+            conn.execute("insert into inventory (id,product_id,quantity) values (%s,%s,%s)",(iid,product[0],new_quantity))
+        else:
+            iid,quantity,reserved=row
+            new_quantity=quantity+payload.delta
+            if new_quantity<reserved: raise HTTPException(status_code=400,detail="Quantity cannot be below reserved stock")
+            if new_quantity<0: raise HTTPException(status_code=400,detail="Inventory cannot be negative")
+            conn.execute("update inventory set quantity=%s,updated_at=now() where id=%s",(new_quantity,iid))
+        conn.execute("insert into inventory_adjustments (inventory_id,actor_user_id,delta,reason) values (%s,%s,%s,%s)",(iid,actor["sub"],payload.delta,payload.reason))
+        write_audit(conn,uuid.UUID(actor["sub"]),"inventory.adjusted","inventory",iid,{"productId":payload.productId,"delta":payload.delta,"reason":payload.reason})
+        conn.commit()
+    return {"ok":True,"productId":payload.productId,"quantity":new_quantity}
+
+@app.get("/api/admin/orders")
+def admin_orders(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select id,reference,status,payment_status,currency,total_amount,customer_name,
+                   customer_email,customer_phone,created_at,updated_at
+            from orders order by created_at desc limit 200
+        """).fetchall()
+    return {"orders":[
+        {"id":str(r[0]),"reference":r[1],"status":r[2],"paymentStatus":r[3],
+         "currency":r[4],"totalAmount":float(r[5]),"customerName":r[6],
+         "customerEmail":r[7],"customerPhone":r[8],"createdAt":r[9].isoformat(),
+         "updatedAt":r[10].isoformat()}
+        for r in rows
+    ]}
+
+@app.post("/api/admin/orders/from-quote",status_code=201)
+def create_order_from_quote(payload:OrderCreatePayload,request:Request):
+    actor=require_admin(request)
+    with db() as conn:
+        quote=conn.execute("""
+            select id,user_id,name,email,phone from quotes where reference=%s
+        """,(payload.quoteReference,)).fetchone()
+        if not quote: raise HTTPException(status_code=404,detail="Quote not found")
+        existing=conn.execute("select id,reference from orders where quote_id=%s",(quote[0],)).fetchone()
+        if existing: return {"order":{"id":str(existing[0]),"reference":existing[1],"existing":True}}
+        oid=uuid.uuid4()
+        reference=f"TW-ORD-{datetime.now().year}-{secrets.token_hex(3).upper()}"
+        conn.execute("""
+            insert into orders
+            (id,reference,user_id,quote_id,customer_name,customer_email,customer_phone,notes)
+            values (%s,%s,%s,%s,%s,%s,%s,%s)
+        """,(oid,reference,quote[1],quote[0],quote[2],quote[3],quote[4],payload.notes))
+        items=conn.execute("""
+            select qi.product_id,p.legacy_catalogue_id,p.name,qi.quantity
+            from quote_items qi left join products p on p.id=qi.product_id
+            where qi.quote_id=%s
+        """,(quote[0],)).fetchall()
+        for item in items:
+            conn.execute("""
+                insert into order_items
+                (id,order_id,product_id,legacy_catalogue_id,name,quantity)
+                values (%s,%s,%s,%s,%s,%s)
+            """,(uuid.uuid4(),oid,item[0],item[1],item[2] or "Catalogue item",item[3]))
+        write_audit(conn,uuid.UUID(actor["sub"]),"order.created","order",oid,{"quoteReference":payload.quoteReference})
+        conn.commit()
+    return {"order":{"id":str(oid),"reference":reference,"status":"pending","paymentStatus":"unpaid","existing":False}}
+
+@app.patch("/api/admin/orders/{order_id}")
+def update_order_status(order_id:str,payload:OrderStatusPayload,request:Request):
+    actor=require_admin(request)
+    allowed={"pending","confirmed","processing","ready","completed","cancelled"}
+    if payload.status not in allowed: raise HTTPException(status_code=422,detail="Unsupported order status")
+    oid=uuid.UUID(order_id)
+    with db() as conn:
+        cur=conn.execute("update orders set status=%s,updated_at=now() where id=%s",(payload.status,oid))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Order not found")
+        write_audit(conn,uuid.UUID(actor["sub"]),"order.status_changed","order",oid,{"status":payload.status})
+        conn.commit()
+    return {"ok":True,"status":payload.status}
+
+@app.get("/api/admin/delivery")
+def admin_delivery(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select d.id,d.order_id,o.reference,d.recipient_name,d.phone,d.address,d.city,d.state,
+                   d.country,d.status,d.tracking_reference,d.scheduled_at,d.delivered_at,d.notes,d.updated_at
+            from deliveries d join orders o on o.id=d.order_id
+            order by d.created_at desc limit 200
+        """).fetchall()
+    return {"deliveries":[
+        {"id":str(r[0]),"orderId":str(r[1]),"orderReference":r[2],"recipientName":r[3],
+         "phone":r[4],"address":r[5],"city":r[6],"state":r[7],"country":r[8],
+         "status":r[9],"trackingReference":r[10],
+         "scheduledAt":r[11].isoformat() if r[11] else None,
+         "deliveredAt":r[12].isoformat() if r[12] else None,"notes":r[13],
+         "updatedAt":r[14].isoformat()}
+        for r in rows
+    ]}
+
+@app.post("/api/admin/delivery",status_code=201)
+def create_delivery(payload:DeliveryCreatePayload,request:Request):
+    actor=require_admin(request)
+    oid=uuid.UUID(payload.orderId);did=uuid.uuid4()
+    with db() as conn:
+        exists=conn.execute("select id from orders where id=%s",(oid,)).fetchone()
+        if not exists: raise HTTPException(status_code=404,detail="Order not found")
+        existing=conn.execute("select id from deliveries where order_id=%s",(oid,)).fetchone()
+        if existing: raise HTTPException(status_code=409,detail="Delivery already exists for this order")
+        conn.execute("""
+            insert into deliveries
+            (id,order_id,recipient_name,phone,address,city,state,country,notes)
+            values (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """,(did,oid,payload.recipientName,payload.phone,payload.address,payload.city,payload.state,payload.country,payload.notes))
+        write_audit(conn,uuid.UUID(actor["sub"]),"delivery.created","delivery",did,{"orderId":payload.orderId})
+        conn.commit()
+    return {"delivery":{"id":str(did),"orderId":payload.orderId,"status":"pending"}}
+
+@app.patch("/api/admin/delivery/{delivery_id}")
+def update_delivery_status(delivery_id:str,payload:DeliveryStatusPayload,request:Request):
+    actor=require_admin(request)
+    allowed={"pending","scheduled","dispatched","in_transit","delivered","failed","cancelled"}
+    if payload.status not in allowed: raise HTTPException(status_code=422,detail="Unsupported delivery status")
+    did=uuid.UUID(delivery_id)
+    with db() as conn:
+        cur=conn.execute("""
+            update deliveries
+            set status=%s,tracking_reference=coalesce(%s,tracking_reference),
+                delivered_at=case when %s='delivered' then now() else delivered_at end,
+                updated_at=now()
+            where id=%s
+        """,(payload.status,payload.trackingReference,payload.status,did))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Delivery not found")
+        write_audit(conn,uuid.UUID(actor["sub"]),"delivery.status_changed","delivery",did,{"status":payload.status})
+        conn.commit()
+    return {"ok":True,"status":payload.status}
+
+@app.get("/api/admin/audit")
+def admin_audit(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select a.id,a.action,a.entity_type,a.entity_id,a.metadata,a.created_at,
+                   coalesce(u.name,u.email,'System')
+            from audit_logs a left join users u on u.id=a.actor_user_id
+            order by a.created_at desc limit 200
+        """).fetchall()
+    return {"events":[
+        {"id":r[0],"action":r[1],"entityType":r[2],"entityId":str(r[3]) if r[3] else None,
+         "metadata":r[4],"createdAt":r[5].isoformat(),"actor":r[6]}
+        for r in rows
+    ]}
