@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "batchId": "candidate-batch-001",
+  "generatedAt": "2026-09-21T16:19:06.492Z",
+  "status": "CANDIDATE",
+  "catalogue": {
+    "population": 530,
+    "canonical": true,
+    "sourceManifest": "tools/media-ingestion/manifests/pending-catalogue.json"
+  },
+  "batchSize": 25,
+  "processedProductIds": [
+    "54",
+    "76",
+    "77",
+    "86",
+    "88",
+    "108",
+    "118",
+    "139",
+    "150",
+    "151",
+    "160",
+    "161",
+    "164",
+    "167",
+    "168",
+    "169",
+    "173",
+    "174",
+    "175",
+    "178",
+    "183",
+    "188",
+    "189",
+    "190",
+    "191"
+  ],
+  "candidates": [
+    {
+      "productId": "88",
+      "productName": "Heavy-Duty 4-Tier Storage Rack",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://image.made-in-china.com/202f0j00wOMbHmPISsuz/NSF-4-Tiers-K-D-Packing-Heavy-Duty-Storage-Stainless-Steel-Wire-Shelving.webp",
+      "sourceUrl": "https://m.made-in-china.com/product/NSF-4-Tiers-K-D-Packing-Heavy-Duty-Storage-Wire-Rack-Stainless-Steel-Shelves-Shelving-Unit-857594245.html",
+      "sourceProvider": "Made-in-China",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://m.made-in-china.com/product/NSF-4-Tiers-K-D-Packing-Heavy-Duty-Storage-Wire-Rack-Stainless-Steel-Shelves-Shelving-Unit-857594245.html",
+        "sourceName": "Made-in-China",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Exact 4-tier heavy-duty commercial storage-rack type match; model/dimensions still require verification. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "108",
+      "productName": "Stainless Wall Cabinet",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://shop.kitchenequipmentaustralia.com.au/61562-small_default/stainless-steel-wall-cabinet-wc-1200.jpg",
+      "sourceUrl": "https://shop.kitchenequipmentaustralia.com.au/stainless-steel/stainless-steel-wall-shelves/stainless-steel-wall-cabinet-wc-1200",
+      "sourceProvider": "Kitchen Equipment Australia",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://shop.kitchenequipmentaustralia.com.au/stainless-steel/stainless-steel-wall-shelves/stainless-steel-wall-cabinet-wc-1200",
+        "sourceName": "Kitchen Equipment Australia",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Commercial stainless wall cabinet image and product page match the catalogue product type; exact local model/dimensions still require verification. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "118",
+      "productName": "GOtv Decoder",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/P/230175_1736320665.jpg",
+      "sourceUrl": "https://www.konga.com/product/gotv-decoder-antenna-6635358",
+      "sourceProvider": "Konga",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.konga.com/product/gotv-decoder-antenna-6635358",
+        "sourceName": "Konga",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Konga listing is explicitly a GOtv decoder with antenna and the image visibly shows a GOtv decoder; exact catalogue package/model still requires verification. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "139",
+      "productName": "Home Theatre Speaker Set",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://img.kirstein.de/out/pictures/generated/product/1/50_50_75/37186e03bfb7a06d41f9c2f4ea486a1f_1.jpg",
+      "sourceUrl": "https://www.kirstein.de/en/HiFi/sound-systems/Yamaha-NS-P41-5-1-Home-Theater-Speaker-Set.html",
+      "sourceProvider": "Musikhaus Kirstein",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://www.kirstein.de/en/HiFi/sound-systems/Yamaha-NS-P41-5-1-Home-Theater-Speaker-Set.html",
+        "sourceName": "Musikhaus Kirstein",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Yamaha NS-P41 is a real 5.1 home-theatre speaker set with a matching product image; catalogue has no brand/model, so exact identity remains unconfirmed. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "150",
+      "productName": "Snooker Table 6ft",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://d21d281c1yd2en.cloudfront.net/media/product_images/high-end-american-fitness-snooker-table-6-feets-d4b6-1280x1280.jpeg",
+      "sourceUrl": "https://zit.ng/products/high-end-american-fitness-snooker-table-6-feets/",
+      "sourceProvider": "Zit Nigeria",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://zit.ng/products/high-end-american-fitness-snooker-table-6-feets/",
+        "sourceName": "Zit Nigeria",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Zit product page explicitly identifies a 6-feet snooker table and the image visibly matches a full-size table; exact catalogue configuration remains unverified. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "151",
+      "productName": "Snooker Table 7ft",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://pictures-nigeria.jijistatic.net/145478090_NjIwLTYyMC0wMDRlZTVjMjhh.webp",
+      "sourceUrl": "https://jiji.ng/lagos-island-west/sports-bicycles-and-fitness/7ft-nigeria-made-classic-special-snooker-table-djhLWWoUy8bFTj5gO0EdrMFu.html",
+      "sourceProvider": "Jiji",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://jiji.ng/lagos-island-west/sports-bicycles-and-fitness/7ft-nigeria-made-classic-special-snooker-table-djhLWWoUy8bFTj5gO0EdrMFu.html",
+        "sourceName": "Jiji",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Jiji listing explicitly identifies a 7ft snooker table and the image visibly matches the product type; exact catalogue configuration remains unverified. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "167",
+      "productName": "Microwave Oven 30L",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://pictures-nigeria.jijistatic.net/152890953_NjIwLTYyMC1jM2VlM2JlMmIw.webp",
+      "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
+      "sourceProvider": "Jiji",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
+        "sourceName": "Jiji",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Jiji listing explicitly identifies an LG 3032jas 30L microwave oven; the image visibly matches the listed product. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    },
+    {
+      "productId": "178",
+      "productName": "6-Burner Gas Range",
+      "category": "See pending-catalogue.json",
+      "productType": "See pending-catalogue.json",
+      "url": "https://image.made-in-china.com/155f0j00vdzMclItEKkP/Commercial-Professional-Kitchen-Catering-Fast-Food-Wholesale-Restaurant-Equipment-Stainless-Steel-6-Gas-Burner-with-Gas-Oven.jpg",
+      "sourceUrl": "https://es.made-in-china.com/co_ntsmart/product_Commercial-Professional-Kitchen-Catering-Fast-Food-Wholesale-Restaurant-Equipment-Stainless-Steel-Gas-Stove-Chinese-Cooking-Range-With-Blower_eyughruny.html",
+      "sourceProvider": "Made-in-China",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://es.made-in-china.com/co_ntsmart/product_Commercial-Professional-Kitchen-Catering-Fast-Food-Wholesale-Restaurant-Equipment-Stainless-Steel-Gas-Stove-Chinese-Cooking-Range-With-Blower_eyughruny.html",
+        "sourceName": "Made-in-China",
+        "checkedAt": "2026-09-21T16:19:06.492Z",
+        "requirementsSatisfied": false
+      },
+      "notes": "Made-in-China commercial listing explicitly shows a stainless commercial six-gas-burner range with oven, matching the product type. Candidate is discovery-only; do not promote to VERIFIED or apply until repository verification requirements are independently satisfied."
+    }
+  ],
+  "pendingProducts": [
+    {
+      "productId": "54",
+      "productName": "One-Bag Bakery Oven",
+      "status": "PENDING",
+      "reason": "No sufficiently exact candidate retained; the found rotary rack oven is not enough to establish the catalogue's one-bag configuration."
+    },
+    {
+      "productId": "76",
+      "productName": "Commercial Chest Freezer - Large",
+      "status": "PENDING",
+      "reason": "Relevant large chest-freezer imagery was found, but the directly retrievable image URL was not recorded without inventing or guessing it."
+    },
+    {
+      "productId": "77",
+      "productName": "Commercial Undercounter Refrigerator",
+      "status": "PENDING",
+      "reason": "Search results showed commercial undercounter refrigerators, but no exact configuration/model match was established."
+    },
+    {
+      "productId": "86",
+      "productName": "Stainless Wall Shelf - 4ft",
+      "status": "PENDING",
+      "reason": "A 72-inch commercial shelf was found, but that conflicts with the catalogue's 4ft specification."
+    },
+    {
+      "productId": "160",
+      "productName": "Game Room Seating",
+      "status": "PENDING",
+      "reason": "No sufficiently specific product candidate established; generic seating imagery would be too weak."
+    },
+    {
+      "productId": "161",
+      "productName": "Scoreboard Display",
+      "status": "PENDING",
+      "reason": "Search results confirmed scoreboard displays generally, but no sufficiently specific commercial product listing was established."
+    },
+    {
+      "productId": "164",
+      "productName": "Chest Freezer Home/Shop",
+      "status": "PENDING",
+      "reason": "Generic chest-freezer candidates were found, but the catalogue has no distinguishing capacity/model and a forced match would be weak."
+    },
+    {
+      "productId": "168",
+      "productName": "Electric Cooker",
+      "status": "PENDING",
+      "reason": "Available results were for specific cooker configurations (for example 2-burner built-in or 4-gas/2-electric); the generic catalogue record does not justify choosing one."
+    },
+    {
+      "productId": "169",
+      "productName": "Standing Fan",
+      "status": "PENDING",
+      "reason": "No sufficiently specific product candidate retained without a catalogue model/specification."
+    },
+    {
+      "productId": "173",
+      "productName": "Blender",
+      "status": "PENDING",
+      "reason": "No sufficiently specific product candidate retained without a catalogue model/specification."
+    },
+    {
+      "productId": "174",
+      "productName": "Toaster",
+      "status": "PENDING",
+      "reason": "No sufficiently specific product candidate retained without a catalogue model/specification."
+    },
+    {
+      "productId": "175",
+      "productName": "Electric Iron",
+      "status": "PENDING",
+      "reason": "Many commercial listings exist, but the catalogue has no brand/model/specification to identify one exact product."
+    },
+    {
+      "productId": "183",
+      "productName": "Double Fryer",
+      "status": "PENDING",
+      "reason": "Search results included double fryers, but no sufficiently exact commercial configuration was established for this catalogue record."
+    },
+    {
+      "productId": "188",
+      "productName": "Rice Cooker 20L",
+      "status": "PENDING",
+      "reason": "No sufficiently exact 20L commercial rice-cooker candidate with retrievable image evidence was established."
+    },
+    {
+      "productId": "189",
+      "productName": "Bain Marie Cooking Station",
+      "status": "PENDING",
+      "reason": "No sufficiently exact product candidate with retrievable image evidence was established."
+    },
+    {
+      "productId": "190",
+      "productName": "Commercial Stock Pot",
+      "status": "PENDING",
+      "reason": "Generic stock-pot imagery would not establish the exact commercial catalogue product."
+    },
+    {
+      "productId": "191",
+      "productName": "Soup Kettle",
+      "status": "PENDING",
+      "reason": "No sufficiently exact commercial soup-kettle candidate with retrievable image evidence was established."
+    }
+  ],
+  "summary": {
+    "productsProcessed": 25,
+    "candidatesFound": 8,
+    "productsWithNoCandidate": 17,
+    "duplicateUrlsRejected": 0,
+    "candidatesRequiringFurtherVerification": 8,
+    "productsRemainingPendingAfterBatch": 307,
+    "batchProductsStillPending": 17
+  },
+  "notes": "Discovery-only research batch. No media mapping was applied. CANDIDATE does not mean VERIFIED. Candidate URLs were normalized and checked against existing data.js media URLs and against other candidates in this batch. Existing legacy duplicate groups were not modified."
+}
