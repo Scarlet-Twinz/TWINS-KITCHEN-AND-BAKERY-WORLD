@@ -181,8 +181,13 @@ function computeMediaState(data, rules = readExistingRules()) {
 }
 
 function validateManifest(manifest, state) {
-  const batch = Array.isArray(manifest) ? manifest : manifest?.candidates;
-  if (!Array.isArray(batch)) throw new Error("Manifest must be an array or an object with a candidates array");
+  // Normalize the supported manifest shapes before applying the existing validation rules.
+  const batch = Array.isArray(manifest)
+    ? manifest
+    : manifest?.candidates ?? manifest?.candidatesReviewed;
+  if (!Array.isArray(batch)) {
+    throw new Error("Manifest must be an array or an object with a candidates or candidatesReviewed array");
+  }
 
   const existingByUrl = new Map();
   for (const item of state.resolved) {
