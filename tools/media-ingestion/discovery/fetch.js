@@ -4,7 +4,16 @@ async function fetchPage(url,options={}) { if(!/^https?:\/\//i.test(url)) return
 async function probeImage(url,options={}) {
   if(!/^https?:\/\//i.test(url)) return {ok:false,status:0,url,error:'invalid-url'};
   const fetchImpl=options.fetchImpl||globalThis.fetch;if(typeof fetchImpl!=='function') return {ok:false,status:0,url,error:'fetch-unavailable'};
-  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),options.timeoutMs||10000);
-  try { const r=await fetchImpl(url,{method:'HEAD',redirect:'follow',signal:controller.signal,headers:{'User-Agent':'TwinsMediaDiscovery/1.0'}}); if(r.status===405||r.status===501){return {ok:true,status:r.status,url};} if(r.status===403||r.status===404)return {ok:false,status:r.status,url,error:r.status===403?'forbidden':'not-found'}; if(!r.ok)return {ok:false,status:r.status,url,error:'http-'+r.status}; const type=r.headers?.get?.('content-type')||''; if(type&&!/^image\//i.test(type))return {ok:false,status:r.status,url,error:'not-an-image'}; return {ok:true,status:r.status,url,contentType:type}; } catch(e) { return {ok:false,status:0,url,error:e.name==='AbortError'?'timeout':'fetch-error'}; } finally { clearTimeout(timer); }
+  const timeoutMs=options.timeoutMs||10000;
+  const request=async(method)=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await fetchImpl(url,{method,redirect:'follow',signal:controller.signal,headers:{'User-Agent':'TwinsMediaDiscovery/1.0',...(method==='GET'?{Range:'bytes=0-0'}:{})}});}finally{clearTimeout(timer);}};
+  try {
+    let r=await request('HEAD');
+    if(r.status===405||r.status===501) r=await request('GET');
+    if(r.status===403||r.status===404)return {ok:false,status:r.status,url,error:r.status===403?'forbidden':'not-found'};
+    if(!r.ok)return {ok:false,status:r.status,url,error:'http-'+r.status};
+    const type=r.headers?.get?.('content-type')||'';
+    if(type&&!/^image\//i.test(type))return {ok:false,status:r.status,url,error:'not-an-image'};
+    return {ok:true,status:r.status,url,contentType:type};
+  } catch(e) { return {ok:false,status:0,url,error:e.name==='AbortError'?'timeout':'fetch-error'}; }
 }
 module.exports={sleep,RateLimiter,fetchPage,probeImage};
