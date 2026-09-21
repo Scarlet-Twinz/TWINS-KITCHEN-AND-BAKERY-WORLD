@@ -135,9 +135,6 @@ function existingCandidate(product, data, rules) {
   const idOverride = getIdMapValue(data.CATALOG_MEDIA_OVERRIDES_BY_ID, id);
   if (idOverride) return { src: idOverride, status: "reference", source: "verified product reference" };
 
-  const nameOverride = nameOverrideFor(product, data.CATALOG_MEDIA_OVERRIDES);
-  if (nameOverride) return { src: nameOverride, status: "reference", source: "verified product reference" };
-
   if (product.media?.images?.length && String(product.media.source || "").startsWith("supplied Twins")) {
     return { src: normalizeUrl(product.media.images[0]), status: "twins", source: product.media.source };
   }
@@ -210,7 +207,7 @@ function validateManifest(manifest, state) {
     if (state.blocklist[id]) { reject(candidate, "product is blocked by the existing media validation rule"); continue; }
     if (!url) { reject(candidate, "missing candidate URL"); continue; }
     if (!verification || typeof verification !== "object") { reject(candidate, "missing required verification information"); continue; }
-    if (verification.verified !== true) { reject(candidate, "candidate explicitly marked unverified"); continue; }
+    if (verification.verified !== true) { reject(candidate, "candidate is not VERIFIED"); continue; }
     if (!verification.sourceUrl || !isUrl(verification.sourceUrl)) { reject(candidate, "missing or invalid verification source URL"); continue; }
     if (!verification.checkedAt || Number.isNaN(Date.parse(verification.checkedAt))) { reject(candidate, "missing or invalid verification timestamp"); continue; }
     if (state.mappedIds.has(id)) { reject(candidate, "product already has a valid media mapping"); continue; }
