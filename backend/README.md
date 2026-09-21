@@ -27,6 +27,19 @@ The storefront is still deployable as a static site, but its customer authentica
 
 PostgreSQL is the source of truth for production accounts and RFQs. The browser should not become the authoritative store for passwords, quotes, inventory or orders.
 
+## Operations backend now implemented
+
+The production operations boundary now includes server-authoritative:
+- inventory records and inventory adjustments
+- order creation from an approved quotation
+- order lifecycle status updates
+- delivery records and delivery status updates
+- operational audit events for those mutations
+- admin UI connections for inventory, orders, delivery and audit log
+- server-session verification before the admin workspace renders
+
+Payments remain intentionally separate: the payment transaction schema exists, but gateway credentials, webhook verification and reconciliation are not activated until the merchant gateway is configured.
+
 ## Production hardening still required
 
 - HTTPS and Secure cookies.
