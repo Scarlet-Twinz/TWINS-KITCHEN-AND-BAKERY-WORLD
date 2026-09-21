@@ -7,6 +7,7 @@ const {
   loadCatalogue, readExistingRules, computeMediaState,
   validateManifest, applyMappings
 } = require("../validator");
+const { buildPendingManifest } = require("../collector");
 
 const DATA = path.join(__dirname, "..", "..", "..", "data.js");
 
