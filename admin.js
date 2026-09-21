@@ -187,7 +187,9 @@ function quoteTable(rows) {
     rows.map(function (q) {
       return '<tr><td><strong>' + escapeHtml(q.reference) + '</strong></td><td>' +
         escapeHtml(q.name) + '<br><span class="muted">' + escapeHtml(q.phone) + '</span></td><td>' +
-        escapeHtml(q.business || "—") + '</td><td>' + statusBadge(q.status) + '</td><td>' +
+        escapeHtml(q.business || "—") + '</td><td><select class="quote-status" data-quote-reference="' + escapeHtml(q.reference) + '">' +
+        ["Draft","Prepared","Sent to Twins","In review","Quoted","Closed"].map(function(s){return '<option value="'+escapeHtml(s)+'">'+escapeHtml(s)+'</option>';}).join("") +
+        '</select><div style="margin-top:5px">'+statusBadge(q.status)+'</div></td><td>' +
         escapeHtml(q.itemCount || 0) + '</td><td>' + formatDate(q.createdAt) +
         '</td><td><button class="btn light quote-view" data-reference="' + escapeHtml(q.reference) + '">View</button></td></tr>';
     }).join("") + "</tbody></table></div>";
@@ -196,6 +198,23 @@ function quoteTable(rows) {
 function bindQuoteButtons() {
   document.querySelectorAll(".quote-view").forEach(function (button) {
     button.onclick = function () { openQuote(button.dataset.reference); };
+  });
+  document.querySelectorAll(".quote-status").forEach(function (select) {
+    var q = quotes.find(function (item) { return item.reference === select.dataset.quoteReference; });
+    if (q) select.value = q.status;
+    select.onchange = async function () {
+      try {
+        await request("/api/admin/quotes/" + encodeURIComponent(select.dataset.quoteReference), {
+          method:"PATCH",
+          body:JSON.stringify({status:select.value})
+        });
+        var match = quotes.find(function (item) { return item.reference === select.dataset.quoteReference; });
+        if (match) match.status = select.value;
+        renderQuotes();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
   });
 }
 
