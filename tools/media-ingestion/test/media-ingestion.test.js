@@ -30,7 +30,11 @@ test("legacy duplicate assignments in CATALOG_MEDIA_OVERRIDES_BY_ID are preserve
   const legacyDuplicateUrls = [...counts.entries()].filter(([, count]) => count > 1);
   assert.ok(legacyDuplicateUrls.length > 0, "expected current repository to contain legacy duplicate assignments");
   const state = computeMediaState(data, readExistingRules());
-  assert.equal(state.counts.uniqueMedia, state.counts.verified);
+  // Existing duplicate assignments are intentionally preserved; uniqueMedia is
+  // therefore lower than the assigned population by the legacy duplicate count.
+  assert.equal(state.counts.verified, 223);
+  assert.equal(state.counts.uniqueMedia, 206);
+  assert.equal(state.counts.duplicates, 17);
 });
 
 test("rejects nonexistent, unverified, missing-verification and invalid-url candidates", () => {
