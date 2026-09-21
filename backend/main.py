@@ -275,12 +275,51 @@ def create_quote(payload:QuotePayload,request:Request):
         conn.commit()
     return {"quote":{"id":str(qid),"reference":ref,"status":"Prepared","createdAt":datetime.now(timezone.utc).isoformat()}}
 
+
+@app.get("/api/orders/me")
+def my_orders(request:Request):
+    session=require_session(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select o.id,o.reference,o.status,o.payment_status,o.currency,o.total_amount,
+                   o.customer_name,o.created_at,o.updated_at,
+                   coalesce(sum(oi.quantity),0)
+            from orders o
+            left join order_items oi on oi.order_id=o.id
+            where o.user_id=%s
+            group by o.id
+            order by o.created_at desc
+            limit 50
+        """,(session["sub"],)).fetchall()
+    return {"orders":[
+        {"id":str(r[0]),"reference":r[1],"status":r[2],"paymentStatus":r[3],
+         "currency":r[4],"totalAmount":float(r[5]),"customerName":r[6],
+         "createdAt":r[7].isoformat(),"updatedAt":r[8].isoformat(),
+         "itemCount":r[9]}
+        for r in rows
+    ]}
+
 @app.get("/api/quotes/me")
 def my_quotes(request:Request):
     session=require_session(request)
     with db() as conn:rows=conn.execute("select reference,name,business,status,created_at from quotes where user_id=%s order by created_at desc limit 50",(session["sub"],)).fetchall()
     return {"quotes":[{"reference":r[0],"name":r[1],"business":r[2],"status":r[3],"createdAt":r[4].isoformat()} for r in rows]}
 
+
+
+@app.patch("/api/admin/quotes/{reference}")
+def update_quote_status(reference:str,payload:OrderStatusPayload,request:Request):
+    actor=require_admin(request)
+    allowed={"Draft","Prepared","Sent to Twins","In review","Quoted","Closed"}
+    if payload.status not in allowed:
+        raise HTTPException(status_code=422,detail="Unsupported quote status")
+    with db() as conn:
+        row=conn.execute("select id from quotes where reference=%s",(reference,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Quote not found")
+        conn.execute("update quotes set status=%s,updated_at=now() where reference=%s",(payload.status,reference))
+        write_audit(conn,uuid.UUID(actor["sub"]),"quote.status_changed","quote",row[0],{"reference":reference,"status":payload.status})
+        conn.commit()
+    return {"ok":True,"reference":reference,"status":payload.status}
 
 @app.get("/api/admin/quotes")
 def admin_quotes(request:Request):
