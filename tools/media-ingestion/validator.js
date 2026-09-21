@@ -38,7 +38,7 @@ function extractObjectPairs(source, declaration) {
 
 function extractCatalogue(dataPath) {
   const source = fs.readFileSync(dataPath, "utf8");
-  const declarations = [...source.matchAll(/const\\s+P\\s*=\\s*\\[/g)];
+  const declarations = [...source.matchAll(/const\s+P\s*=\s*\[/g)];
   if (!declarations.length) throw new Error("Catalogue declaration P was not found in data.js");
 
   // data.js currently contains a duplicated catalogue declaration. The canonical
@@ -49,9 +49,9 @@ function extractCatalogue(dataPath) {
   const arrayOpen = source.indexOf("[", declaration);
   if (arrayOpen < 0 || arrayOpen >= nextDeclaration) throw new Error("Canonical catalogue array was not found");
   const arrayClose = balanced(source, arrayOpen, "[", "]");
-  let program = "const P=" + source.slice(arrayOpen, arrayClose + 1) + ";\\n";
+  let program = "const P=" + source.slice(arrayOpen, arrayClose + 1) + ";\n";
   const catalogueRegion = source.slice(arrayClose + 1, nextDeclaration);
-  const pushRe = /P\\.push\\s*\\(/g;
+  const pushRe = /P\.push\s*\(/g;
   let match;
   while ((match = pushRe.exec(catalogueRegion))) {
     const open = catalogueRegion.indexOf("(", match.index);
