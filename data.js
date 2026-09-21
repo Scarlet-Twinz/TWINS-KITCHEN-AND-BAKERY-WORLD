@@ -1040,8 +1040,8 @@ const RESOURCE_CARDS=[
   "203":"https://pictures-nigeria.jijistatic.net/194717031_NjIwLTYyMC1jNDNjM2IzMWRk.webp",
   "217":"https://img.chinax.com/nimg/db/22/dee38b10dcaf19b8c43865cda4c7-200x200-1.jpg",
   "224":"https://img.chinax.com/nimg/89/a3/db98ab20a756376fd8f187823c27-200x200-1/commercial_220v_240v_salad_bar_fridge_r134a_salad_counter_chiller_2_steel_doors.jpg",
-  "229":"https://restaurantequipmentxpress.com/cdn/shop/files/Stainless_Steel_Table_4ft_9a688806-28b8-4447-b8d3-a782c4db157c.png?v=1742539488&width=1445",
-  "230":"https://restaurantequipmentxpress.com/cdn/shop/files/Stainless_Steel_Table_4ft_9a688806-28b8-4447-b8d3-a782c4db157c.png?v=1742539488&width=1445",
+  "229":"https://restaurantequipmentxpress.com/cdn/shop/files/Stainless_Steel_Table_6ft_693655cb-e3a6-48a9-8432-28215c617bb1.png?v=1742539485&width=1445",
+  "230":"https://yavolo.co.uk/products/images/1/800X800/bdc0de249d476caf89e393a74f171bd4.jpg",
   "233":"https://cdnimg.webstaurantstore.com/images/products/large/671060/3157109.jpg",
 };
 const MARKETPLACE_CONFIG={name:"Twins Marketplace",description:"A moderated community marketplace alongside the official Twins catalogue.",sellerModel:"Verified seller listings",paymentModel:"Seller membership and promotion payments will connect to a production payment gateway after merchant credentials are configured.",buyerProtection:"Community listings begin as enquiry-first. Twins-owned catalogue checkout can use a payment gateway once prices and inventory are production-ready."};
