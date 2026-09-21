@@ -1,34 +1,92 @@
-import base64, hashlib, hmac, json, secrets, uuid
+import base64, hashlib, hmac, json, secrets, time, uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 import bcrypt, psycopg
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str=""
-    session_secret: str="change-me"
+    session_secret: str=""
     frontend_origins: str="http://127.0.0.1:5500,http://localhost:5500,http://localhost:3000"
+    trusted_hosts: str=""
+    app_env: str="development"
     port: int=8000
     cookie_secure: bool=False
+    auth_rate_limit: int=10
+    auth_rate_window_seconds: int=900
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
-app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
+trusted_hosts=[x.strip() for x in settings.trusted_hosts.split(",") if x.strip()]
+if trusted_hosts:
+    app.add_middleware(TrustedHostMiddleware,allowed_hosts=trusted_hosts)
+app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"],max_age=600)
+
+_auth_attempts={}
+_AUTH_PATHS={"/api/auth/login","/api/auth/signup"}
+_MUTATING_METHODS={"POST","PUT","PATCH","DELETE"}
+
+def _client_key(request:Request)->str:
+    return f"{request.client.host if request.client else 'unknown'}:{request.url.path}"
+
+def _rate_limited(request:Request)->bool:
+    key=_client_key(request);now=time.monotonic();window=settings.auth_rate_window_seconds
+    bucket=[stamp for stamp in _auth_attempts.get(key,[]) if now-stamp<window]
+    if len(bucket)>=settings.auth_rate_limit:
+        _auth_attempts[key]=bucket
+        return True
+    bucket.append(now);_auth_attempts[key]=bucket
+    if len(_auth_attempts)>2048:
+        for old_key,stamps in list(_auth_attempts.items())[:256]:
+            if not stamps or now-stamps[-1]>=window: _auth_attempts.pop(old_key,None)
+    return False
+
+@app.middleware("http")
+async def security_guard(request:Request,call_next):
+    origin=request.headers.get("origin")
+    if request.method in _MUTATING_METHODS and origin and origin not in origins:
+        return JSONResponse(status_code=403,content={"detail":"Origin not allowed"})
+    if request.url.path in _AUTH_PATHS and request.method=="POST" and _rate_limited(request):
+        return JSONResponse(status_code=429,content={"detail":"Too many authentication attempts. Try again later."},headers={"Retry-After":str(settings.auth_rate_window_seconds)})
+    response=await call_next(request)
+    response.headers["X-Content-Type-Options"]="nosniff"
+    response.headers["X-Frame-Options"]="DENY"
+    response.headers["Referrer-Policy"]="strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"]="camera=(), microphone=(), geolocation=()"
+    if settings.cookie_secure:
+        response.headers["Strict-Transport-Security"]="max-age=31536000; includeSubDomains"
+    if request.url.path.startswith("/api/auth/") or request.url.path.startswith("/api/account/") or request.url.path.startswith("/api/admin/"):
+        response.headers["Cache-Control"]="no-store"
+    return response
+
+@app.on_event("startup")
+def validate_production_security():
+    if settings.app_env.lower()=="production":
+        if len(settings.session_secret)<32:
+            raise RuntimeError("SESSION_SECRET must be at least 32 characters in production")
+        if not settings.cookie_secure:
+            raise RuntimeError("COOKIE_SECURE=true is required in production")
+        if not origins:
+            raise RuntimeError("FRONTEND_ORIGINS must contain at least one allowed origin in production")
 
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
     return psycopg.connect(settings.database_url)
 def sign_session(user_id:str,role:str)->str:
-    payload={"sub":user_id,"role":role,"exp":int((datetime.now(timezone.utc)+timedelta(days=7)).timestamp())}
+    if not settings.session_secret:
+        raise HTTPException(status_code=503,detail="Session security is not configured")
+    payload={"sub":user_id,"role":role,"iat":int(datetime.now(timezone.utc).timestamp()),"exp":int((datetime.now(timezone.utc)+timedelta(hours=8)).timestamp())}
     raw=base64.urlsafe_b64encode(json.dumps(payload,separators=(",",":")).encode()).decode().rstrip("=")
     sig=hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()
     return raw+"."+sig
 def read_session(request:Request)->dict[str,Any]|None:
-    token=request.cookies.get("twins_session")
+    token=request.cookies.get("__Host-twins_session")
     if not token or "." not in token:return None
     raw,sig=token.rsplit(".",1)
     if not hmac.compare_digest(sig,hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()):return None
@@ -142,19 +200,19 @@ def signup(payload:AuthPayload,response:Response):
         with db() as conn:
             conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph));conn.commit()
     except psycopg.errors.UniqueViolation:raise HTTPException(status_code=409,detail="An account with this email already exists")
-    response.set_cookie("twins_session",sign_session(str(uid),"customer"),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=604800,path="/")
+    response.set_cookie("__Host-twins_session",sign_session(str(uid),"customer"),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
 def login(payload:AuthPayload,response:Response):
     with db() as conn:row=conn.execute("select id,name,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
     if not row or not bcrypt.checkpw(payload.password.encode(),row[3].encode()):raise HTTPException(status_code=401,detail="Invalid email or password")
-    response.set_cookie("twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=604800,path="/")
+    response.set_cookie("__Host-twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(row[0]),"name":row[1],"email":row[2],"role":row[4]}}
 
 @app.post("/api/auth/logout")
 def logout(response:Response):
-    response.delete_cookie("twins_session",path="/");return {"ok":True}
+    response.delete_cookie("__Host-twins_session",path="/");response.headers["Clear-Site-Data"]="cache, cookies";response.headers["Cache-Control"]="no-store";return {"ok":True}
 
 @app.get("/api/account/me")
 def me(request:Request):
