@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     auth_rate_window_seconds: int=900
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
+SESSION_COOKIE="__Host-twins_session" if settings.cookie_secure else "twins_session"
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
 trusted_hosts=[x.strip() for x in settings.trusted_hosts.split(",") if x.strip()]
@@ -86,7 +87,7 @@ def sign_session(user_id:str,role:str)->str:
     sig=hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()
     return raw+"."+sig
 def read_session(request:Request)->dict[str,Any]|None:
-    token=request.cookies.get("__Host-twins_session")
+    token=request.cookies.get(SESSION_COOKIE)
     if not token or "." not in token:return None
     raw,sig=token.rsplit(".",1)
     if not hmac.compare_digest(sig,hmac.new(settings.session_secret.encode(),raw.encode(),hashlib.sha256).hexdigest()):return None
@@ -200,7 +201,7 @@ def signup(payload:AuthPayload,response:Response):
         with db() as conn:
             conn.execute("insert into users (id,name,email,phone,password_hash,role) values (%s,%s,%s,%s,%s,'customer')",(uid,payload.name,str(payload.email).lower(),None,ph));conn.commit()
     except psycopg.errors.UniqueViolation:raise HTTPException(status_code=409,detail="An account with this email already exists")
-    response.set_cookie("__Host-twins_session",sign_session(str(uid),"customer"),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
+    response.set_cookie(SESSION_COOKIE,sign_session(str(uid),"customer"),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=28800,path="/")
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
@@ -212,7 +213,7 @@ def login(payload:AuthPayload,response:Response):
 
 @app.post("/api/auth/logout")
 def logout(response:Response):
-    response.delete_cookie("__Host-twins_session",path="/");response.headers["Clear-Site-Data"]="cache, cookies";response.headers["Cache-Control"]="no-store";return {"ok":True}
+    response.delete_cookie(SESSION_COOKIE,path="/");response.headers["Clear-Site-Data"]="cache, cookies";response.headers["Cache-Control"]="no-store";return {"ok":True}
 
 @app.get("/api/account/me")
 def me(request:Request):
