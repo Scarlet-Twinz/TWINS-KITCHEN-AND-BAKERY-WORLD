@@ -297,21 +297,75 @@ function openProduct(id) {
   document.getElementById("closeDrawer").onclick = closeDrawer;
 }
 
-function renderModule(name) {
+async function renderModule(name) {
   var modules = {
-    inventory:["INVENTORY","Inventory","Stock quantities, low-stock alerts, adjustments and history.","Inventory UI is complete and awaiting server inventory records."],
-    orders:["ORDERS","Orders","Order lifecycle, customer order details and fulfilment history.","Order UI is complete and awaiting the backend order service."],
-    payments:["PAYMENTS","Payments","Gateway records, references, statuses and refunds.","Gateway-ready only. Add Paystack or Flutterwave credentials and server-side webhooks later."],
-    delivery:["DELIVERY","Fulfilment","Delivery destinations, dispatch, status and completion.","Delivery UI is complete and awaiting server delivery records."],
-    audit:["SECURITY","Audit log","Admin mutations and security events.","Audit UI is complete and will become live when backend mutation logging is enabled."]
+    inventory:["INVENTORY","Inventory","Stock quantities, low-stock alerts, adjustments and history."],
+    orders:["ORDERS","Orders","Order lifecycle, customer order details and fulfilment history."],
+    payments:["PAYMENTS","Payments","Gateway records, references, statuses and refunds."],
+    delivery:["DELIVERY","Fulfilment","Delivery destinations, dispatch, status and completion."],
+    audit:["SECURITY","Audit log","Admin mutations and security events."]
   };
   var module = modules[name];
-  document.getElementById("view-" + name).innerHTML =
-    hero(module[0],module[1],module[2]) +
-    '<div class="notice">' + module[3] + '</div><div class="cards">' +
-    '<div class="card module"><span class="eyebrow">UI READY</span><h4>Operations workspace</h4><p>Navigation, tables, status presentation and detail surfaces are implemented.</p><span>UI READY</span></div>' +
-    '<div class="card module"><span class="eyebrow">SERVER</span><h4>Integration boundary</h4><p>State-changing data must be persisted and authorised by FastAPI and PostgreSQL.</p><span>API INTEGRATION</span></div>' +
-    '<div class="card module"><span class="eyebrow">NEXT</span><h4>Production connection</h4><p>Connect the matching database tables, endpoints, validation, permissions and audit events.</p><span>BACKEND NEXT</span></div></div>';
+  var el = document.getElementById("view-" + name);
+  el.innerHTML = hero(module[0],module[1],module[2]) + '<div id="moduleBody"><div class="empty">Loading server records…</div></div>';
+  if(name === "payments"){
+    document.getElementById("moduleBody").innerHTML =
+      '<div class="notice">Payment records are intentionally gateway-ready only. Paystack/Flutterwave credentials, webhook verification and reconciliation will be connected after the merchant account is configured.</div>' +
+      '<div class="cards"><div class="card module"><span class="eyebrow">SAFE BOUNDARY</span><h4>No browser payment authority</h4><p>Payment status must come from verified server-side gateway webhooks.</p></div><div class="card module"><span class="eyebrow">DATABASE</span><h4>Transaction table ready</h4><p>payment_transactions exists in the backend schema for the integration phase.</p></div></div>';
+    return;
+  }
+  try {
+    var data;
+    if(name === "inventory") data = await request("/api/admin/inventory");
+    if(name === "orders") data = await request("/api/admin/orders");
+    if(name === "delivery") data = await request("/api/admin/delivery");
+    if(name === "audit") data = await request("/api/admin/audit");
+    var body = document.getElementById("moduleBody");
+    if(name === "inventory"){
+      var rows=data.inventory||[];
+      body.innerHTML = '<div class="tablewrap"><table class="table"><thead><tr><th>Product</th><th>Qty</th><th>Reserved</th><th>Reorder</th><th>Status</th><th>Updated</th><th>Adjust</th></tr></thead><tbody>' +
+        (rows.length ? rows.map(function(x){
+          return '<tr><td><strong>'+escapeHtml(x.name)+'</strong><br><span class="muted">#'+escapeHtml(x.productId)+'</span></td><td>'+x.quantity+'</td><td>'+x.reservedQuantity+'</td><td>'+x.reorderLevel+'</td><td>'+statusBadge(x.status)+'</td><td>'+formatDate(x.updatedAt)+'</td><td><button class="btn light mini" data-adjust="'+x.productId+'" data-delta="-1">−1</button> <button class="btn light mini" data-adjust="'+x.productId+'" data-delta="1">+1</button></td></tr>';
+        }).join("") : '<tr><td colspan="7">No inventory records yet. Seed inventory from the authenticated operations workflow.</td></tr>') +
+        '</tbody></table></div>';
+      body.querySelectorAll("[data-adjust]").forEach(function(btn){
+        btn.onclick=async function(){
+          var reason=prompt("Reason for this inventory adjustment:");
+          if(!reason)return;
+          try{await request("/api/admin/inventory/adjust",{method:"POST",body:JSON.stringify({productId:Number(btn.dataset.adjust),delta:Number(btn.dataset.delta),reason:reason})});renderModule(name)}catch(e){alert(e.message)}
+        };
+      });
+    } else if(name === "orders"){
+      var rows=data.orders||[];
+      body.innerHTML = '<div class="tablewrap"><table class="table"><thead><tr><th>Reference</th><th>Customer</th><th>Status</th><th>Payment</th><th>Total</th><th>Created</th><th>Change</th></tr></thead><tbody>' +
+        (rows.length ? rows.map(function(x){
+          return '<tr><td><strong>'+escapeHtml(x.reference)+'</strong></td><td>'+escapeHtml(x.customerName)+'<br><span class="muted">'+escapeHtml(x.customerPhone)+'</span></td><td>'+statusBadge(x.status)+'</td><td>'+statusBadge(x.paymentStatus)+'</td><td>'+escapeHtml(x.currency)+' '+x.totalAmount.toLocaleString()+'</td><td>'+formatDate(x.createdAt)+'</td><td><select data-order-status="'+x.id+'"><option value="pending">pending</option><option value="confirmed">confirmed</option><option value="processing">processing</option><option value="ready">ready</option><option value="completed">completed</option><option value="cancelled">cancelled</option></select></td></tr>';
+        }).join("") : '<tr><td colspan="7">No orders have been created from approved quotation requests.</td></tr>') +
+        '</tbody></table></div>';
+      body.querySelectorAll("[data-order-status]").forEach(function(select){
+        var current=rows.find(function(x){return x.id===select.dataset.orderStatus}); if(current)select.value=current.status;
+        select.onchange=async function(){try{await request("/api/admin/orders/"+select.dataset.orderStatus,{method:"PATCH",body:JSON.stringify({status:select.value})});renderModule(name)}catch(e){alert(e.message)}};
+      });
+    } else if(name === "delivery"){
+      var rows=data.deliveries||[];
+      body.innerHTML = '<div class="tablewrap"><table class="table"><thead><tr><th>Order</th><th>Recipient</th><th>Destination</th><th>Status</th><th>Tracking</th><th>Updated</th><th>Change</th></tr></thead><tbody>' +
+        (rows.length ? rows.map(function(x){
+          return '<tr><td><strong>'+escapeHtml(x.orderReference)+'</strong></td><td>'+escapeHtml(x.recipientName)+'<br><span class="muted">'+escapeHtml(x.phone)+'</span></td><td>'+escapeHtml([x.address,x.city,x.state,x.country].filter(Boolean).join(", "))+'</td><td>'+statusBadge(x.status)+'</td><td>'+escapeHtml(x.trackingReference||"—")+'</td><td>'+formatDate(x.updatedAt)+'</td><td><select data-delivery-status="'+x.id+'"><option>pending</option><option>scheduled</option><option>dispatched</option><option>in_transit</option><option>delivered</option><option>failed</option><option>cancelled</option></select></td></tr>';
+        }).join("") : '<tr><td colspan="7">No delivery records yet.</td></tr>') +
+        '</tbody></table></div>';
+      body.querySelectorAll("[data-delivery-status]").forEach(function(select){
+        var current=rows.find(function(x){return x.id===select.dataset.deliveryStatus}); if(current)select.value=current.status;
+        select.onchange=async function(){try{await request("/api/admin/delivery/"+select.dataset.deliveryStatus,{method:"PATCH",body:JSON.stringify({status:select.value})});renderModule(name)}catch(e){alert(e.message)}};
+      });
+    } else if(name === "audit"){
+      var rows=data.events||[];
+      body.innerHTML = rows.length ? '<div class="tablewrap"><table class="table"><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead><tbody>'+rows.map(function(x){
+        return '<tr><td>'+formatDate(x.createdAt)+'</td><td>'+escapeHtml(x.actor)+'</td><td><strong>'+escapeHtml(x.action)+'</strong></td><td>'+escapeHtml(x.entityType||"—")+' '+escapeHtml(x.entityId||"")+'</td><td><code>'+escapeHtml(JSON.stringify(x.metadata||{}))+'</code></td></tr>';
+      }).join("")+'</tbody></table></div>' : '<div class="empty">No audit events have been recorded yet.</div>';
+    }
+  } catch(error) {
+    document.getElementById("moduleBody").innerHTML = '<div class="notice">' + escapeHtml(error.message) + "</div>";
+  }
 }
 
 function renderCustomers() {
