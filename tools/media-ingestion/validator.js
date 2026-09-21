@@ -89,7 +89,21 @@ function readExistingRules(appPath = APP_PATH) {
   return { blocklist };
 }
 
-function normalizeUrl(value) { return typeof value === "string" ? value.trim() : ""; }
+function normalizeUrl(value) {
+  if (typeof value !== "string") return "";
+  const raw = value.trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    url.protocol = url.protocol.toLowerCase();
+    url.hostname = url.hostname.toLowerCase();
+    url.hash = "";
+    if ((url.protocol === "http:" && url.port === "80") || (url.protocol === "https:" && url.port === "443")) url.port = "";
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
 
 function isUrl(value) {
   try {
@@ -201,7 +215,7 @@ function validateManifest(manifest, state) {
     if (!verification.checkedAt || Number.isNaN(Date.parse(verification.checkedAt))) { reject(candidate, "missing or invalid verification timestamp"); continue; }
     if (state.mappedIds.has(id)) { reject(candidate, "product already has a valid media mapping"); continue; }
 
-    if (seenBatch.has(url)) {
+    const normalizedSourceUrl = normalizeUrl(verification.sourceUrl);\n    if (seenBatch.has(url)) {
       reject(candidate, "duplicate URL in new batch; no-new-duplicates rule");
       continue;
     }
@@ -222,7 +236,7 @@ function validateManifest(manifest, state) {
     accepted.push({
       productId: id,
       url,
-      sourceUrl: verification.sourceUrl,
+      sourceUrl: normalizedSourceUrl,
       verificationStatus: "verified",
       checkedAt: verification.checkedAt,
       sourceName: verification.sourceName || "",
