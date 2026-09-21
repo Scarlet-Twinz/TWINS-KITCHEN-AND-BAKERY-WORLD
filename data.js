@@ -288,7 +288,25 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "commercial coffee machine":"https://canmac.co.uk/cdn/shop/files/MIA5_6-1200x1200_1024x1024.jpg?v=1756647383",
   
   "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg"
-};
+  "8":"https://mobileimages.lowes.com/productimages/e24c9c00-f391-4b79-89ca-a1e874307af9/74813158.jpeg?size=pdhz",
+  "12":"https://cpimg.tistatic.com/10760726/b/4/Stainless-Steel-Heavy-Duty-Rack..jpg",
+  "33":"https://www.lamber.it/it/images/prodotti/gallery/product-113_1463.jpeg",
+  "53":"https://lirp.cdn-website.com/85f93c4d/dms3rep/multi/opt/forno-rotativo-rg6080-2-1920w.png",
+  "56":"https://foodbusinessmachines.com/cdn/shop/products/1_c6e77a86-102b-4297-80cf-11f9f7abf6d8.jpg?v=1656377833&width=550",
+  "58":"https://image.made-in-china.com/202f0j00QdyhwzgKrHkL/Heavy-Duty-Bread-Bakery-Equipment-Commercial-Kitchen-Mixer-Dough-Mixer-Stand-Mixer-Planetary-Mixer-20L-Bread-Mixer-Machine.webp",
+  "62":"https://image.made-in-china.com/365f3j00KQmViUjBnvur/Dough-Spiral-Mixer-Commercial-Pizza-Dough-Mixer-40L.webp",
+  "63":"https://image.made-in-china.com/202f0j00RbKlvGWBhifk/Caterwin-50L-Commercial-Dough-Mixers-Machine-Stainless-Steel-Stand-Electric-Dough-Blender-Spiral-Mixer-for-Bakery-Food.webp",
+  "70":"https://www.costco.com.au/medias/sys_master/images/h31/hbb/102876098068510.jpg",
+  "79":"https://tanstella.com.au/cdn/shop/files/IM-A-ZB45F-COM-202502251148-07.jpg?v=1748418942&width=1000",
+  "85":"https://img.vevorstatic.com/us%2FBXGDLSSCMSSC0LHIC001V0%2Fgoods_thumb-v2%2Fstainless-steel-sink-f6.jpg?format=webp&timestamp=1765950808000",
+  "168":"https://image.made-in-china.com/2f0j00LPkUdYqRJMbQ/Malaysia-Standard-Restaurant-School-Service-Equipment-Stainless-Steel-4-Hot-Plate-Electric-Range-Stove-on-Oven-Hot-Plate-Cooking.webp",
+  "173":"https://www.rewardhospitality.com.au/Images/ProductImages/Medium/4006066_3.jpg",
+  "174":"https://images.allianceonline.co.uk/Products/LT4X1.jpg",
+  "210":"https://irrnrwxhnoll5p.leadongcdn.com/cloud/jmBqrKmmSRikoqnikiko/HBE-BE-4B32Dguanwang.jpg",
+  "213":"https://www.restaurantsupply.com/cdn/shop/collections/952868.jpg?crop=center&height=1200&v=1767974269&width=1200",
+  "219":"https://www.daiko.ma/cdn/shop/files/CGC850XDKClose.jpg?v=1710408866",
+  "221":"https://cdn.ckitchen.com/pmidimages/blue-air-bluf48-hc-48-38-2-section-undercounter-freezer-with-2-left-right-hinged-solid-doors-and-side-rear-breathing-compressor-20250411081349527.webp",
+}
 const PREMIUM_MEDIA_LIBRARY={
 "commercial 6-burner stainless range":"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1400&q=90",
 "professional spiral dough mixer":"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1400&q=90",
