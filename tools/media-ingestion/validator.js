@@ -207,7 +207,11 @@ function validateManifest(manifest, state) {
     if (!verification || typeof verification !== "object") { reject(candidate, "missing required verification information"); continue; }
     if (verification.verified !== true) { reject(candidate, "candidate is unverified / not VERIFIED"); continue; }
     if (!verification.sourceUrl || !isUrl(verification.sourceUrl)) { reject(candidate, "missing or invalid verification source URL"); continue; }
-    const verificationTimestamp = verification.verifiedAt ?? verification.checkedAt;\n    if (!verificationTimestamp || Number.isNaN(Date.parse(verificationTimestamp))) { reject(candidate, "missing or invalid verification timestamp"); continue; }
+    const verificationTimestamp = verification.verifiedAt ?? verification.checkedAt;
+    if (!verificationTimestamp || Number.isNaN(Date.parse(verificationTimestamp))) {
+      reject(candidate, "missing or invalid verification timestamp");
+      continue;
+    }
     if (state.mappedIds.has(id)) { reject(candidate, "product already has a valid media mapping"); continue; }
 
     const normalizedSourceUrl = normalizeUrl(verification.sourceUrl);
