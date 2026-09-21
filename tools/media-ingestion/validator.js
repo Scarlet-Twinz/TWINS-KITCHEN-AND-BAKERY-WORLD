@@ -56,11 +56,11 @@ function extractCatalogue(dataPath) {
   while ((match = pushRe.exec(catalogueRegion))) {
     const open = catalogueRegion.indexOf("(", match.index);
     const close = balanced(catalogueRegion, open, "(", ")");
-    program += "P.push" + catalogueRegion.slice(open, close + 1) + ";\\n";
+    program += "P.push" + catalogueRegion.slice(open, close + 1) + ";\n";
     pushRe.lastIndex = close + 1;
   }
   const context = {};
-  vm.runInNewContext(program + "\\nglobalThis.__P__=P;", context, { filename: dataPath, timeout: 15000 });
+  vm.runInNewContext(program + "\nglobalThis.__P__=P;", context, { filename: dataPath, timeout: 15000 });
   if (!Array.isArray(context.__P__)) throw new Error("Could not evaluate catalogue P");
   return context.__P__;
 }
