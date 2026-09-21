@@ -139,6 +139,27 @@ test("pending manifest is deterministic and contains exactly the current pending
   assert.ok(first.products.every(x => x.currentMediaStatus === "PENDING"));
 });
 
+test("accepts verification manifest shape with candidatesReviewed", () => {
+  const state = computeMediaState(loadCatalogue(), readExistingRules());
+  const pending = state.pending[0];
+  const result = validateManifest({
+    schemaVersion: 1,
+    batchId: "verification-shape-test",
+    candidatesReviewed: [{
+      productId: String(pending.id),
+      url: "https://example.test/candidates-reviewed.jpg",
+      status: "VERIFIED",
+      verification: {
+        verified: true,
+        sourceUrl: "https://example.test/source",
+        verifiedAt: "2026-09-21T00:00:00Z"
+      }
+    }]
+  }, state);
+  assert.equal(result.accepted.length, 1);
+  assert.equal(result.rejected.length, 0);
+});
+
 test("candidate schema requires a VERIFIED status before acceptance", () => {
   const state = computeMediaState(loadCatalogue(), readExistingRules());
   const pending = state.pending[0];
