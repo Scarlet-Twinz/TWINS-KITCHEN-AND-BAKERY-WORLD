@@ -49,12 +49,12 @@ function sellerFormUx(){
    aside.appendChild(box);
  }
  window.saveSellerListing=function(){
-   var title=document.getElementById("sellerTitle"),category=document.getElementById("sellerCategory"),description=document.getElementById("sellerDescription"),price=document.getElementById("sellerPrice"),location=document.getElementById("sellerLocation");
-   if(!title||!category||!description||!location)return;
+   var title=document.getElementById("sellerTitle"),category=document.getElementById("sellerCategory"),description=document.getElementById("sellerDescription"),price=document.getElementById("sellerPrice"),locationField=document.getElementById("sellerLocation");
+   if(!title||!category||!description||!locationField)return;
    var condition=document.getElementById("sellerCondition"),stock=document.getElementById("sellerStock");
-   var listing={id:Date.now(),title:title.value.trim(),category:category.value,description:description.value.trim(),price:price.value.trim(),location:location.value.trim(),condition:condition?condition.value:"Condition to confirm",stock:stock?stock.value:"Stock to confirm",image:window.__sellerImage||"",status:"Pending moderation",createdAt:new Date().toISOString()};
+   var listing={id:Date.now(),title:title.value.trim(),category:category.value,description:description.value.trim(),price:price.value.trim(),location:locationField.value.trim(),condition:condition?condition.value:"Condition to confirm",stock:stock?stock.value:"Stock to confirm",image:window.__sellerImage||"",status:"Pending moderation",createdAt:new Date().toISOString()};
    if(!listing.title||!listing.description||!listing.location){marketToast("Complete the required listing details");return}
-   var list=getM();list.unshift(listing);setM(list);location.href="seller-dashboard.html?saved=1";
+   var list=getM();list.unshift(listing);setM(list);window.location.href="seller-dashboard.html?saved=1";
  };
 }
 
