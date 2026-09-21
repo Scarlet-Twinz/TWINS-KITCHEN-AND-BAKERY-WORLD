@@ -123,3 +123,39 @@ Do not collect or apply an image merely because it looks visually similar. If ca
 - `manifests/pending-catalogue.json` — current deterministic 307-product pending population.
 - `manifests/candidate-batch-template.json` — discovery/verification batch shape.
 - `collector.js` — deterministic pending-manifest generator.
+
+
+## Catalogue-wide automatic discovery
+
+Discovery is a proposal-only layer. It dynamically derives the current pending population from the catalogue/media state, searches through a pluggable SearchProvider, fetches source pages without bypassing access controls, extracts deterministic static evidence, scores matches, and writes no catalogue mappings.
+
+Eventual command:
+
+```bash
+node tools/media-ingestion/index.js discover
+```
+
+The command processes the current pending population automatically; internal concurrency and rate limiting prevent the user from managing manual batches. Discovery never calls `applyMappings()`, never modifies `data.js` or `app.js`, and does not modify existing verification manifests.
+
+### Search provider configuration
+
+The default provider is Brave Search API. Set:
+
+- `MEDIA_SEARCH_PROVIDER=brave`
+- `MEDIA_SEARCH_API_KEY=<provider credential>`
+- optional `MEDIA_SEARCH_API_URL=<supported provider endpoint>`
+
+Operational controls:
+
+- `MEDIA_DISCOVERY_CONCURRENCY`
+- `MEDIA_DISCOVERY_MAX_QUERIES_PER_PRODUCT`
+- `MEDIA_DISCOVERY_MAX_RESULTS_PER_QUERY`
+- `MEDIA_DISCOVERY_TIMEOUT_MS`
+- `MEDIA_DISCOVERY_RETRIES`
+- `MEDIA_DISCOVERY_RETRY_BACKOFF_MS`
+- `MEDIA_DISCOVERY_REQUESTS_PER_SECOND`
+- optional `MEDIA_DISCOVERY_MAX_PRODUCTS` for an explicit bounded run
+
+The provider is isolated behind the `SearchProvider` interface, so another supported API can be substituted without changing matching, extraction, deduplication, or orchestration. Search-engine result HTML is never scraped.
+
+Discovery output is a single catalogue-wide proposal with HIGH, REVIEW, and UNRESOLVED results. Existing mappings and legacy duplicate assignments remain authoritative. A discovery result is not an ingestion mapping until the existing validation/apply workflow is deliberately invoked later.
