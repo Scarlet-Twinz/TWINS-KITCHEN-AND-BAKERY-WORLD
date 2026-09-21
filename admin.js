@@ -19,7 +19,7 @@ function escapeHtml(value) {
 }
 
 function apiBase() {
-  return window.SITE_CONFIG && SITE_CONFIG.apiBase ? SITE_CONFIG.apiBase : "http://localhost:8000";
+  return (typeof SITE_CONFIG !== "undefined" && SITE_CONFIG.apiBase) ? SITE_CONFIG.apiBase : "http://localhost:8000";
 }
 
 async function request(path, options) {
@@ -432,6 +432,7 @@ function deny() {
 }
 
 window.addEventListener("load", async function () {
+  document.getElementById("admin").innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:20px"><div class="panel" style="max-width:520px;text-align:center"><span class="eyebrow">TWINS ADMIN</span><h1>Checking staff access…</h1><p class="muted">Connecting to the authenticated operations workspace.</p></div></main>';
   try {
     var session = await request("/api/account/me");
     var role = session && session.user && session.user.role;
