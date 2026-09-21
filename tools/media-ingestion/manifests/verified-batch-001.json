@@ -54,21 +54,6 @@
         "verifiedAt": "2026-09-21T16:29:34.700Z"
       },
       "notes": "The candidate image URL resolves and visibly shows a snooker table. The accessible Jiji listing explicitly identifies '7ft Nigeria Made Classic Special Snooker Table' and lists table type 7 ft. The distinguishing 7-foot attribute directly matches the catalogue name 'Snooker Table 7ft'."
-    },
-    {
-      "productId": "167",
-      "productName": "Microwave Oven 30L",
-      "url": "https://pictures-nigeria.jijistatic.net/152890953_NjIwLTYyMC1jM2VlM2JlMmIw.webp",
-      "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
-      "sourceProvider": "Jiji",
-      "status": "VERIFIED",
-      "verification": {
-        "verified": true,
-        "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
-        "sourceName": "Jiji",
-        "verifiedAt": "2026-09-21T16:29:34.700Z"
-      },
-      "notes": "The candidate image URL resolves and visibly shows the LG microwave pictured in the listing. The accessible Jiji page explicitly identifies LG 3032jas 1350W 30L Microwave Oven and provides 30L capacity, 1350W power, model-specific description and product dimensions. The catalogue name 'Microwave Oven 30L' directly matches the distinguishing 30L attribute."
     }
   ]
 }
