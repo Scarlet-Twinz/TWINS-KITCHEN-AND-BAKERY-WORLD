@@ -29,6 +29,9 @@ PostgreSQL is the source of truth for production accounts and RFQs. The browser 
 
 ## Operations backend now implemented
 
+Customer accounts can also retrieve their server-side order history from the dashboard after staff converts a quotation into an order.
+
+
 The production operations boundary now includes server-authoritative:
 - inventory records and inventory adjustments
 - order creation from an approved quotation
