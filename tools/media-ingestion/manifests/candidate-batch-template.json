@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "batchId": "candidate-batch-001",
+  "status": "CANDIDATE",
+  "cataloguePopulation": 530,
+  "batchSize": 25,
+  "notes": "Discovery-only batch. Select 25-50 records from pending-catalogue.json. Candidates are not eligible for apply until independently verified.",
+  "candidates": [
+    {
+      "productId": "193",
+      "productName": "Planetary Mixer 20L",
+      "category": "Bakery Equipment",
+      "productType": "Expanded catalogue",
+      "candidateUrl": "https://supplier.example/product-image.jpg",
+      "sourceUrl": "https://supplier.example/product-page",
+      "sourceProvider": "Supplier name",
+      "status": "CANDIDATE",
+      "verification": {
+        "verified": false,
+        "sourceUrl": "https://supplier.example/product-page",
+        "sourceName": "Supplier name",
+        "checkedAt": "2026-09-21T00:00:00Z"
+      },
+      "notes": "Discovery candidate only. Confirm exact 20L model/specification before changing status to VERIFIED."
+    }
+  ]
+}
