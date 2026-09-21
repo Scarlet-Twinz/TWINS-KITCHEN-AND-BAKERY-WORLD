@@ -215,7 +215,8 @@ function validateManifest(manifest, state) {
     if (!verification.checkedAt || Number.isNaN(Date.parse(verification.checkedAt))) { reject(candidate, "missing or invalid verification timestamp"); continue; }
     if (state.mappedIds.has(id)) { reject(candidate, "product already has a valid media mapping"); continue; }
 
-    const normalizedSourceUrl = normalizeUrl(verification.sourceUrl);\n    if (seenBatch.has(url)) {
+    const normalizedSourceUrl = normalizeUrl(verification.sourceUrl);
+    if (seenBatch.has(url)) {
       reject(candidate, "duplicate URL in new batch; no-new-duplicates rule");
       continue;
     }
