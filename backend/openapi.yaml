@@ -69,6 +69,60 @@ paths:
       responses:
         '200': { description: Quote collection }
         '403': { description: Staff access required }
+  /api/admin/inventory:
+    get:
+      summary: List inventory records for staff
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Inventory collection}
+        '403': {description: Staff access required}
+  /api/admin/inventory/adjust:
+    post:
+      summary: Adjust product inventory
+      security: [{sessionCookie: []}]
+      responses:
+        '201': {description: Inventory adjustment recorded}
+  /api/admin/orders:
+    get:
+      summary: List orders for staff
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Order collection}
+  /api/admin/orders/from-quote:
+    post:
+      summary: Convert a quotation into an operational order
+      security: [{sessionCookie: []}]
+      responses:
+        '201': {description: Order created}
+  /api/admin/orders/{order_id}:
+    patch:
+      summary: Update order status
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Order updated}
+  /api/admin/delivery:
+    get:
+      summary: List delivery records for staff
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Delivery collection}
+    post:
+      summary: Create a delivery record
+      security: [{sessionCookie: []}]
+      responses:
+        '201': {description: Delivery created}
+  /api/admin/delivery/{delivery_id}:
+    patch:
+      summary: Update delivery status
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Delivery updated}
+  /api/admin/audit:
+    get:
+      summary: List operational audit events
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Audit event collection}
 components:
   securitySchemes:
     sessionCookie:
