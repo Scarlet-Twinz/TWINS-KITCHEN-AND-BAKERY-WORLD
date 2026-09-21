@@ -404,7 +404,8 @@ toast('Business plan saved');
 setTimeout(function(){location.href='project-planner.html'},450);
 }
 function projectPlanner(){
-var savedPlan=get('twins_project_plan',null);
+var savedPlan=get('twins_project_plan',null),savedBusiness=get('twins_business_plan',null);
+var preferredBusiness=(savedPlan&&savedPlan.business)||(savedBusiness&&savedBusiness.type)||'';
 var businessOptions=B.map(function(b){return '<option '+((savedPlan&&savedPlan.business===b[0])||(!savedPlan&&preferredBusiness===b[0])?'selected':'')+'>'+b[0]+'</option>'}).join('');
 var stageOptions=PROJECT_STAGES.map(function(x){return '<option '+(savedPlan&&savedPlan.stage===x?'selected':'')+'>'+x+'</option>'}).join('');
 document.getElementById('planner').innerHTML=head()+
