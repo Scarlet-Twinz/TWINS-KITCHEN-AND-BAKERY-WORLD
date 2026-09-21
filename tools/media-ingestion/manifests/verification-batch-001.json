@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "batchId": "verification-batch-001",
+  "generatedAt": "2026-09-21T16:29:34.700Z",
+  "sourceCandidateManifest": "tools/media-ingestion/manifests/candidate-batch-001.json",
+  "catalogue": {
+    "population": 530,
+    "canonical": true
+  },
+  "verificationPolicy": "Independent web verification only. No catalogue or media mappings modified.",
+  "candidatesReviewed": [
+    {
+      "productId": "88",
+      "productName": "Heavy-Duty 4-Tier Storage Rack",
+      "candidateImageUrl": "https://image.made-in-china.com/202f0j00wOMbHmPISsuz/NSF-4-Tiers-K-D-Packing-Heavy-Duty-Storage-Stainless-Steel-Wire-Shelving.webp",
+      "sourceUrl": "https://wellandcs.en.made-in-china.com/product/ryKEZicYAVhH/China-NSF-4-Tiers-K-D-Packing-Heavy-Duty-Storage-Stainless-Steel-Wire-Shelving.html",
+      "sourceProvider": "Made-in-China / Zhongshan Changsheng Metal Products Co., Ltd.",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The accessible source page is explicitly the NSF 4 Tiers K/D Packing Heavy Duty Storage Stainless Steel Wire Shelving product and gives model HD214863A4SS, four tiers, stainless steel, and 21x48x63 inch dimensions. However, the exact candidate image URL could not be independently fetched by the verification browser, so the URL-resolution requirement is not fully satisfied.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T16:29:34.700Z"
+    },
+    {
+      "productId": "108",
+      "productName": "Stainless Wall Cabinet",
+      "candidateImageUrl": "https://shop.kitchenequipmentaustralia.com.au/61562-small_default/stainless-steel-wall-cabinet-wc-1200.jpg",
+      "sourceUrl": "https://shop.kitchenequipmentaustralia.com.au/stainless-steel/stainless-steel-wall-shelves/stainless-steel-wall-cabinet-wc-1200",
+      "sourceProvider": "Kitchen Equipment Australia",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The candidate image URL resolves to a stainless wall cabinet image, and the accessible source page is explicitly Stainless Steel Wall Cabinet - WC-1200. The page identifies Modular Systems, reference WC-1200, 1200mm width, 380mm depth and 600mm height. The catalogue record contains only the generic name and no model/dimensions, so the evidence establishes the product type but not that WC-1200 is the exact Twins catalogue unit.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T16:29:34.700Z"
+    },
+    {
+      "productId": "118",
+      "productName": "GOtv Decoder",
+      "candidateImageUrl": "https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/P/230175_1736320665.jpg",
+      "sourceUrl": "https://www.konga.com/product/gotv-decoder-antenna-6635358",
+      "sourceProvider": "Konga",
+      "result": "VERIFIED",
+      "evidence": "The candidate image URL resolves and visibly shows a GOtv decoder. The accessible Konga product page is explicitly 'Gotv Decoder + Antenna', product code 6635358, and its description states that the unit is a GOtv decoder with an outdoor antenna. The catalogue record is the generic product 'GOtv Decoder' with no model/capacity/configuration that conflicts with this evidence.",
+      "verifiedAt": "2026-09-21T16:29:34.700Z",
+      "reviewerStatus": "independent-web-review"
+    },
+    {
+      "productId": "139",
+      "productName": "Home Theatre Speaker Set",
+      "candidateImageUrl": "https://img.kirstein.de/out/pictures/generated/product/1/50_50_75/37186e03bfb7a06d41f9c2f4ea486a1f_1.jpg",
+      "sourceUrl": "https://www.kirstein.de/en/HiFi/sound-systems/Yamaha-NS-P41-5-1-Home-Theater-Speaker-Set.html",
+      "sourceProvider": "Musikhaus Kirstein",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The accessible source page is explicitly Yamaha NS-P41 5.1 Home Theater Speaker Set and provides product images plus 5.1-channel specifications. The exact candidate image URL could not be independently fetched by the verification browser. In addition, the catalogue record has no manufacturer/model, so exact identity cannot be established from the available catalogue data.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T16:29:34.700Z"
+    },
+    {
+      "productId": "150",
+      "productName": "Snooker Table 6ft",
+      "candidateImageUrl": "https://d21d281c1yd2en.cloudfront.net/media/product_images/high-end-american-fitness-snooker-table-6-feets-d4b6-1280x1280.jpeg",
+      "sourceUrl": "https://zit.ng/products/high-end-american-fitness-snooker-table-6-feets/",
+      "sourceProvider": "Zit Nigeria",
+      "result": "VERIFIED",
+      "evidence": "The candidate image URL resolves and visibly shows a snooker/pool table. The accessible Zit product page explicitly names the product 'High-End American Fitness Snooker Table (6 feets)' and displays the same product-image family. The distinguishing 6-foot attribute directly matches the catalogue name 'Snooker Table 6ft'.",
+      "verifiedAt": "2026-09-21T16:29:34.700Z",
+      "reviewerStatus": "independent-web-review"
+    },
+    {
+      "productId": "151",
+      "productName": "Snooker Table 7ft",
+      "candidateImageUrl": "https://pictures-nigeria.jijistatic.net/145478090_NjIwLTYyMC0wMDRlZTVjMjhh.webp",
+      "sourceUrl": "https://jiji.ng/lagos-island-west/sports-bicycles-and-fitness/7ft-nigeria-made-classic-special-snooker-table-djhLWWoUy8bFTj5gO0EdrMFu.html",
+      "sourceProvider": "Jiji",
+      "result": "VERIFIED",
+      "evidence": "The candidate image URL resolves and visibly shows a snooker table. The accessible Jiji listing explicitly identifies '7ft Nigeria Made Classic Special Snooker Table' and lists table type 7 ft. The distinguishing 7-foot attribute directly matches the catalogue name 'Snooker Table 7ft'.",
+      "verifiedAt": "2026-09-21T16:29:34.700Z",
+      "reviewerStatus": "independent-web-review"
+    },
+    {
+      "productId": "167",
+      "productName": "Microwave Oven 30L",
+      "candidateImageUrl": "https://pictures-nigeria.jijistatic.net/152890953_NjIwLTYyMC1jM2VlM2JlMmIw.webp",
+      "sourceUrl": "https://jiji.ng/ojo/kitchen-appliances/lg-3032jas-1350w-30l-microwave-oven-hMyjxFGL1ewJZPCQ5hUQyWU5.html",
+      "sourceProvider": "Jiji",
+      "result": "VERIFIED",
+      "evidence": "The candidate image URL resolves and visibly shows the LG microwave pictured in the listing. The accessible Jiji page explicitly identifies LG 3032jas 1350W 30L Microwave Oven and provides 30L capacity, 1350W power, model-specific description and product dimensions. The catalogue name 'Microwave Oven 30L' directly matches the distinguishing 30L attribute.",
+      "verifiedAt": "2026-09-21T16:29:34.700Z",
+      "reviewerStatus": "independent-web-review"
+    },
+    {
+      "productId": "178",
+      "productName": "6-Burner Gas Range",
+      "candidateImageUrl": "https://image.made-in-china.com/155f0j00vdzMclItEKkP/Commercial-Professional-Kitchen-Catering-Fast-Food-Wholesale-Restaurant-Equipment-Stainless-Steel-6-Gas-Burner-with-Gas-Oven.jpg",
+      "sourceUrl": "https://es.made-in-china.com/co_ntsmart/product_Commercial-Professional-Kitchen-Catering-Fast-Food-Wholesale-Restaurant-Equipment-Stainless-Steel-6-Gas-Burner-with-Gas-Oven_eyughruny.html",
+      "sourceProvider": "Made-in-China / NTS",
+      "result": "NEEDS_REVIEW",
+      "evidence": "The candidate image URL resolves and visibly shows a stainless commercial range with six burner positions and an oven. However, the accessible source page's structured product data reports 'Número de quemadores: 1' while the product title/URL says 6 Gas Burner. This internal source conflict prevents a clean independent verification despite the image appearance.",
+      "reviewerStatus": "independent-web-review",
+      "verificationTimestamp": "2026-09-21T16:29:34.700Z"
+    }
+  ],
+  "summary": {
+    "candidatesReviewed": 8,
+    "verified": 4,
+    "rejected": 0,
+    "needsReview": 4,
+    "duplicateConflicts": 0,
+    "inaccessibleUrls": 2,
+    "inaccessibleUrlProductIds": [
+      "88",
+      "139"
+    ],
+    "mappingsApplied": 0
+  },
+  "notes": "The original candidate manifest was not modified. No replacement candidates were searched for rejected products. No data.js/app.js/product records/media mappings were changed. URL uniqueness was checked using the repository normalization rules against current data.js media URLs; no candidate URL conflicted with an existing assigned URL."
+}
