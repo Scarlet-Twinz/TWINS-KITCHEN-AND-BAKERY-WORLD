@@ -5,6 +5,7 @@ const {
   DATA_PATH, loadCatalogue, readExistingRules, computeMediaState,
   validateManifest, applyMappings, buildAudit
 } = require("./validator");
+const { writePendingManifest } = require("./collector");
 
 function arg(name, fallback = null) {
   const i = process.argv.indexOf(name);
@@ -27,8 +28,15 @@ function writeReport(report) {
 }
 function main() {
   const command = process.argv[2] || "dry-run";
-  if (!["dry-run", "apply", "audit"].includes(command)) {
-    throw new Error("Usage: node tools/media-ingestion/index.js <audit|dry-run|apply> [--manifest path] [--report path]");
+  if (!["dry-run", "apply", "audit", "pending-manifest"].includes(command)) {
+    throw new Error("Usage: node tools/media-ingestion/index.js <audit|pending-manifest|dry-run|apply> [--manifest path] [--report path]");
+  }
+
+  if (command === "pending-manifest") {
+    const target = arg("--output", "tools/media-ingestion/manifests/pending-catalogue.json");
+    const manifest = writePendingManifest(path.resolve(process.cwd(), target));
+    console.log(JSON.stringify({ output: target, ...manifest.counts }, null, 2));
+    return;
   }
 
   const data = loadCatalogue();
