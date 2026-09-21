@@ -190,6 +190,78 @@ create index if not exists idx_marketplace_listings_seller on marketplace_listin
 create index if not exists idx_marketplace_reports_status on marketplace_reports(status, created_at desc);
 create index if not exists idx_payment_transactions_user on payment_transactions(user_id, created_at desc);
 
+-- Operations foundation: inventory, orders and delivery.
+create table if not exists inventory (
+  id uuid primary key,
+  product_id uuid unique not null references products(id) on delete cascade,
+  quantity integer not null default 0 check (quantity >= 0),
+  reserved_quantity integer not null default 0 check (reserved_quantity >= 0),
+  reorder_level integer not null default 0 check (reorder_level >= 0),
+  status text not null default 'active' check (status in ('active','paused')),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists inventory_adjustments (
+  id bigserial primary key,
+  inventory_id uuid not null references inventory(id) on delete cascade,
+  actor_user_id uuid references users(id),
+  delta integer not null,
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists orders (
+  id uuid primary key,
+  reference text unique not null,
+  user_id uuid references users(id),
+  quote_id uuid references quotes(id),
+  status text not null default 'pending' check (status in ('pending','confirmed','processing','ready','completed','cancelled')),
+  payment_status text not null default 'unpaid' check (payment_status in ('unpaid','pending','paid','refunded')),
+  currency text not null default 'NGN',
+  total_amount numeric(14,2) not null default 0 check (total_amount >= 0),
+  customer_name text not null,
+  customer_email text,
+  customer_phone text not null,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists order_items (
+  id uuid primary key,
+  order_id uuid not null references orders(id) on delete cascade,
+  product_id uuid references products(id),
+  legacy_catalogue_id integer,
+  name text not null,
+  quantity integer not null check (quantity > 0),
+  unit_amount numeric(14,2) check (unit_amount is null or unit_amount >= 0)
+);
+
+create table if not exists deliveries (
+  id uuid primary key,
+  order_id uuid unique not null references orders(id) on delete cascade,
+  recipient_name text not null,
+  phone text not null,
+  address text not null,
+  city text,
+  state text,
+  country text not null default 'Nigeria',
+  status text not null default 'pending' check (status in ('pending','scheduled','dispatched','in_transit','delivered','failed','cancelled')),
+  tracking_reference text unique,
+  scheduled_at timestamptz,
+  delivered_at timestamptz,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_inventory_status on inventory(status);
+create index if not exists idx_inventory_adjustments_inventory on inventory_adjustments(inventory_id,created_at desc);
+create index if not exists idx_orders_status_created on orders(status,created_at desc);
+create index if not exists idx_orders_user_created on orders(user_id,created_at desc);
+create index if not exists idx_order_items_order on order_items(order_id);
+create index if not exists idx_deliveries_status_created on deliveries(status,created_at desc);
+
 -- Phase 4 production hardening.
 create index if not exists idx_users_email_lower on users(lower(email));
 create index if not exists idx_seller_profiles_verification on seller_profiles(verification_status,seller_status);
