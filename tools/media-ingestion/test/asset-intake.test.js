@@ -22,7 +22,11 @@ function jpegBuffer(width=800,height=600) {
 function webpBuffer(width=800,height=600) {
   const b=Buffer.alloc(30); Buffer.from("RIFF").copy(b,0); b.writeUInt32LE(22,4); Buffer.from("WEBPVP8X").copy(b,8); b[20]=0; b.writeUIntLE(width-1,24,3); b.writeUIntLE(height-1,27,3); return b;
 }
-function makeAsset(root, relative, buffer=pngBuffer()) {
+function makeAsset(root, relative, buffer=null) {
+  if (!buffer) {
+    const ext=path.extname(relative).toLowerCase();
+    buffer=ext===".jpg"||ext===".jpeg" ? jpegBuffer() : ext===".webp" ? webpBuffer() : pngBuffer();
+  }
   const file=path.join(root,relative); fs.mkdirSync(path.dirname(file),{recursive:true}); fs.writeFileSync(file,buffer); return file;
 }
 function pendingState() { return computeMediaState(loadCatalogue(), readExistingRules()); }
