@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "productId": 58,
+      "asset": "supplier-a/planetary-mixer-20l.jpg",
+      "source": "Supplier A",
+      "sourceUrl": "https://supplier.example/products/planetary-mixer-20l",
+      "rights": "supplier-authorized"
+    }
+  ]
+}
