@@ -119,3 +119,121 @@ The repository now includes a separate community marketplace layer: `marketplace
 ## Payments
 
 The intended production flow is quote-first for variable Twins equipment pricing. Once confirmed prices/inventory exist, customer checkout can use a Nigerian/African payment gateway such as Paystack or Flutterwave. Seller memberships and promoted listings can use the same gateway, with payment confirmation handled by server-side webhooks rather than trusting browser state.
+
+
+## Local bulk asset intake
+
+The media workflow now has a **free, local-first asset-intake path** that does not use Tavily, Brave, or any external search API.
+
+### 1. Generate the current pending-product manifest
+
+This is calculated from the canonical catalogue and existing media mappings at runtime; it does not hardcode the current pending count.
+
+```powershell
+node tools/media-ingestion/index.js asset-intake-manifest
+```
+
+Default output:
+
+```text
+tools/media-ingestion/manifests/pending-asset-intake.json
+```
+
+The manifest contains the product ID, name, category/type, brand/model/capacity/specification, current media status, and a deterministic suggested asset path.
+
+### 2. Supply local assets
+
+Create a directory such as:
+
+```text
+supplier-assets/
+  supplier-a/
+    planetary-mixer-20l.jpg
+    commercial-dishwasher.png
+  supplier-b/
+    freezer-large.webp
+```
+
+Supported image types are `.jpg`, `.jpeg`, `.png`, and `.webp`.
+
+The intake walker is recursive. Unsupported files are recorded as rejected rather than silently accepted. Obvious placeholders, logos, icons, banners and tracking assets are ignored/rejected by the intake rules.
+
+### 3. Optional explicit asset manifest
+
+For authoritative product associations, create a JSON file:
+
+```json
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "productId": 58,
+      "asset": "supplier-a/planetary-mixer-20l.jpg",
+      "source": "Supplier A",
+      "sourceUrl": "https://supplier.example/products/planetary-mixer-20l",
+      "rights": "supplier-authorized"
+    }
+  ]
+}
+```
+
+`productId` takes precedence over fuzzy matching. Unknown or non-authorizing provenance cannot become `VERIFIED`.
+
+An example schema is available at `tools/media-ingestion/manifests/asset-intake.example.json`.
+
+### 4. Run a local dry-run
+
+```powershell
+node tools/media-ingestion/index.js asset-intake-dry-run --assets supplier-assets --asset-manifest supplier-assets.json
+```
+
+Default report:
+
+```text
+tools/media-ingestion/manifests/asset-intake-report.json
+```
+
+You can choose another report path with `--report`.
+
+Dry-run never modifies `data.js`, `app.js`, existing verified mappings, or production media mappings.
+
+### 5. Result states
+
+- **VERIFIED** — strong product association, valid image, duplicate checks passed, and provenance/rights are sufficient.
+- **REVIEW** — potentially usable, but a human must confirm the association or provenance.
+- **REJECTED** — invalid image, duplicate, already-mapped product, unsupported input, or another hard safety failure.
+- **UNRESOLVED** — local evidence is insufficient to identify a product confidently.
+
+The workflow does not guess when evidence is ambiguous.
+
+### 6. Apply verified results
+
+Apply is a separate explicit step:
+
+```powershell
+node tools/media-ingestion/index.js asset-intake-apply --report tools/media-ingestion/manifests/asset-intake-report.json
+```
+
+Apply writes the verified intake ledger to `tools/media-ingestion/manifests/applied-asset-intake.json`.
+
+This ledger is intentionally separate from the protected `data.js` mappings. It preserves an auditable record of the local asset, product ID, SHA-256 content hash, source, source URL, rights declaration, import time and verification reason. Existing verified mappings and legacy duplicate assignments are not rewritten.
+
+### 7. Duplicate protection
+
+The intake checks duplicate content within the current intake, duplicate content against existing local `assets/media/` mappings, products that already have valid media mappings, invalid/unsupported image content, and obvious placeholder/logo/icon/banner/tracking assets.
+
+Existing legacy duplicates remain preserved exactly as they are.
+
+### 8. Bulk processing
+
+The intake is designed for local filesystem processing rather than one network search request per product. It recursively walks the supplied asset directory and processes all supported assets in one run, so the same workflow can handle 10, 100, 500 or 1,000+ assets without a search API dependency.
+
+### 9. Supplier catalogues and PDF files
+
+PDF/catalogue ingestion is deliberately not part of the first implementation. The local asset-intake boundary is designed so a future catalogue/PDF extractor can emit the same normalized asset-manifest records without introducing a large PDF framework into the core intake path.
+
+### 10. External discovery remains optional
+
+The existing `tools/media-ingestion/discovery/` architecture is preserved. Its provider abstraction, matching, scoring, extraction and deduplication code remain available as an optional future fallback.
+
+The local asset-intake commands never invoke Tavily or Brave and do not consume external search API credits.
