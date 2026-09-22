@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { loadCatalogue, readExistingRules, computeMediaState } = require('../validator');
-const { discover, queryTerms } = require('../discovery');
+const { discover, queryTerms, pageQuality, rankCandidate } = require('../discovery');
 const { extractEvidence } = require('../discovery/extract');
 const { matchProduct } = require('../discovery/matcher');
 const { classifyMatch } = require('../discovery/scorer');
@@ -61,6 +61,54 @@ test('query generation uses actual catalogue fields and future pending data', ()
   assert.ok(q.some(x => x.includes('Test Oven')));
   assert.ok(q.some(x => x.includes('T20')));
   assert.ok(q.some(x => x.includes('20L')));
+});
+
+test('query generation prioritizes exact product intent and includes available identity terms', () => {
+  const q = queryTerms({ id: 999, n: 'Commercial Dishwasher', model: 'DW-500', capacity: '500L', spec: '3 phase' });
+  assert.deepEqual(q.slice(0, 3), [
+    '"Commercial Dishwasher" product',
+    '"Commercial Dishwasher" manufacturer',
+    '"Commercial Dishwasher" commercial equipment'
+  ]);
+  assert.ok(q[3].includes('"Commercial Dishwasher"'));
+  assert.ok(q[3].includes('"DW-500"'));
+  assert.ok(q[3].includes('"500L"'));
+  assert.ok(q[3].includes('"3 phase"'));
+});
+
+test('candidate ranking prefers product-detail pages over generic category pages without changing classification thresholds', async () => {
+  const state = {
+    pending: [{ id: 999, n: 'Commercial Oven' }],
+    counts: { catalogue: 1, pending: 1 },
+    resolved: [],
+    byId: new Map([['999', { id: 999, n: 'Commercial Oven' }]]),
+    blocklist: {}
+  };
+  const q = queryTerms(state.pending[0])[0];
+  const category = 'https://fixture.example/category/commercial-ovens';
+  const product = 'https://fixture.example/products/commercial-oven-model-x';
+  const categoryImage = 'https://fixture.example/category-oven.jpg';
+  const productImage = 'https://fixture.example/product-oven.jpg';
+  const result = await discover({
+    state,
+    config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 2, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
+    provider: provider({ [q]: [
+      { url: category, title: 'Commercial Oven Category' },
+      { url: product, title: 'Commercial Oven Product' }
+    ] }),
+    fetchImpl: async url => {
+      if (url === category) return { ok: true, status: 200, url, text: async () => html('Commercial Oven Category', categoryImage, 'Commercial Oven'), headers: { get: name => name === 'content-type' ? 'text/html' : null } };
+      if (url === product) return { ok: true, status: 200, url, text: async () => html('Commercial Oven Product', productImage, 'Commercial Oven'), headers: { get: name => name === 'content-type' ? 'text/html' : null } };
+      if (url === categoryImage || url === productImage) return { ok: true, status: 200, url, headers: { get: name => name === 'content-type' ? 'image/jpeg' : null } };
+      return { ok: false, status: 404, url };
+    },
+    discoveredAt: '2026-09-22T00:00:00Z'
+  });
+  assert.equal(result.results[0].status, 'HIGH');
+  assert.equal(result.results[0].candidate.sourceUrl, product);
+  assert.ok(pageQuality({ url: product, title: 'Commercial Oven Product' }, result.results[0].evaluated.find(x => x.candidate.url === product).evidence) >
+    pageQuality({ url: category, title: 'Commercial Oven Category' }, result.results[0].evaluated.find(x => x.candidate.url === category).evidence));
+  assert.deepEqual(rankCandidate(result.results[0].evaluated.find(x => x.candidate.url === product)), [2, 11, 1]);
 });
 
 test('SearchProvider is provider-independent', async () => {
