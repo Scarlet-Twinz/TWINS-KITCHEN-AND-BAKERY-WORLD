@@ -133,8 +133,8 @@ test('candidate ranking prefers product-detail pages over generic category pages
 
   assert.equal(categoryClassification.status, 'REVIEW');
   assert.equal(productClassification.status, 'REVIEW');
-  assert.ok(productRank[1] > categoryRank[1]);
-  assert.ok(productRank[0] >= categoryRank[0]);
+  assert.equal(productRank[1], categoryRank[1]);
+  assert.ok(productRank[0] > categoryRank[0]);
 });
 
 test('generic product names are disambiguated with catalogue context', () => {
