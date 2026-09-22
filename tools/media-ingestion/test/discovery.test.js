@@ -101,6 +101,74 @@ test('Tavily provider normalizes BASIC results without internet', async () => {
   }]);
 });
 
+test('Tavily normalized results reach downstream discovery evaluation', async () => {
+  const page = 'https://fixture.example/tavily-product';
+  const image = 'https://fixture.example/tavily-product.jpg';
+  const tavily = new TavilySearchProvider({
+    apiKey: 'test-key',
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      async json() {
+        return {
+          results: [{ url: page, title: 'Commercial Oven', content: 'Commercial Oven product page' }]
+        };
+      }
+    })
+  });
+  const state = {
+    pending: [{ id: 999, n: 'Commercial Oven' }],
+    counts: { catalogue: 1, pending: 1 },
+    resolved: [],
+    byId: new Map([['999', { id: 999, n: 'Commercial Oven' }]]),
+    blocklist: {}
+  };
+  const q = queryTerms(state.pending[0])[0];
+  const result = await discover({
+    state,
+    config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 1, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
+    provider: tavily,
+    fetchImpl: async url => {
+      if (url === page) {
+        return { ok: true, status: 200, url, text: async () => html('Commercial Oven', image, 'Commercial Oven'), headers: { get: name => name === 'content-type' ? 'text/html' : null } };
+      }
+      if (url === image) {
+        return { ok: true, status: 200, url, headers: { get: name => name === 'content-type' ? 'image/jpeg' : null } };
+      }
+      return { ok: false, status: 404, url };
+    },
+    discoveredAt: '2026-09-22T00:00:00Z'
+  });
+  assert.equal(result.results[0].status, 'HIGH');
+  assert.equal(result.results[0].candidate.sourceProvider, 'tavily');
+  assert.equal(result.results[0].candidate.sourceUrl, page);
+  assert.equal(result.results[0].candidate.imageUrl, image);
+  assert.equal(result.results[0].evaluated.length, 1);
+  assert.equal(result.results[0].evaluated[0].status, 'HIGH');
+});
+
+test('discovery preserves search provider errors instead of presenting them as empty evaluation', async () => {
+  const state = {
+    pending: [{ id: 999, n: 'Commercial Oven' }],
+    counts: { catalogue: 1, pending: 1 },
+    resolved: [],
+    byId: new Map([['999', { id: 999, n: 'Commercial Oven' }]]),
+    blocklist: {}
+  };
+  const result = await discover({
+    state,
+    config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 1, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
+    provider: { name: 'tavily', async search() { throw Object.assign(new Error('Tavily search provider returned HTTP 401'), { status: 401 }); } },
+    fetchImpl: async () => ({ ok: false, status: 500 }),
+    discoveredAt: '2026-09-22T00:00:00Z'
+  });
+  assert.equal(result.results[0].status, 'UNRESOLVED');
+  assert.equal(result.results[0].evaluated.length, 1);
+  assert.equal(result.results[0].evaluated[0].query, queryTerms(state.pending[0])[0]);
+  assert.equal(result.results[0].evaluated[0].error, 'Tavily search provider returned HTTP 401');
+  assert.equal(result.results[0].evaluated[0].reason, 'Tavily search provider returned HTTP 401');
+});
+
 test('Tavily provider returns empty results cleanly', async () => {
   const tavily = new TavilySearchProvider({
     apiKey: 'test-key',
