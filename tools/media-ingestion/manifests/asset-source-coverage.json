@@ -762,13 +762,10 @@
         "Food Preparation",
         "Kitchen Equipment"
       ],
-      "potentialPendingProductCount": 16,
+      "potentialPendingProductCount": 13,
       "potentialProductIds": [
         26,
         33,
-        236,
-        237,
-        238,
         401,
         402,
         403,
@@ -1153,6 +1150,7 @@
     "Potential coverage is family-level research, not confirmed media coverage.",
     "Publicly visible images/catalogues are not assumed reusable.",
     "No assets were downloaded or applied.",
-    "Rights remain REQUIRES_PERMISSION until Twins-specific authorization or a clear dealer/reseller asset license is established."
+    "Rights remain REQUIRES_PERMISSION until Twins-specific authorization or a clear dealer/reseller asset license is established.",
+    "The current repository state resolves to 258 pending products / 272 assigned products under the existing validator.computeMediaState() semantics. The earlier 304/226 figures are stale for this commit."
   ]
 }
