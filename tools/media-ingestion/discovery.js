@@ -54,7 +54,7 @@ function pageQuality(candidate,evidence,match,product){
   if((match?.nameScore||0)>=.9)score+=2;
   if(/\\/(?:category|categories|collection|collections|blog|article|news|about|directory|directories|search|tag|tags|company|companies)(?:\\/|$)/i.test(path))score-=6;
   if(/(?:shutterstock|istockphoto|gettyimages|alamy|freepik|unsplash|pexels|pixabay|depositphotos|dreamstime)\\./i.test(host))score-=10;
-  if(/(?:software|3d|animation|gaming|game|market-report|market-reporting|news|article|tutorial)/i.test(String(candidate?.title||'')+' '+String(evidence?.fields?.description?.value||'')))score-=8;
+  if(/(?:software|3d|animation|gaming|game|market-report|market-reporting|news|article|tutorial)/i.test(String(candidate?.title||'')+' '+String(evidence?.fields?.description?.value||'')))score-=8;\n  if(/(?:official site|manufacturer|catalog|catalogue|solutions|company profile)/i.test(String(candidate?.title||''))&&!/\\/(?:product|products|item|shop|store|sku|model)(?:\\/|$)/i.test(path))score-=3;
   if(product&&String(product.n||'').trim().split(/\\s+/).length<=2&&contextOverlap(product,evidence)===0)score-=8;
   return score;
 }
