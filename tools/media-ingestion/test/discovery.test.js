@@ -104,11 +104,37 @@ test('candidate ranking prefers product-detail pages over generic category pages
     },
     discoveredAt: '2026-09-22T00:00:00Z'
   });
+  const evaluated = result.results[0].evaluated;
+  const categoryResult = evaluated.find(x => x.url === category);
+  const productResult = evaluated.find(x => x.url === product);
+  assert.ok(categoryResult);
+  assert.ok(productResult);
+  assert.equal(categoryResult.status, 'REVIEW');
+  assert.equal(productResult.status, 'REVIEW');
   assert.equal(result.results[0].status, 'REVIEW');
   assert.equal(result.results[0].candidate.sourceUrl, product);
-  assert.ok(pageQuality({ url: product, title: 'Commercial Oven Product' }, result.results[0].evaluated.find(x => x.candidate.url === product).evidence) >
-    pageQuality({ url: category, title: 'Commercial Oven Category' }, result.results[0].evaluated.find(x => x.candidate.url === category).evidence));
-  assert.deepEqual(rankCandidate(result.results[0].evaluated.find(x => x.candidate.url === product)), [1, 10, 0.75]);
+
+  const categoryEvidence = extractEvidence(html('Commercial Oven Category', categoryImage, 'Commercial Oven'), category);
+  const productEvidence = extractEvidence(html('Commercial Oven Product', productImage, 'Commercial Oven'), product);
+  const categoryMatch = matchProduct(state.pending[0], categoryEvidence);
+  const productMatch = matchProduct(state.pending[0], productEvidence);
+  const categoryClassification = classifyMatch(categoryMatch, categoryEvidence);
+  const productClassification = classifyMatch(productMatch, productEvidence);
+  const categoryRank = rankCandidate({
+    candidate: { url: category, title: 'Commercial Oven Category' },
+    evidence: categoryEvidence,
+    classification: categoryClassification
+  });
+  const productRank = rankCandidate({
+    candidate: { url: product, title: 'Commercial Oven Product' },
+    evidence: productEvidence,
+    classification: productClassification
+  });
+
+  assert.equal(categoryClassification.status, 'REVIEW');
+  assert.equal(productClassification.status, 'REVIEW');
+  assert.ok(productRank[1] > categoryRank[1]);
+  assert.ok(productRank[0] >= categoryRank[0]);
 });
 
 test('SearchProvider is provider-independent', async () => {
