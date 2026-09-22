@@ -182,7 +182,15 @@ test('provider-independent downstream behavior uses the fixture provider', async
     state,
     config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 1, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
     provider: provider({ [q]: [{ url: page, title: 'Commercial Oven', snippet: 'Commercial Oven' }] }),
-    fetchImpl: fetcher({ [page]: html('Commercial Oven', image, 'Commercial Oven') }),
+    fetchImpl: async url => {
+      if (url === page) {
+        return { ok: true, status: 200, url, text: async () => html('Commercial Oven', image, 'Commercial Oven'), headers: { get: name => name === 'content-type' ? 'text/html' : null } };
+      }
+      if (url === image) {
+        return { ok: true, status: 200, url, headers: { get: name => name === 'content-type' ? 'image/jpeg' : null } };
+      }
+      return { ok: false, status: 404, url };
+    },
     discoveredAt: '2026-09-21T00:00:00Z'
   });
   assert.equal(result.results[0].status, 'HIGH');
