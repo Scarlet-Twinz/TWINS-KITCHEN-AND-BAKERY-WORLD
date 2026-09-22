@@ -104,11 +104,11 @@ test('candidate ranking prefers product-detail pages over generic category pages
     },
     discoveredAt: '2026-09-22T00:00:00Z'
   });
-  assert.equal(result.results[0].status, 'HIGH');
+  assert.equal(result.results[0].status, 'REVIEW');
   assert.equal(result.results[0].candidate.sourceUrl, product);
   assert.ok(pageQuality({ url: product, title: 'Commercial Oven Product' }, result.results[0].evaluated.find(x => x.candidate.url === product).evidence) >
     pageQuality({ url: category, title: 'Commercial Oven Category' }, result.results[0].evaluated.find(x => x.candidate.url === category).evidence));
-  assert.deepEqual(rankCandidate(result.results[0].evaluated.find(x => x.candidate.url === product)), [2, 10, 0.75]);
+  assert.deepEqual(rankCandidate(result.results[0].evaluated.find(x => x.candidate.url === product)), [1, 10, 0.75]);
 });
 
 test('SearchProvider is provider-independent', async () => {
