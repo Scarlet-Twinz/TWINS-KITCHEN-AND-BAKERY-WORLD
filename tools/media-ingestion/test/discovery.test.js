@@ -163,10 +163,12 @@ test('discovery preserves search provider errors instead of presenting them as e
     discoveredAt: '2026-09-22T00:00:00Z'
   });
   assert.equal(result.results[0].status, 'UNRESOLVED');
-  assert.equal(result.results[0].evaluated.length, 1);
-  assert.equal(result.results[0].evaluated[0].query, queryTerms(state.pending[0])[0]);
-  assert.equal(result.results[0].evaluated[0].error, 'Tavily search provider returned HTTP 401');
-  assert.equal(result.results[0].evaluated[0].reason, 'Tavily search provider returned HTTP 401');
+  assert.equal(result.results[0].evaluated.length, 0);
+  assert.equal(result.results[0].searchStages.length, 1);
+  assert.equal(result.results[0].searchStages[0].query, queryTerms(state.pending[0])[0]);
+  assert.equal(result.results[0].searchStages[0].status, 'ERROR');
+  assert.equal(result.results[0].searchStages[0].error, 'Tavily search provider returned HTTP 401');
+  assert.equal(result.results[0].searchStages[0].reason, 'Tavily search provider returned HTTP 401');
 });
 
 test('Tavily provider rejects non-empty responses whose URLs were all filtered out', async () => {
@@ -205,10 +207,12 @@ test('discovery records an explicit zero-result search stage instead of empty ev
     discoveredAt: '2026-09-22T00:00:00Z'
   });
   assert.equal(result.results[0].status, 'UNRESOLVED');
-  assert.equal(result.results[0].evaluated.length, 1);
-  assert.equal(result.results[0].evaluated[0].status, 'NO_SEARCH_RESULTS');
-  assert.equal(result.results[0].evaluated[0].error, 'Search provider returned 0 results');
-  assert.equal(result.results[0].evaluated[0].reason, 'Search provider returned 0 results');
+  assert.equal(result.results[0].evaluated.length, 0);
+  assert.equal(result.results[0].searchStages.length, 1);
+  assert.equal(result.results[0].searchStages[0].query, queryTerms(state.pending[0])[0]);
+  assert.equal(result.results[0].searchStages[0].status, 'NO_RESULTS');
+  assert.equal(result.results[0].searchStages[0].error, 'Search provider returned 0 results');
+  assert.equal(result.results[0].searchStages[0].reason, 'Search provider returned 0 results');
 });
 
 test('Tavily provider returns empty results cleanly', async () => {
