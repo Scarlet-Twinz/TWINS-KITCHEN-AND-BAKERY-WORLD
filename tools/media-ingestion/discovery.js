@@ -3,7 +3,7 @@ const {loadDiscoveryConfig}=require('./discovery/config');
 const {createSearchProvider}=require('./discovery/sources');
 const {fetchPage,probeImage,RateLimiter}=require('./discovery/fetch');
 const {extractEvidence}=require('./discovery/extract');
-const {matchProduct}=require('./discovery/matcher');
+const {matchProduct,overlap}=require('./discovery/matcher');
 const {classifyMatch}=require('./discovery/scorer');
 const {buildExistingUrlSet,checkDuplicate}=require('./discovery/dedupe');
 function quote(v){return '"' + String(v||'').trim().replace(/"/g,'') + '"';}
