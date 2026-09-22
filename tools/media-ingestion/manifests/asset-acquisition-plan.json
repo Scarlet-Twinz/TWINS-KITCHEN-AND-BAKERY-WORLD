@@ -1,0 +1,2042 @@
+{
+  "schemaVersion": 1,
+  "planType": "bulk-asset-acquisition-preparation",
+  "generatedFrom": {
+    "stage2Report": "tools/media-ingestion/manifests/asset-source-coverage.json",
+    "stage2Commit": "e36f1f8e07d2215fe1126f6dd5e3b7934ce7d485",
+    "catalogueCommit": "96a2601909c63ba818a62457e60d4ffc5958891e",
+    "canonicalProducts": 530,
+    "pendingProducts": 258
+  },
+  "constraints": {
+    "tavily": false,
+    "brave": false,
+    "paidSearchApis": false,
+    "catalogueWideDiscovery": false,
+    "automatedImageDownloading": false,
+    "productionCatalogueModification": false,
+    "assetIntakeImplementationModified": false
+  },
+  "waves": {
+    "wave1": [
+      "SINMAG",
+      "Fagor Professional",
+      "METRO",
+      "Carl-Dave Global Ventures"
+    ],
+    "wave2": [
+      "Alababoy Enterprise",
+      "Hobart",
+      "Pentair Everpure"
+    ],
+    "specialized": [
+      "Hoshizaki",
+      "BUNN",
+      "VIQUA",
+      "DStv Nigeria",
+      "GOtv Nigeria"
+    ]
+  },
+  "sources": [
+    {
+      "source": "SINMAG",
+      "officialUrl": "https://www.sinmag.com/",
+      "contactUrl": "https://www.sinmag.com/en/contact.html",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 23,
+      "productIds": [
+        39,
+        51,
+        53,
+        54,
+        58,
+        62,
+        63,
+        301,
+        302,
+        303,
+        306,
+        307,
+        308,
+        310,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320
+      ],
+      "products": [
+        {
+          "productId": 39,
+          "twinsCatalogueName": "Bakery Dough Sheeter",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Dough sheeter · stainless steel · bakery"
+        },
+        {
+          "productId": 51,
+          "twinsCatalogueName": "Three-Deck Electric Bakery Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 53,
+          "twinsCatalogueName": "Rotary Bakery Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 54,
+          "twinsCatalogueName": "One-Bag Bakery Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 58,
+          "twinsCatalogueName": "20L Planetary Mixer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 62,
+          "twinsCatalogueName": "40L Spiral Dough Mixer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 63,
+          "twinsCatalogueName": "50L Spiral Dough Mixer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 301,
+          "twinsCatalogueName": "High-Capacity Dough Divider",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 302,
+          "twinsCatalogueName": "Countertop Dough Rounder",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 303,
+          "twinsCatalogueName": "Commercial Bread Slicer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 306,
+          "twinsCatalogueName": "Stainless Dough Moulder",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 307,
+          "twinsCatalogueName": "Digital Bread Proofer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 308,
+          "twinsCatalogueName": "Automatic Deck Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 310,
+          "twinsCatalogueName": "Industrial Pastry Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 312,
+          "twinsCatalogueName": "High-Capacity Cooling Rack",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 313,
+          "twinsCatalogueName": "Countertop Baking Work Table",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 314,
+          "twinsCatalogueName": "Commercial Cake Decorating Station",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 315,
+          "twinsCatalogueName": "Heavy-Duty Dough Retarder",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 316,
+          "twinsCatalogueName": "Professional Bread Bag Sealer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 317,
+          "twinsCatalogueName": "Stainless Bakery Depositor",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 318,
+          "twinsCatalogueName": "Digital Cake Depositor",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 319,
+          "twinsCatalogueName": "Automatic Pastry Sheeter",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 320,
+          "twinsCatalogueName": "Compact Bakery Packaging Machine",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "planetary mixers, spiral mixers, dough sheeters, divider-rounders, moulders, proofers, rack/deck ovens, slicers, bakery work tables and related bakery equipment",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos (JPG/PNG/WebP)",
+        "multiple views where available",
+        "model/product identifier sheet",
+        "current catalogue/product sheet",
+        "written permission for commercial website use",
+        "source/attribution information"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact/inquiry form; export@sinmag.com.cn",
+      "requestMessage": "Hello SINMAG team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 39 — Bakery Dough Sheeter\n- 51 — Three-Deck Electric Bakery Oven\n- 53 — Rotary Bakery Oven\n- 54 — One-Bag Bakery Oven\n- 58 — 20L Planetary Mixer\n- 62 — 40L Spiral Dough Mixer\n- 63 — 50L Spiral Dough Mixer\n- 301 — High-Capacity Dough Divider\n- 302 — Countertop Dough Rounder\n- 303 — Commercial Bread Slicer\n- 306 — Stainless Dough Moulder\n- 307 — Digital Bread Proofer\n- 308 — Automatic Deck Oven\n- 310 — Industrial Pastry Oven\n- 312 — High-Capacity Cooling Rack\n- 313 — Countertop Baking Work Table\n- 314 — Commercial Cake Decorating Station\n- 315 — Heavy-Duty Dough Retarder\n- 316 — Professional Bread Bag Sealer\n- 317 — Stainless Bakery Depositor\n- 318 — Digital Cake Depositor\n- 319 — Automatic Pastry Sheeter\n- 320 — Compact Bakery Packaging Machine\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as HIGH-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Fagor Professional",
+      "officialUrl": "https://www.fagorprofessional.com/en/",
+      "contactUrl": "https://www.fagorprofessional.com/en/contact",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 73,
+      "productIds": [
+        1,
+        23,
+        56,
+        65,
+        70,
+        281,
+        282,
+        283,
+        285,
+        286,
+        288,
+        289,
+        291,
+        293,
+        294,
+        297,
+        299,
+        13,
+        76,
+        77,
+        79,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+        353,
+        355,
+        356,
+        357,
+        358,
+        359,
+        360,
+        33,
+        85,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        14,
+        36,
+        441,
+        442,
+        450,
+        451,
+        452,
+        453,
+        454,
+        455,
+        456,
+        459,
+        460,
+        16
+      ],
+      "products": [
+        {
+          "productId": 1,
+          "twinsCatalogueName": "Commercial 6-Burner Stainless Range",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "6 burners · stainless body · commercial duty"
+        },
+        {
+          "productId": 23,
+          "twinsCatalogueName": "Commercial Pizza Oven",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Commercial oven · pizza · high temperature"
+        },
+        {
+          "productId": 56,
+          "twinsCatalogueName": "Double-Deck Pizza Oven",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 65,
+          "twinsCatalogueName": "4-Burner Commercial Gas Range",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 70,
+          "twinsCatalogueName": "Heavy-Duty Double Fryer",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 281,
+          "twinsCatalogueName": "Commercial Commercial Gas Burner",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 282,
+          "twinsCatalogueName": "Heavy-Duty Electric Hot Plate",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 283,
+          "twinsCatalogueName": "Professional Countertop Griddle",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 285,
+          "twinsCatalogueName": "Digital Electric Tilting Pan",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 286,
+          "twinsCatalogueName": "Automatic Soup Kettle",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 288,
+          "twinsCatalogueName": "Industrial Commercial Pasta Cooker",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 289,
+          "twinsCatalogueName": "Premium Steam Cooking Cabinet",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 291,
+          "twinsCatalogueName": "Countertop Electric Salamander",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 293,
+          "twinsCatalogueName": "Heavy-Duty Waffle Maker",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 294,
+          "twinsCatalogueName": "Professional Contact Grill",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 297,
+          "twinsCatalogueName": "Automatic Tilting Braising Pan",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 299,
+          "twinsCatalogueName": "Industrial Induction Cooker",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 13,
+          "twinsCatalogueName": "Commercial Deep Freezer",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Deep freezer · hinged lid · commercial cold storage"
+        },
+        {
+          "productId": 76,
+          "twinsCatalogueName": "Commercial Chest Freezer - Large",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 77,
+          "twinsCatalogueName": "Commercial Undercounter Refrigerator",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 79,
+          "twinsCatalogueName": "45kg Commercial Ice Maker",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 341,
+          "twinsCatalogueName": "Automatic Upright Chiller",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 342,
+          "twinsCatalogueName": "Compact Glass Door Chiller",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 343,
+          "twinsCatalogueName": "Industrial Chest Freezer",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 344,
+          "twinsCatalogueName": "Premium Under Counter Freezer",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 345,
+          "twinsCatalogueName": "High-Capacity Bottle Cooler",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 346,
+          "twinsCatalogueName": "Countertop Back Bar Cooler",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 347,
+          "twinsCatalogueName": "Commercial Blast Chiller",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 348,
+          "twinsCatalogueName": "Heavy-Duty Blast Freezer",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 349,
+          "twinsCatalogueName": "Professional Cold Room Panel",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 350,
+          "twinsCatalogueName": "Stainless Cold Room Door",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 351,
+          "twinsCatalogueName": "Digital Refrigerated Prep Table",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 352,
+          "twinsCatalogueName": "Automatic Ice Storage Bin",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 353,
+          "twinsCatalogueName": "Compact Display Freezer",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 355,
+          "twinsCatalogueName": "Premium Meat Display Chiller",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 356,
+          "twinsCatalogueName": "High-Capacity Fish Display Chiller",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 357,
+          "twinsCatalogueName": "Countertop Cold Beverage Cooler",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 358,
+          "twinsCatalogueName": "Commercial Milk Cooler",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 359,
+          "twinsCatalogueName": "Heavy-Duty Wine Cooler",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 360,
+          "twinsCatalogueName": "Professional Refrigerated Counter",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 33,
+          "twinsCatalogueName": "Commercial Dishwasher",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Commercial washing · high throughput"
+        },
+        {
+          "productId": 85,
+          "twinsCatalogueName": "Three-Compartment Sink Station",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 321,
+          "twinsCatalogueName": "Industrial Preparation Table",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 322,
+          "twinsCatalogueName": "Premium Pot Wash Sink",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 323,
+          "twinsCatalogueName": "High-Capacity Three Compartment Sink",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 324,
+          "twinsCatalogueName": "Countertop Hand Wash Station",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 325,
+          "twinsCatalogueName": "Commercial Pre-Rinse Faucet",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 326,
+          "twinsCatalogueName": "Heavy-Duty Wall Shelf",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 327,
+          "twinsCatalogueName": "Professional Ingredient Bin",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 328,
+          "twinsCatalogueName": "Stainless Kitchen Trolley",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 329,
+          "twinsCatalogueName": "Digital Utility Cart",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 330,
+          "twinsCatalogueName": "Automatic Plate Rack",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 332,
+          "twinsCatalogueName": "Industrial Waste Bin Station",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 333,
+          "twinsCatalogueName": "Premium Mobile Prep Bench",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 334,
+          "twinsCatalogueName": "High-Capacity Kitchen Pass Counter",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 335,
+          "twinsCatalogueName": "Countertop Stainless Cabinet",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 336,
+          "twinsCatalogueName": "Commercial Corner Work Table",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 337,
+          "twinsCatalogueName": "Heavy-Duty Under-Counter Cabinet",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 338,
+          "twinsCatalogueName": "Professional Dish Landing Table",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 14,
+          "twinsCatalogueName": "Electric Food Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Food warmer · heat lamps · commercial holding"
+        },
+        {
+          "productId": 36,
+          "twinsCatalogueName": "Stainless Chafing Dish Set",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Chafing dishes · stainless steel · catering"
+        },
+        {
+          "productId": 441,
+          "twinsCatalogueName": "Compact Food Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 442,
+          "twinsCatalogueName": "Industrial Bain Marie",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 450,
+          "twinsCatalogueName": "Digital Plate Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 451,
+          "twinsCatalogueName": "Automatic Tray Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 452,
+          "twinsCatalogueName": "Compact Soup Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 453,
+          "twinsCatalogueName": "Industrial Countertop Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 454,
+          "twinsCatalogueName": "Premium Buffet Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 455,
+          "twinsCatalogueName": "High-Capacity Serving Trolley",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 456,
+          "twinsCatalogueName": "Countertop Food Holding Cabinet",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 459,
+          "twinsCatalogueName": "Professional Service Station",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 460,
+          "twinsCatalogueName": "Stainless Condiment Station",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 16,
+          "twinsCatalogueName": "Stainless Steel Extraction Hood",
+          "category": "Ventilation",
+          "modelKnown": false,
+          "modelOrSpecification": "Stainless steel · extraction hood · commercial ventilation"
+        }
+      ],
+      "relevantProductFamilies": "commercial cooking, ovens, dishwashing, refrigeration/cold storage, sinks/preparation, shelving/workstations, serving/holding and ventilation",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "multiple views where available",
+        "model numbers/spec sheets",
+        "current foodservice catalogue/product sheets",
+        "written permission for commercial website use",
+        "source/attribution information"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact form; contact@fagorprofessional.com",
+      "requestMessage": "Hello Fagor Professional team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 1 — Commercial 6-Burner Stainless Range\n- 23 — Commercial Pizza Oven\n- 56 — Double-Deck Pizza Oven\n- 65 — 4-Burner Commercial Gas Range\n- 70 — Heavy-Duty Double Fryer\n- 281 — Commercial Commercial Gas Burner\n- 282 — Heavy-Duty Electric Hot Plate\n- 283 — Professional Countertop Griddle\n- 285 — Digital Electric Tilting Pan\n- 286 — Automatic Soup Kettle\n- 288 — Industrial Commercial Pasta Cooker\n- 289 — Premium Steam Cooking Cabinet\n- 291 — Countertop Electric Salamander\n- 293 — Heavy-Duty Waffle Maker\n- 294 — Professional Contact Grill\n- 297 — Automatic Tilting Braising Pan\n- 299 — Industrial Induction Cooker\n- 13 — Commercial Deep Freezer\n- 76 — Commercial Chest Freezer - Large\n- 77 — Commercial Undercounter Refrigerator\n- 79 — 45kg Commercial Ice Maker\n- 341 — Automatic Upright Chiller\n- 342 — Compact Glass Door Chiller\n- 343 — Industrial Chest Freezer\n- 344 — Premium Under Counter Freezer\n- 345 — High-Capacity Bottle Cooler\n- 346 — Countertop Back Bar Cooler\n- 347 — Commercial Blast Chiller\n- 348 — Heavy-Duty Blast Freezer\n- 349 — Professional Cold Room Panel\n- 350 — Stainless Cold Room Door\n- 351 — Digital Refrigerated Prep Table\n- 352 — Automatic Ice Storage Bin\n- 353 — Compact Display Freezer\n- 355 — Premium Meat Display Chiller\n- 356 — High-Capacity Fish Display Chiller\n- 357 — Countertop Cold Beverage Cooler\n- 358 — Commercial Milk Cooler\n- 359 — Heavy-Duty Wine Cooler\n- 360 — Professional Refrigerated Counter\n- 33 — Commercial Dishwasher\n- 85 — Three-Compartment Sink Station\n- 321 — Industrial Preparation Table\n- 322 — Premium Pot Wash Sink\n- 323 — High-Capacity Three Compartment Sink\n- 324 — Countertop Hand Wash Station\n- 325 — Commercial Pre-Rinse Faucet\n- 326 — Heavy-Duty Wall Shelf\n- 327 — Professional Ingredient Bin\n- 328 — Stainless Kitchen Trolley\n- 329 — Digital Utility Cart\n- 330 — Automatic Plate Rack\n- 332 — Industrial Waste Bin Station\n- 333 — Premium Mobile Prep Bench\n- 334 — High-Capacity Kitchen Pass Counter\n- 335 — Countertop Stainless Cabinet\n- 336 — Commercial Corner Work Table\n- 337 — Heavy-Duty Under-Counter Cabinet\n- 338 — Professional Dish Landing Table\n- 14 — Electric Food Warmer\n- 36 — Stainless Chafing Dish Set\n- 441 — Compact Food Warmer\n- 442 — Industrial Bain Marie\n- 450 — Digital Plate Warmer\n- 451 — Automatic Tray Warmer\n- 452 — Compact Soup Warmer\n- 453 — Industrial Countertop Warmer\n- 454 — Premium Buffet Warmer\n- 455 — High-Capacity Serving Trolley\n- 456 — Countertop Food Holding Cabinet\n- 459 — Professional Service Station\n- 460 — Stainless Condiment Station\n- 16 — Stainless Steel Extraction Hood\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as HIGH-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Hobart",
+      "officialUrl": "https://www.hobartcorp.com/products",
+      "contactUrl": "https://www.hobartcorp.com/support-hobart",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 13,
+      "productIds": [
+        26,
+        33,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        410,
+        413,
+        414,
+        418,
+        419
+      ],
+      "products": [
+        {
+          "productId": 26,
+          "twinsCatalogueName": "Commercial Vegetable Cutter",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Vegetable cutter · stainless steel · commercial"
+        },
+        {
+          "productId": 33,
+          "twinsCatalogueName": "Commercial Dishwasher",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Commercial washing · high throughput"
+        },
+        {
+          "productId": 401,
+          "twinsCatalogueName": "Countertop Meat Mincer",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 402,
+          "twinsCatalogueName": "Commercial Bone Saw",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 403,
+          "twinsCatalogueName": "Heavy-Duty Vegetable Cutter",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 404,
+          "twinsCatalogueName": "Professional Food Processor",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 405,
+          "twinsCatalogueName": "Stainless Food Chopper",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 406,
+          "twinsCatalogueName": "Digital Potato Peeler",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 410,
+          "twinsCatalogueName": "Premium Meat Tenderizer",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 413,
+          "twinsCatalogueName": "Commercial Fish Scaler",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 414,
+          "twinsCatalogueName": "Heavy-Duty Fish Cutter",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 418,
+          "twinsCatalogueName": "Automatic Vacuum Sealer",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 419,
+          "twinsCatalogueName": "Compact Weighing Scale",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "commercial food preparation, meat processing, slicers/cutters, mixers and dishwashing equipment",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "exact model numbers",
+        "spec sheets/product literature",
+        "current catalogue",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official support/contact and sales-representative routes",
+      "requestMessage": "Hello Hobart team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 26 — Commercial Vegetable Cutter\n- 33 — Commercial Dishwasher\n- 401 — Countertop Meat Mincer\n- 402 — Commercial Bone Saw\n- 403 — Heavy-Duty Vegetable Cutter\n- 404 — Professional Food Processor\n- 405 — Stainless Food Chopper\n- 406 — Digital Potato Peeler\n- 410 — Premium Meat Tenderizer\n- 413 — Commercial Fish Scaler\n- 414 — Heavy-Duty Fish Cutter\n- 418 — Automatic Vacuum Sealer\n- 419 — Compact Weighing Scale\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as MEDIUM-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "METRO",
+      "officialUrl": "https://metro.com/",
+      "contactUrl": "https://metro.com/contact-us/",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 41,
+      "productIds": [
+        12,
+        86,
+        88,
+        421,
+        422,
+        423,
+        424,
+        425,
+        426,
+        427,
+        428,
+        429,
+        430,
+        431,
+        432,
+        433,
+        434,
+        435,
+        436,
+        437,
+        438,
+        439,
+        440,
+        321,
+        326,
+        328,
+        329,
+        333,
+        335,
+        336,
+        337,
+        340,
+        455,
+        456,
+        20,
+        462,
+        464,
+        465,
+        466,
+        468,
+        480
+      ],
+      "products": [
+        {
+          "productId": 12,
+          "twinsCatalogueName": "Heavy-Duty Storage Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Heavy duty · storage · shelving"
+        },
+        {
+          "productId": 86,
+          "twinsCatalogueName": "Stainless Wall Shelf - 4ft",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 88,
+          "twinsCatalogueName": "Heavy-Duty 4-Tier Storage Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 421,
+          "twinsCatalogueName": "Premium Heavy Duty Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 422,
+          "twinsCatalogueName": "High-Capacity Mobile Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 423,
+          "twinsCatalogueName": "Countertop Wall Shelf",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 424,
+          "twinsCatalogueName": "Commercial Ingredient Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 425,
+          "twinsCatalogueName": "Heavy-Duty Pan Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 426,
+          "twinsCatalogueName": "Professional Tray Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 427,
+          "twinsCatalogueName": "Stainless Storage Cabinet",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 428,
+          "twinsCatalogueName": "Digital Dry Store Cabinet",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 429,
+          "twinsCatalogueName": "Automatic Bin Storage System",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 430,
+          "twinsCatalogueName": "Compact Plastic Crate Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 431,
+          "twinsCatalogueName": "Industrial Bakery Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 432,
+          "twinsCatalogueName": "Premium Dish Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 433,
+          "twinsCatalogueName": "High-Capacity Cup Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 434,
+          "twinsCatalogueName": "Countertop Bottle Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 435,
+          "twinsCatalogueName": "Commercial Retail Shelf",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 436,
+          "twinsCatalogueName": "Heavy-Duty Gondola Shelf",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 437,
+          "twinsCatalogueName": "Professional Warehouse Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 438,
+          "twinsCatalogueName": "Stainless Lockable Cabinet",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 439,
+          "twinsCatalogueName": "Digital Mobile Storage Cart",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 440,
+          "twinsCatalogueName": "Automatic Under Shelf Rack",
+          "category": "Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 321,
+          "twinsCatalogueName": "Industrial Preparation Table",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 326,
+          "twinsCatalogueName": "Heavy-Duty Wall Shelf",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 328,
+          "twinsCatalogueName": "Stainless Kitchen Trolley",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 329,
+          "twinsCatalogueName": "Digital Utility Cart",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 333,
+          "twinsCatalogueName": "Premium Mobile Prep Bench",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 335,
+          "twinsCatalogueName": "Countertop Stainless Cabinet",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 336,
+          "twinsCatalogueName": "Commercial Corner Work Table",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 337,
+          "twinsCatalogueName": "Heavy-Duty Under-Counter Cabinet",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 340,
+          "twinsCatalogueName": "Digital Service Counter",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 455,
+          "twinsCatalogueName": "High-Capacity Serving Trolley",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 456,
+          "twinsCatalogueName": "Countertop Food Holding Cabinet",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 20,
+          "twinsCatalogueName": "Catering Service Trolley",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "3-tier trolley · stainless steel · catering"
+        },
+        {
+          "productId": 462,
+          "twinsCatalogueName": "Automatic Insulated Food Carrier",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 464,
+          "twinsCatalogueName": "Industrial Service Trolley",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 465,
+          "twinsCatalogueName": "Premium Transport Cart",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 466,
+          "twinsCatalogueName": "High-Capacity Banquet Table",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 468,
+          "twinsCatalogueName": "Commercial Catering Table",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 480,
+          "twinsCatalogueName": "Heavy-Duty Event Service Cart",
+          "category": "Catering Supplies",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "shelving/racks, wall shelving, storage cabinets, carts/trolleys, prep tables, holding/transport cabinets, food carriers and catering storage",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "model/part numbers",
+        "spec sheets/brochures",
+        "current foodservice catalogue",
+        "written permission for commercial website use",
+        "source/attribution information"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact page; cssupport@metro.com; Middle East/Africa/India contact listed on official page",
+      "requestMessage": "Hello METRO team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 12 — Heavy-Duty Storage Rack\n- 86 — Stainless Wall Shelf - 4ft\n- 88 — Heavy-Duty 4-Tier Storage Rack\n- 421 — Premium Heavy Duty Rack\n- 422 — High-Capacity Mobile Rack\n- 423 — Countertop Wall Shelf\n- 424 — Commercial Ingredient Rack\n- 425 — Heavy-Duty Pan Rack\n- 426 — Professional Tray Rack\n- 427 — Stainless Storage Cabinet\n- 428 — Digital Dry Store Cabinet\n- 429 — Automatic Bin Storage System\n- 430 — Compact Plastic Crate Rack\n- 431 — Industrial Bakery Rack\n- 432 — Premium Dish Rack\n- 433 — High-Capacity Cup Rack\n- 434 — Countertop Bottle Rack\n- 435 — Commercial Retail Shelf\n- 436 — Heavy-Duty Gondola Shelf\n- 437 — Professional Warehouse Rack\n- 438 — Stainless Lockable Cabinet\n- 439 — Digital Mobile Storage Cart\n- 440 — Automatic Under Shelf Rack\n- 321 — Industrial Preparation Table\n- 326 — Heavy-Duty Wall Shelf\n- 328 — Stainless Kitchen Trolley\n- 329 — Digital Utility Cart\n- 333 — Premium Mobile Prep Bench\n- 335 — Countertop Stainless Cabinet\n- 336 — Commercial Corner Work Table\n- 337 — Heavy-Duty Under-Counter Cabinet\n- 340 — Digital Service Counter\n- 455 — High-Capacity Serving Trolley\n- 456 — Countertop Food Holding Cabinet\n- 20 — Catering Service Trolley\n- 462 — Automatic Insulated Food Carrier\n- 464 — Industrial Service Trolley\n- 465 — Premium Transport Cart\n- 466 — High-Capacity Banquet Table\n- 468 — Commercial Catering Table\n- 480 — Heavy-Duty Event Service Cart\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as HIGH-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Alababoy Enterprise",
+      "officialUrl": "https://alababoy.com/",
+      "contactUrl": "https://alababoy.com/contact-us/",
+      "sourceType": "Nigeria commercial-equipment supplier",
+      "potentialCoverage": 17,
+      "productIds": [
+        39,
+        58,
+        303,
+        306,
+        307,
+        319,
+        14,
+        36,
+        441,
+        442,
+        450,
+        451,
+        452,
+        453,
+        454,
+        16,
+        419
+      ],
+      "products": [
+        {
+          "productId": 39,
+          "twinsCatalogueName": "Bakery Dough Sheeter",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Dough sheeter · stainless steel · bakery"
+        },
+        {
+          "productId": 58,
+          "twinsCatalogueName": "20L Planetary Mixer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 303,
+          "twinsCatalogueName": "Commercial Bread Slicer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 306,
+          "twinsCatalogueName": "Stainless Dough Moulder",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 307,
+          "twinsCatalogueName": "Digital Bread Proofer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 319,
+          "twinsCatalogueName": "Automatic Pastry Sheeter",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 14,
+          "twinsCatalogueName": "Electric Food Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Food warmer · heat lamps · commercial holding"
+        },
+        {
+          "productId": 36,
+          "twinsCatalogueName": "Stainless Chafing Dish Set",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Chafing dishes · stainless steel · catering"
+        },
+        {
+          "productId": 441,
+          "twinsCatalogueName": "Compact Food Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 442,
+          "twinsCatalogueName": "Industrial Bain Marie",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 450,
+          "twinsCatalogueName": "Digital Plate Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 451,
+          "twinsCatalogueName": "Automatic Tray Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 452,
+          "twinsCatalogueName": "Compact Soup Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 453,
+          "twinsCatalogueName": "Industrial Countertop Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 454,
+          "twinsCatalogueName": "Premium Buffet Warmer",
+          "category": "Serving Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 16,
+          "twinsCatalogueName": "Stainless Steel Extraction Hood",
+          "category": "Ventilation",
+          "modelKnown": false,
+          "modelOrSpecification": "Stainless steel · extraction hood · commercial ventilation"
+        },
+        {
+          "productId": 419,
+          "twinsCatalogueName": "Compact Weighing Scale",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "bakery machines, food warmers/bain-marie, ventilation/hoods, scales and commercial food-preparation equipment",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "model/product identifiers",
+        "catalogue/product sheets",
+        "source URLs",
+        "written permission to use supplied media commercially",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact page; WhatsApp/call +234 809 791 8381; email/contact form",
+      "requestMessage": "Hello Alababoy Enterprise team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 39 — Bakery Dough Sheeter\n- 58 — 20L Planetary Mixer\n- 303 — Commercial Bread Slicer\n- 306 — Stainless Dough Moulder\n- 307 — Digital Bread Proofer\n- 319 — Automatic Pastry Sheeter\n- 14 — Electric Food Warmer\n- 36 — Stainless Chafing Dish Set\n- 441 — Compact Food Warmer\n- 442 — Industrial Bain Marie\n- 450 — Digital Plate Warmer\n- 451 — Automatic Tray Warmer\n- 452 — Compact Soup Warmer\n- 453 — Industrial Countertop Warmer\n- 454 — Premium Buffet Warmer\n- 16 — Stainless Steel Extraction Hood\n- 419 — Compact Weighing Scale\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as MEDIUM-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Carl-Dave Global Ventures",
+      "officialUrl": "https://www.carldaveglobal.com/",
+      "contactUrl": "https://www.carldaveglobal.com/contact-us/",
+      "sourceType": "Nigeria commercial-equipment supplier",
+      "potentialCoverage": 20,
+      "productIds": [
+        16,
+        33,
+        58,
+        65,
+        70,
+        76,
+        77,
+        79,
+        303,
+        307,
+        310,
+        419,
+        502,
+        508,
+        511,
+        512,
+        519,
+        520,
+        521,
+        522
+      ],
+      "products": [
+        {
+          "productId": 16,
+          "twinsCatalogueName": "Stainless Steel Extraction Hood",
+          "category": "Ventilation",
+          "modelKnown": false,
+          "modelOrSpecification": "Stainless steel · extraction hood · commercial ventilation"
+        },
+        {
+          "productId": 33,
+          "twinsCatalogueName": "Commercial Dishwasher",
+          "category": "Kitchen Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Commercial washing · high throughput"
+        },
+        {
+          "productId": 58,
+          "twinsCatalogueName": "20L Planetary Mixer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 65,
+          "twinsCatalogueName": "4-Burner Commercial Gas Range",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 70,
+          "twinsCatalogueName": "Heavy-Duty Double Fryer",
+          "category": "Cooking Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 76,
+          "twinsCatalogueName": "Commercial Chest Freezer - Large",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 77,
+          "twinsCatalogueName": "Commercial Undercounter Refrigerator",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 79,
+          "twinsCatalogueName": "45kg Commercial Ice Maker",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 303,
+          "twinsCatalogueName": "Commercial Bread Slicer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 307,
+          "twinsCatalogueName": "Digital Bread Proofer",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 310,
+          "twinsCatalogueName": "Industrial Pastry Oven",
+          "category": "Bakery Equipment",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 419,
+          "twinsCatalogueName": "Compact Weighing Scale",
+          "category": "Food Preparation",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 502,
+          "twinsCatalogueName": "2000 LPH Commercial Reverse Osmosis Machine",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "2000 LPH · 8 membranes · confirm exact configuration"
+        },
+        {
+          "productId": 508,
+          "twinsCatalogueName": "500 LPH Dual-Stage Reverse Osmosis System",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "500 LPH · dual-stage filtration · stainless frame"
+        },
+        {
+          "productId": 511,
+          "twinsCatalogueName": "Reverse Osmosis Machine 1000L",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "1000 LPH · 4 RO membranes · 1.5 kW"
+        },
+        {
+          "productId": 512,
+          "twinsCatalogueName": "Reverse Osmosis Machine 500L",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "500 LPH · 2 RO membranes · commercial treatment"
+        },
+        {
+          "productId": 519,
+          "twinsCatalogueName": "Automatic 4-Nozzle Liquid Filling Machine",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "4 nozzles · 5–3000ml · 5–30 bottles/min · 220V"
+        },
+        {
+          "productId": 520,
+          "twinsCatalogueName": "12 Head Bottle Filling Machine",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "12 filling heads · 1000–2000 bottles/hour · 1.5 kW"
+        },
+        {
+          "productId": 521,
+          "twinsCatalogueName": "Sure Pure Water Packaging Machine",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "S-AS1000 · up to 2500 sachets/hour · 200–500ml · UV steriliser"
+        },
+        {
+          "productId": 522,
+          "twinsCatalogueName": "Complete Pure Water Production Machines",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "Pure water machine · filtration · UV · pumps · testing kit"
+        }
+      ],
+      "relevantProductFamilies": "industrial bakery equipment, commercial cooking, refrigeration, shelving, catering, water-treatment/filling/packaging and food-preparation equipment",
+      "modelHints": [
+        {
+          "productId": 519,
+          "hint": "4-nozzle, 5–3000 ml filling machine"
+        },
+        {
+          "productId": 520,
+          "hint": "12-head, 1000–2000 bottles/hour filling machine"
+        },
+        {
+          "productId": 521,
+          "hint": "S-AS1000"
+        },
+        {
+          "productId": 522,
+          "hint": "complete pure-water production line; exact model not established"
+        }
+      ],
+      "requestedAssets": [
+        "original product photos",
+        "model/product identifiers",
+        "catalogue/product sheets",
+        "source URLs",
+        "written permission to use supplied media commercially",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact form; sales@carldaveglobal.com; +234-8035718127",
+      "requestMessage": "Hello Carl-Dave Global Ventures team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 16 — Stainless Steel Extraction Hood\n- 33 — Commercial Dishwasher\n- 58 — 20L Planetary Mixer\n- 65 — 4-Burner Commercial Gas Range\n- 70 — Heavy-Duty Double Fryer\n- 76 — Commercial Chest Freezer - Large\n- 77 — Commercial Undercounter Refrigerator\n- 79 — 45kg Commercial Ice Maker\n- 303 — Commercial Bread Slicer\n- 307 — Digital Bread Proofer\n- 310 — Industrial Pastry Oven\n- 419 — Compact Weighing Scale\n- 502 — 2000 LPH Commercial Reverse Osmosis Machine\n- 508 — 500 LPH Dual-Stage Reverse Osmosis System\n- 511 — Reverse Osmosis Machine 1000L\n- 512 — Reverse Osmosis Machine 500L\n- 519 — Automatic 4-Nozzle Liquid Filling Machine\n- 520 — 12 Head Bottle Filling Machine\n- 521 — Sure Pure Water Packaging Machine\n- 522 — Complete Pure Water Production Machines\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as HIGH-COVERAGE with MEDIUM confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Hoshizaki",
+      "officialUrl": "https://www.hoshizaki.com/en/solutions-innovation/products/ice-makers",
+      "contactUrl": "https://www.hoshizaki.com/en/contact-us",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 3,
+      "productIds": [
+        79,
+        352,
+        400
+      ],
+      "products": [
+        {
+          "productId": 79,
+          "twinsCatalogueName": "45kg Commercial Ice Maker",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, dimensions, utilities and current availability with Twins"
+        },
+        {
+          "productId": 352,
+          "twinsCatalogueName": "Automatic Ice Storage Bin",
+          "category": "Cold Storage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 400,
+          "twinsCatalogueName": "High-Capacity Water Dispenser",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "ice makers, ice storage and water/ice dispensing",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "exact model numbers",
+        "product literature",
+        "current catalogue",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact route / regional sales support",
+      "requestMessage": "Hello Hoshizaki team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 79 — 45kg Commercial Ice Maker\n- 352 — Automatic Ice Storage Bin\n- 400 — High-Capacity Water Dispenser\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as LOW-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "BUNN",
+      "officialUrl": "https://commercial.bunn.com/",
+      "contactUrl": "https://commercial.bunn.com/help",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 7,
+      "productIds": [
+        386,
+        388,
+        390,
+        391,
+        392,
+        393,
+        400
+      ],
+      "products": [
+        {
+          "productId": 386,
+          "twinsCatalogueName": "Compact Coffee Grinder",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 388,
+          "twinsCatalogueName": "Premium Coffee Brewer",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 390,
+          "twinsCatalogueName": "Countertop Hot Water Boiler",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 391,
+          "twinsCatalogueName": "Commercial Tea Urn",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 392,
+          "twinsCatalogueName": "Heavy-Duty Drink Dispenser",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 393,
+          "twinsCatalogueName": "Professional Juice Dispenser",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 400,
+          "twinsCatalogueName": "High-Capacity Water Dispenser",
+          "category": "Bar & Beverage",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "commercial coffee grinders/brewers, hot water and beverage dispensing",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "exact model numbers",
+        "marketing literature/product sheets",
+        "current catalogue",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official International Commercial Equipment Inquiry; internationalcs@bunn.com",
+      "requestMessage": "Hello BUNN team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 386 — Compact Coffee Grinder\n- 388 — Premium Coffee Brewer\n- 390 — Countertop Hot Water Boiler\n- 391 — Commercial Tea Urn\n- 392 — Heavy-Duty Drink Dispenser\n- 393 — Professional Juice Dispenser\n- 400 — High-Capacity Water Dispenser\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as LOW-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "Pentair Everpure",
+      "officialUrl": "https://www.pentair.com/commercial-filtration.html",
+      "contactUrl": "https://www.pentair.com/education-support/contact-us/commercial-filtration-solutions-customer-service.html",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 5,
+      "productIds": [
+        502,
+        508,
+        511,
+        512,
+        518
+      ],
+      "products": [
+        {
+          "productId": 502,
+          "twinsCatalogueName": "2000 LPH Commercial Reverse Osmosis Machine",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "2000 LPH · 8 membranes · confirm exact configuration"
+        },
+        {
+          "productId": 508,
+          "twinsCatalogueName": "500 LPH Dual-Stage Reverse Osmosis System",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "500 LPH · dual-stage filtration · stainless frame"
+        },
+        {
+          "productId": 511,
+          "twinsCatalogueName": "Reverse Osmosis Machine 1000L",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "1000 LPH · 4 RO membranes · 1.5 kW"
+        },
+        {
+          "productId": 512,
+          "twinsCatalogueName": "Reverse Osmosis Machine 500L",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "500 LPH · 2 RO membranes · commercial treatment"
+        },
+        {
+          "productId": 518,
+          "twinsCatalogueName": "7-Stage Reverse Osmosis System with UV",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "7-stage RO · 75G membrane · 6W UV · 3.2-gallon tank"
+        }
+      ],
+      "relevantProductFamilies": "commercial RO/filtration and foodservice water-treatment systems",
+      "modelHints": [],
+      "requestedAssets": [
+        "original product photos",
+        "exact Everpure model numbers",
+        "technical/product sheets",
+        "current commercial catalogue",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official Commercial Filtration customer service; dealer/global-location routes",
+      "requestMessage": "Hello Pentair Everpure team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 502 — 2000 LPH Commercial Reverse Osmosis Machine\n- 508 — 500 LPH Dual-Stage Reverse Osmosis System\n- 511 — Reverse Osmosis Machine 1000L\n- 512 — Reverse Osmosis Machine 500L\n- 518 — 7-Stage Reverse Osmosis System with UV\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as MEDIUM-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "VIQUA",
+      "officialUrl": "https://viqua.com/",
+      "contactUrl": "https://viqua.com/about-viqua/contact-us/",
+      "sourceType": "Official manufacturer",
+      "potentialCoverage": 1,
+      "productIds": [
+        517
+      ],
+      "products": [
+        {
+          "productId": 517,
+          "twinsCatalogueName": "30W Philips Stainless Steel UV Water Steriliser",
+          "category": "Water Treatment & Pure Water",
+          "modelKnown": false,
+          "modelOrSpecification": "30W Philips lamp · 304 stainless housing · up to 1.8 m³/hr"
+        }
+      ],
+      "relevantProductFamilies": "commercial UV water-treatment systems",
+      "modelHints": [
+        {
+          "productId": 517,
+          "hint": "Philips 30W lamp is in Twins product description; VIQUA model not established"
+        }
+      ],
+      "requestedAssets": [
+        "original product photos",
+        "exact model number",
+        "technical/product sheet",
+        "current catalogue",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official contact page; info@viqua.com",
+      "requestMessage": "Hello VIQUA team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 517 — 30W Philips Stainless Steel UV Water Steriliser\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as LOW-COVERAGE with MEDIUM confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "DStv Nigeria",
+      "officialUrl": "https://www.dstv.com/en-ng/",
+      "contactUrl": "https://www.dstv.com/en-ng/help/contact-us/",
+      "sourceType": "Official service/manufacturer source",
+      "potentialCoverage": 2,
+      "productIds": [
+        115,
+        484
+      ],
+      "products": [
+        {
+          "productId": 115,
+          "twinsCatalogueName": "DStv HD Decoder",
+          "category": "Satellite & TV",
+          "modelKnown": false,
+          "modelOrSpecification": "Reference catalogue record · confirm exact model, dimensions, utility, current price and availability"
+        },
+        {
+          "productId": 484,
+          "twinsCatalogueName": "Automatic DStv Subscription Package",
+          "category": "Satellite & TV",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "DStv decoder/package products; generic satellite hardware is not established by the Stage 2 evidence",
+      "modelHints": [
+        {
+          "productId": 115,
+          "hint": "exact decoder model not established"
+        },
+        {
+          "productId": 484,
+          "hint": "subscription package; not a hardware model"
+        }
+      ],
+      "requestedAssets": [
+        "current decoder/product imagery where applicable",
+        "exact decoder/model identifier",
+        "product information sheet",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official Nigeria contact; dstvnigeria@ng.multichoice.com / official chat",
+      "requestMessage": "Hello DStv Nigeria team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 115 — DStv HD Decoder\n- 484 — Automatic DStv Subscription Package\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as LOW-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    },
+    {
+      "source": "GOtv Nigeria",
+      "officialUrl": "https://www.gotvafrica.com/en-ng",
+      "contactUrl": "https://www.gotvafrica.com/en-ng/contact-us/",
+      "sourceType": "Official service/manufacturer source",
+      "potentialCoverage": 2,
+      "productIds": [
+        481,
+        482
+      ],
+      "products": [
+        {
+          "productId": 481,
+          "twinsCatalogueName": "Professional GOtv Decoder",
+          "category": "Satellite & TV",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        },
+        {
+          "productId": 482,
+          "twinsCatalogueName": "Stainless GOtv Subscription Package",
+          "category": "Satellite & TV",
+          "modelKnown": false,
+          "modelOrSpecification": "Catalogue reference · confirm exact model, capacity, price, availability and installation requirements with Twins"
+        }
+      ],
+      "relevantProductFamilies": "GOtv decoder/package products; generic satellite hardware is not established by the Stage 2 evidence",
+      "modelHints": [
+        {
+          "productId": 481,
+          "hint": "exact decoder model not established"
+        },
+        {
+          "productId": 482,
+          "hint": "subscription package; not a hardware model"
+        }
+      ],
+      "requestedAssets": [
+        "current decoder/product imagery where applicable",
+        "exact decoder/model identifier",
+        "product information sheet",
+        "written permission for commercial website use",
+        "credit requirements"
+      ],
+      "rightsStatus": "REQUIRES_PERMISSION",
+      "contactMethod": "Official Nigeria contact route",
+      "requestMessage": "Hello GOtv Nigeria team,\n\nTwins Kitchen is building a commercial kitchen equipment marketplace/catalogue and we are interested in accurately representing the relevant products in your range. We are not claiming to be an authorized distributor; we are contacting you to request authorized product media for the products listed below.\n\nCould you please provide a bulk media pack for the matching products/models, rather than individual web images? For each asset, please include the model/product identifier and, where available, the current catalogue or product-sheet reference.\n\nRequested products:\n- 481 — Professional GOtv Decoder\n- 482 — Stainless GOtv Subscription Package\n\nIf you can provide the media, please also confirm in writing that Twins Kitchen may use the supplied product photographs/media on its commercial website/catalogue. If attribution or a specific credit line is required, please tell us and we will follow it. We would also appreciate confirmation of the source URL/product page or catalogue reference for each supplied asset.\n\nPreferred package: ZIP/folder containing original JPG/PNG/WebP product photos plus a CSV/XLSX/PDF model index or filename-to-model mapping. A PDF catalogue or individual images are also acceptable if that is the format you normally provide.\n\nThank you,\nTwins Kitchen",
+      "notes": "Stage 2 identified this as LOW-COVERAGE with HIGH confidence. Potential coverage is not confirmed asset coverage. Exact model reconciliation is required before any asset is accepted. Public web images are not assumed reusable."
+    }
+  ],
+  "packageHandling": {
+    "zip": "Do not apply directly. Preserve original ZIP, extract to an isolated intake directory, retain manifest/index files and provenance, then run the existing local asset-intake dry-run after rights and identity are confirmed.",
+    "pdf": "Do not treat PDF pages as automatically reusable images. Preserve the original PDF and use it as a model/specification/provenance reference; request original image files or explicit permission if images need to be extracted.",
+    "individualImages": "Preserve original filenames and source context. Record source URL, supplier/manufacturer, rights confirmation and model mapping before placing them in the local asset-intake directory."
+  },
+  "pipelineEntry": "Once authorized assets are received: preserve source package -> record provenance/rights -> reconcile product/model IDs -> place copies in a local supplier-assets intake area -> run existing asset-intake manifest/dry-run -> review VERIFIED/REVIEW/REJECTED/UNRESOLVED -> only explicitly authorized VERIFIED assets may proceed to the existing apply workflow."
+}
