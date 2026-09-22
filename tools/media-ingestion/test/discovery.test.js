@@ -65,15 +65,15 @@ test('query generation uses actual catalogue fields and future pending data', ()
 
 test('query generation prioritizes exact product intent and includes available identity terms', () => {
   const q = queryTerms({ id: 999, n: 'Commercial Dishwasher', model: 'DW-500', capacity: '500L', spec: '3 phase' });
-  assert.deepEqual(q.slice(0, 3), [
-    '"Commercial Dishwasher" product',
-    '"Commercial Dishwasher" manufacturer',
-    '"Commercial Dishwasher" commercial equipment'
-  ]);
-  assert.ok(q[3].includes('"Commercial Dishwasher"'));
-  assert.ok(q[3].includes('"DW-500"'));
-  assert.ok(q[3].includes('"500L"'));
-  assert.ok(q[3].includes('"3 phase"'));
+  assert.match(q[0], /"Commercial Dishwasher"/);
+  assert.match(q[0], /"DW-500"/);
+  assert.match(q[0], /"500L"/);
+  assert.match(q[0], /product page/);
+  assert.match(q[1], /"Commercial Dishwasher"/);
+  assert.match(q[1], /manufacturer/);
+  assert.match(q[2], /"Commercial Dishwasher"/);
+  assert.match(q[2], /distributor retailer product/);
+  assert.match(q[3], /"3 phase"/);
 });
 
 test('candidate ranking prefers product-detail pages over generic category pages without changing classification thresholds', async () => {
