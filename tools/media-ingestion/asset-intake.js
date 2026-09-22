@@ -248,10 +248,11 @@ function processAsset(asset, state, explicitMap, options = {}) {
     match = chooseFuzzyProduct(asset, pending, record || {});
   }
   if (match.status === "UNRESOLVED") return { asset: asset.relativePath, state: "UNRESOLVED", validation, provenance: record || null, match: match.match || null, reason: match.reason };
-  const rights = String(record?.rights || "").trim().toLowerCase();
-  const provenanceKnown = Boolean(record && (record.source || record.sourceUrl || rights));
-  if (!provenanceKnown) return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "REVIEW", validation, provenance: { rights: "unknown" }, match: match.match, reason: "asset provenance/rights declaration is missing" };
-  if (!RIGHTS_THAT_CAN_VERIFY.has(rights)) return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "REVIEW", validation, provenance: record, match: match.match, reason: "rights declaration does not establish authorization for VERIFIED state" };
+  const rights = String(record?.rights || "").trim().toLowerCase() || "unknown";
+  const provenance = { ...(record || {}), rights };
+  const provenanceKnown = Boolean(record && (record.source || record.sourceUrl || rights !== "unknown"));
+  if (!provenanceKnown) return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "REVIEW", validation, provenance, match: match.match, reason: "asset provenance/rights declaration is missing" };
+  if (!RIGHTS_THAT_CAN_VERIFY.has(rights)) return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "REVIEW", validation, provenance, match: match.match, reason: "rights declaration does not establish authorization for VERIFIED state" };
   if (match.match?.contradictions?.length) return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "REVIEW", validation, provenance: record, match: match.match, reason: match.match.contradictions.join("; ") };
   return { asset: asset.relativePath, productId: String(match.product.id), productName: match.product.n, state: "VERIFIED", confidence: match.explicit ? 1 : match.match.score, validation, provenance: record, match: match.match, reason: match.explicit ? "explicit productId, valid image, and authorized provenance" : "strong deterministic filename/context match with authorized provenance", assetSha256: hash };
 }
