@@ -169,6 +169,48 @@ test('discovery preserves search provider errors instead of presenting them as e
   assert.equal(result.results[0].evaluated[0].reason, 'Tavily search provider returned HTTP 401');
 });
 
+test('Tavily provider rejects non-empty responses whose URLs were all filtered out', async () => {
+  const tavily = new TavilySearchProvider({
+    apiKey: 'test-key',
+    fetchImpl: fakeTavilyFetch(() => ({
+      ok: true,
+      status: 200,
+      async json() {
+        return { results: [
+          { title: 'Commercial Oven', content: 'result without URL' },
+          { title: 'Another Oven', content: 'another result without URL' }
+        ] };
+      }
+    }))
+  });
+  await assert.rejects(
+    () => tavily.search('commercial oven', { count: 3 }),
+    /results contained no usable URL fields/
+  );
+});
+
+test('discovery records an explicit zero-result search stage instead of empty evaluation', async () => {
+  const state = {
+    pending: [{ id: 999, n: 'Commercial Oven' }],
+    counts: { catalogue: 1, pending: 1 },
+    resolved: [],
+    byId: new Map([['999', { id: 999, n: 'Commercial Oven' }]]),
+    blocklist: {}
+  };
+  const result = await discover({
+    state,
+    config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 1, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
+    provider: { name: 'tavily', async search() { return []; } },
+    fetchImpl: async () => ({ ok: false, status: 500 }),
+    discoveredAt: '2026-09-22T00:00:00Z'
+  });
+  assert.equal(result.results[0].status, 'UNRESOLVED');
+  assert.equal(result.results[0].evaluated.length, 1);
+  assert.equal(result.results[0].evaluated[0].status, 'NO_SEARCH_RESULTS');
+  assert.equal(result.results[0].evaluated[0].error, 'Search provider returned 0 results');
+  assert.equal(result.results[0].evaluated[0].reason, 'Search provider returned 0 results');
+});
+
 test('Tavily provider returns empty results cleanly', async () => {
   const tavily = new TavilySearchProvider({
     apiKey: 'test-key',
