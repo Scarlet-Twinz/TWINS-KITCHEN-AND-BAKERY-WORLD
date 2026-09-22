@@ -32,6 +32,14 @@ async function main() {
     const reportPath = arg('--report', path.relative(process.cwd(), DEFAULT_REPORT_OUTPUT));
     const report = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), reportPath), 'utf8'));
     if (report.externalSearch !== false || report.manifestType !== 'local-bulk-asset-intake') throw new Error('Refusing apply: report is not a local asset-intake report');
+    const data = loadCatalogue();
+    const rules = readExistingRules();
+    const state = computeMediaState(data, rules);
+    for (const item of report.results.filter(x => x.state === 'VERIFIED')) {
+      if (state.mappedIds.has(String(item.productId))) throw new Error('Refusing apply: product ' + item.productId + ' is already mapped in the current catalogue state');
+      const source = path.resolve(process.cwd(), arg('--assets', path.relative(process.cwd(), DEFAULT_ASSET_ROOT)), item.asset);
+      if (!fs.existsSync(source)) throw new Error('Refusing apply: source asset is missing: ' + item.asset);
+    }
     const target = path.resolve(process.cwd(), arg('--output', path.relative(process.cwd(), DEFAULT_APPLIED_OUTPUT)));
     const applied = buildAppliedManifest(report, target);
     console.log(JSON.stringify({ output: path.relative(process.cwd(), target).replace(/\\\\/g, '/'), applied: applied.assets.length, mode: 'apply' }, null, 2));
