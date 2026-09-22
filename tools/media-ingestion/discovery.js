@@ -31,7 +31,7 @@ function contextOverlap(product,evidence){
   return overlap(catalogueContext,sourceContext);
 }
 function isCandidateRelevant(product,evidence,match){
-  const nameTokens=String(product.n||'').trim().split(/\\s+/).filter(Boolean);
+  const nameTokens=String(product.n||'').trim().split(/\s+/).filter(Boolean);
   const hasCatalogueContext=[product.c,product.type,product.productType,product.tag,product.model,product.capacity,product.spec].some(Boolean);
   if(nameTokens.length<=2&&hasCatalogueContext)return contextOverlap(product,evidence)>0;
   return match.contextScore>0;
@@ -41,8 +41,8 @@ function pageQuality(candidate,evidence,match,product){
   let host='',path='';
   try{const u=new URL(raw);host=u.hostname;path=u.pathname;}catch{}
   let score=0;
-  if(/\\/(?:product|products|item|shop|store|sku|model)(?:\\/|$)/i.test(path))score+=5;
-  if(/\\/(?:p)(?:\\/|$)/i.test(path))score+=4;
+  if(/\/(?:product|products|item|shop|store|sku|model)(?:\/|$)/i.test(path))score+=5;
+  if(/\/(?:p)(?:\/|$)/i.test(path))score+=4;
   if(/(?:product|item|sku|model)/i.test(String(candidate?.title||'')))score+=2;
   if(evidence?.fields?.name)score+=2;
   if(evidence?.fields?.brand)score+=1;
@@ -52,11 +52,11 @@ function pageQuality(candidate,evidence,match,product){
   if(match?.capacityMatch)score+=3;
   if((match?.contextScore||0)>=.5)score+=2;
   if((match?.nameScore||0)>=.9)score+=2;
-  if(/\\/(?:category|categories|collection|collections|blog|article|news|about|directory|directories|search|tag|tags|company|companies)(?:\\/|$)/i.test(path))score-=6;
-  if(/(?:shutterstock|istockphoto|gettyimages|alamy|freepik|unsplash|pexels|pixabay|depositphotos|dreamstime)\\./i.test(host))score-=10;
+  if(/\/(?:category|categories|collection|collections|blog|article|news|about|directory|directories|search|tag|tags|company|companies)(?:\/|$)/i.test(path))score-=6;
+  if(/(?:shutterstock|istockphoto|gettyimages|alamy|freepik|unsplash|pexels|pixabay|depositphotos|dreamstime)\./i.test(host))score-=10;
   if(/(?:software|3d|animation|gaming|game|market-report|market-reporting|news|article|tutorial)/i.test(String(candidate?.title||'')+' '+String(evidence?.fields?.description?.value||'')))score-=8;
-  if(/(?:official site|manufacturer|catalog|catalogue|solutions|company profile)/i.test(String(candidate?.title||''))&&!/\\/(?:product|products|item|shop|store|sku|model)(?:\\/|$)/i.test(path))score-=3;
-  if(product&&String(product.n||'').trim().split(/\\s+/).length<=2&&contextOverlap(product,evidence)===0)score-=8;
+  if(/(?:official site|manufacturer|catalog|catalogue|solutions|company profile)/i.test(String(candidate?.title||''))&&!/\/(?:product|products|item|shop|store|sku|model)(?:\/|$)/i.test(path))score-=3;
+  if(product&&String(product.n||'').trim().split(/\s+/).length<=2&&contextOverlap(product,evidence)===0)score-=8;
   return score;
 }
 function rankCandidate(item){const statusRank=item?.classification?.status==='HIGH'?2:item?.classification?.status==='REVIEW'?1:0;return [pageQuality(item?.candidate,item?.evidence,item?.match,item?.product),statusRank,Number(item?.classification?.confidence||0)];}
