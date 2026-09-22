@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { loadCatalogue, readExistingRules, computeMediaState } = require('../validator');
-const { discover, queryTerms, pageQuality, rankCandidate } = require('../discovery');
+const { discover, queryTerms, pageQuality, rankCandidate, isCandidateRelevant } = require('../discovery');
 const { extractEvidence } = require('../discovery/extract');
 const { matchProduct } = require('../discovery/matcher');
 const { classifyMatch } = require('../discovery/scorer');
@@ -135,6 +135,87 @@ test('candidate ranking prefers product-detail pages over generic category pages
   assert.equal(productClassification.status, 'REVIEW');
   assert.ok(productRank[1] > categoryRank[1]);
   assert.ok(productRank[0] >= categoryRank[0]);
+});
+
+test('generic product names are disambiguated with catalogue context', () => {
+  const q = queryTerms({
+    n: 'Blender',
+    type: 'Food Preparation Equipment',
+    c: 'Commercial Kitchen Equipment',
+    spec: '2L'
+  });
+  assert.match(q[0], /"Blender"/);
+  assert.match(q[0], /"Food Preparation Equipment"/);
+  assert.match(q[0], /"Commercial Kitchen Equipment"/);
+  assert.match(q[0], /product page/);
+  assert.doesNotMatch(q[0], /^"Blender" product$/);
+});
+
+test('exact model and capacity evidence outrank generic name-only candidates', () => {
+  const product = { n: 'Planetary Mixer', model: 'B20', capacity: '20L', type: 'Bakery Equipment' };
+  const exactEvidence = extractEvidence(
+    html('Planetary Mixer B20 20L', 'https://cdn.example/exact.jpg', 'Planetary Mixer', 'B20', '20L'),
+    'https://example.test/products/b20'
+  );
+  const genericEvidence = extractEvidence(
+    html('Planetary Mixer', 'https://cdn.example/generic.jpg', 'Planetary Mixer'),
+    'https://example.test/products/generic'
+  );
+  const exactMatch = matchProduct(product, exactEvidence);
+  const genericMatch = matchProduct(product, genericEvidence);
+  const exactClassification = classifyMatch(exactMatch, exactEvidence);
+  const genericClassification = classifyMatch(genericMatch, genericEvidence);
+  const exactRank = rankCandidate({ candidate: { url: 'https://example.test/products/b20', title: 'Planetary Mixer B20 20L' }, evidence: exactEvidence, match: exactMatch, product, classification: exactClassification });
+  const genericRank = rankCandidate({ candidate: { url: 'https://example.test/products/generic', title: 'Planetary Mixer' }, evidence: genericEvidence, match: genericMatch, product, classification: genericClassification });
+  assert.equal(exactMatch.modelMatch, true);
+  assert.equal(exactMatch.capacityMatch, true);
+  assert.ok(exactRank[0] > genericRank[0]);
+  assert.equal(exactClassification.status, 'HIGH');
+});
+
+test('unrelated meaning of a generic product name is rejected before candidate acceptance', async () => {
+  const state = {
+    pending: [{ id: 999, n: 'Blender', type: 'Food Preparation Equipment', c: 'Commercial Kitchen Equipment' }],
+    counts: { catalogue: 1, pending: 1 },
+    resolved: [],
+    byId: new Map([['999', { id: 999, n: 'Blender', type: 'Food Preparation Equipment', c: 'Commercial Kitchen Equipment' }]]),
+    blocklist: {}
+  };
+  const q = queryTerms(state.pending[0])[0];
+  const page = 'https://fixture.example/blender-3d';
+  const image = 'https://fixture.example/blender-3d.jpg';
+  const result = await discover({
+    state,
+    config: { concurrency: 1, maxQueriesPerProduct: 1, maxResultsPerQuery: 1, timeoutMs: 10, retries: 0, retryBackoffMs: 0, requestsPerSecond: 100 },
+    provider: provider({ [q]: [{ url: page, title: 'Blender 3D Software' }] }),
+    fetchImpl: async url => {
+      if (url === page) return { ok: true, status: 200, url, text: async () => html('Blender 3D Software', image, 'Blender'), headers: { get: name => name === 'content-type' ? 'text/html' : null } };
+      if (url === image) return { ok: true, status: 200, url, headers: { get: name => name === 'content-type' ? 'image/jpeg' : null } };
+      return { ok: false, status: 404, url };
+    }
+  });
+  const evidence = extractEvidence(html('Blender 3D Software', image, 'Blender'), page);
+  const match = matchProduct(state.pending[0], evidence);
+  assert.equal(isCandidateRelevant(state.pending[0], evidence, match), false);
+  assert.equal(result.results[0].status, 'UNRESOLVED');
+  assert.equal(result.results[0].candidate, null);
+});
+
+test('discovery ranking preserves the classifier result instead of changing thresholds', () => {
+  const product = { n: 'Commercial Oven' };
+  const evidence = extractEvidence(html('Commercial Oven', 'https://cdn.example/oven.jpg', 'Commercial Oven'), 'https://example.test/products/oven');
+  const match = matchProduct(product, evidence);
+  const classification = classifyMatch(match, evidence);
+  const ranked = rankCandidate({
+    candidate: { url: 'https://example.test/products/oven', title: 'Commercial Oven Product' },
+    evidence,
+    match,
+    product,
+    classification
+  });
+  assert.equal(classification.status, 'HIGH');
+  assert.equal(ranked[1], 2);
+  assert.equal(classifyMatch(match, evidence).status, classification.status);
 });
 
 test('SearchProvider is provider-independent', async () => {
