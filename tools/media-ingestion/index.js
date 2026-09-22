@@ -5,7 +5,7 @@ const { writePendingManifest } = require('./collector');
 const { discover } = require('./discovery');
 
 function arg(name, fallback = null) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : fallback; }
-function productIdsArg() { const value = arg('--product-ids'); if (!value) return null; const ids = value.split(',').map(x => x.trim()).filter(Boolean); if (!ids.length || ids.some(x => !/^\\d+$/.test(x))) throw new Error('--product-ids must be a comma-separated list of numeric product IDs'); return [...new Set(ids)]; }
+function productIdsArg() { const value = arg('--product-ids'); if (!value) return null; const ids = value.split(',').map(x => x.trim()).filter(Boolean); if (!ids.length || ids.some(x => !/^\d+$/.test(x))) throw new Error('--product-ids must be a comma-separated list of numeric product IDs'); return [...new Set(ids)]; }
 function readManifest(file) { if (!file) return { candidates: [] }; const parsed = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), file), 'utf8')); return Array.isArray(parsed) ? { candidates: parsed } : parsed; }
 function writeReport(report) { const target = arg('--report'); const output = JSON.stringify(report, null, 2); if (target) { const p = path.resolve(process.cwd(), target); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, output + '\\n', 'utf8'); } console.log(output); }
 async function main() {
