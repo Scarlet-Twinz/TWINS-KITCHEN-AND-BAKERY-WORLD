@@ -125,8 +125,9 @@ test("duplicate asset content is rejected within an intake", () => {
 });
 
 test("existing mapped product is protected", () => {
-  const root=tempDir(), state=pendingState(), rel="mapped.jpg", file=makeAsset(root,rel);
-  const result=processAsset({absolutePath:file,relativePath:rel},state,new Map([[rel,{productId:"1",rights:"owned"}]]),{existingHashes:new Map(),seenHashes:new Map()});
+  const root=tempDir(), state=pendingState(), rel="mapped.jpg", file=makeAsset(root,rel), mapped=state.resolved.find(x=>x.candidate.src);
+  assert.ok(mapped);
+  const result=processAsset({absolutePath:file,relativePath:rel},state,new Map([[rel,{productId:String(mapped.product.id),rights:"owned"}]]),{existingHashes:new Map(),seenHashes:new Map()});
   assert.equal(result.state,"REJECTED");
   assert.match(result.reason,/existing media mapping/i);
 });
@@ -139,7 +140,7 @@ test("legacy duplicate mappings remain untouched", () => {
 
 test("missing provenance produces REVIEW", () => {
   const state=pendingState(), root=tempDir(), product=state.pending[0], rel="candidate.jpg", file=makeAsset(root,rel);
-  const result=processAsset({absolutePath:file,relativePath:rel},state,new Map(),{existingHashes:new Map(),seenHashes:new Map()});
+  const result=processAsset({absolutePath:file,relativePath:rel},state,new Map([[rel,{productId:String(product.id),source:"Supplier A"}]]),{existingHashes:new Map(),seenHashes:new Map()});
   assert.equal(result.state,"REVIEW");
   assert.equal(result.provenance.rights,"unknown");
 });
