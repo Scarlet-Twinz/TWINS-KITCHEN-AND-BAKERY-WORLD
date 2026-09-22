@@ -175,6 +175,8 @@ function filenameEvidence(asset, metadata = {}) {
   const base = path.basename(asset.relativePath, path.extname(asset.relativePath)).replace(/[_-]+/g, " ");
   const folder = path.dirname(asset.relativePath).replace(/[\/_-]+/g, " ");
   const title = [base, folder].filter(Boolean).join(" ");
+  const capacityMatch = String(metadata.capacity || title).match(/\b\d+(?:[.,]\d+)?\s*(?:L|litre|litres|liter|liters|kg|ft|feet|quart|quarts|W|kW|mm|cm|inch|in)\b/i);
+  const modelMatch = String(metadata.model || title).match(/\b[A-Za-z]{1,5}[- ]?\d{1,5}[A-Za-z0-9-]*\b/);
   const name = metadata.name || base;
   return {
     sourceUrl: "file://" + asset.absolutePath,
@@ -182,8 +184,8 @@ function filenameEvidence(asset, metadata = {}) {
     fields: {
       name: { value: String(name), source: metadata.name ? "asset-manifest" : "filename" },
       brand: metadata.brand ? { value: String(metadata.brand), source: "asset-manifest" } : undefined,
-      model: metadata.model ? { value: String(metadata.model), source: "asset-manifest" } : undefined,
-      capacity: metadata.capacity ? { value: String(metadata.capacity), source: "asset-manifest" } : undefined,
+      model: { value: String(metadata.model || (modelMatch ? modelMatch[0] : "")), source: metadata.model ? "asset-manifest" : "filename" },
+      capacity: { value: String(metadata.capacity || (capacityMatch ? capacityMatch[0] : "")), source: metadata.capacity ? "asset-manifest" : "filename" },
       category: metadata.category ? { value: String(metadata.category), source: "asset-manifest" } : undefined,
       description: metadata.description ? { value: String(metadata.description), source: "asset-manifest" } : undefined
     },
