@@ -98,14 +98,20 @@ class TavilySearchProvider extends SearchProvider {
         throw new Error('Malformed Tavily search response: results array is missing');
       }
 
-      return body.results
+      const normalized = body.results
         .map(result => ({
-          url: typeof result?.url === 'string' ? result.url : '',
+          url: typeof result?.url === 'string' ? result.url.trim() : '',
           title: typeof result?.title === 'string' ? result.title : '',
           snippet: typeof result?.content === 'string' ? result.content : '',
           provider: this.name
         }))
         .filter(result => result.url);
+
+      if (body.results.length > 0 && normalized.length === 0) {
+        throw new Error('Malformed Tavily search response: results contained no usable URL fields');
+      }
+
+      return normalized;
     } finally {
       clearTimeout(timer);
     }
