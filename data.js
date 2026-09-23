@@ -111,7 +111,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "162":"https://tiimg.tistatic.com/fp/1/008/101/150-liters-300-watts-power-long-lasting-stainless-steel-water-cooler-264.jpg",
   "163":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD732/2507/23/products/44bca5b6ca-6d87.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100%2Fresize%2Cm_lfit%2Ch_640%2Cw_640",
   "165":"https://www.webstaurantstore.com/images/products/large/190504/903619.jpg",
-  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp",    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
+  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
   "4":"https://i5.walmartimages.com/asr/5dac02af-64d4-4744-8a6f-828dc807c171.69e379764896f6b933af40a8a238734c.jpeg",
   "7":"https://m.media-amazon.com/images/I/61lWjllZmoL._AC_SL1500_.jpg",
   "41":"https://sunshinecoastcoffeemachines.com.au/cdn/shop/files/Expobar_Office_Control_1_group_Coffee_Machine_1e7e5269-54f2-4240-a02e-c08da2728693.webp?v=1740021844&width=900",
@@ -205,7 +205,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
 ,
   "256":"https://tmwardcoffee.com/cdn/shop/files/NETTUNO-07-MAIN-1000x1000-03_1200x630.jpg?v=1761123650"
 ,
-  "257":"https://timscoffee.com/wp-content/uploads/2023/12/unic-aura-front-600x600.png",
+  "257":"https://timscoffee.com/wp-content/uploads/2023/12/unic-aura-front-600x600.png"
   "17":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/14/1907814/1.jpg?9803=",
   "120":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/32/4051172/1.jpg?1669=",
   "122":"https://www.ahmicrowave.com/uploads/202322313/1-2m-offset-satellite-dish-antennaf2807782-7b6b-4cb8-a18f-9d8e30fad03b.jpg",
@@ -303,7 +303,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "commercial shawarma grill":"https://system4.ua/images/product/product_32435_168969/600",
   "commercial coffee machine":"https://canmac.co.uk/cdn/shop/files/MIA5_6-1200x1200_1024x1024.jpg?v=1756647383",
   
-  "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg",
+  "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg"
   "8":"https://mobileimages.lowes.com/productimages/e24c9c00-f391-4b79-89ca-a1e874307af9/74813158.jpeg?size=pdhz",
   "12":"https://cpimg.tistatic.com/10760726/b/4/Stainless-Steel-Heavy-Duty-Rack..jpg",
   "33":"https://www.lamber.it/it/images/prodotti/gallery/product-113_1463.jpeg",
@@ -333,13 +333,13 @@ const PREMIUM_MEDIA_LIBRARY={
 "commercial stainless sink station":"https://cdnimg.webstaurantstore.com/images/products/large/114718/2899097.jpg",
 "restaurant dining chair set":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=90",
 "commercial gas fryer":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=90",
-"commercial coffee machine":"https://cdnimg.webstaurantstore.com/images/products/large/448775/1659944.jpg",
-  "236":"https://i5.walmartimages.com/seo/High-Temp-Undercounter-Commercial-Dishwasher-Glasswasher-Built-in-Booster-Built-in-Detergent-Rinse-Aid-Pumps-30-Racks-hr-208-240V_c89ebab0-d2c7-49db-8837-783563f1f395.5ed9f3356cc3be8452980b5bf2087120.png?odnBg=FFFFFF&odnHeight=640&odnWidth=640",
-  "237":"https://pictures-nigeria.jijistatic.net/205378533_NjIwLTExMzgtNjI2MTRiMmVjNw.webp",
-  "238":"https://phoenixfoodequipment.com/cdn/shop/files/Hobart-PW-10-High-Temp-Hood-Type-Pot-Pan-Washer-3_800x.webp?v=1696482648",
-  "239":"https://deqonline.com/cdn/shop/files/140_1.jpg?v=1707877015",
-  "240":"https://cdnimg.webstaurantstore.com/images/products/extra_large/204222/1854570.jpg",
-  "241":"https://www.howdybrewer.com/cdn/shop/files/e629b9e81a97f7878d457e5a89ed166a359a1714_6c61e17a-331c-47b5-a2d0-9ce0bea12cd5.jpg?v=1757527578&width=800",
+"commercial coffee machine":"https://cdnimg.webstaurantstore.com/images/products/large/448775/1659944.jpg"
+  "236":"https://i5.walmartimages.com/seo/High-Temp-Undercounter-Commercial-Dishwasher-Glasswasher-Built-in-Booster-Built-in-Detergent-Rinse-Aid-Pumps-30-Racks-hr-208-240V_c89ebab0-d2c7-49db-8837-783563f1f395.5ed9f3356cc3be8452980b5bf2087120.png?odnBg=FFFFFF&odnHeight=640&odnWidth=640"
+  "237":"https://pictures-nigeria.jijistatic.net/205378533_NjIwLTExMzgtNjI2MTRiMmVjNw.webp"
+  "238":"https://phoenixfoodequipment.com/cdn/shop/files/Hobart-PW-10-High-Temp-Hood-Type-Pot-Pan-Washer-3_800x.webp?v=1696482648"
+  "239":"https://deqonline.com/cdn/shop/files/140_1.jpg?v=1707877015"
+  "240":"https://cdnimg.webstaurantstore.com/images/products/extra_large/204222/1854570.jpg"
+  "241":"https://www.howdybrewer.com/cdn/shop/files/e629b9e81a97f7878d457e5a89ed166a359a1714_6c61e17a-331c-47b5-a2d0-9ce0bea12cd5.jpg?v=1757527578&width=800"
   "242":"https://m.media-amazon.com/images/I/71iDt4dyEAL._AC_SL1500_.jpg"
 };
 const P=[
@@ -1033,7 +1033,15 @@ const RESOURCE_CARDS=[
 ["Delivery planning","Information to confirm before moving large equipment into a location.","delivery.html","Read delivery notes →"],
 ["Frequently asked questions","Quick answers about pricing, availability, enquiries and the current static storefront.","faq.html","Read FAQs →"]
 ];
-const SITE_CONFIG=IG={name:"Twins Kitchen",email:"Ikegodsunday@gmail.com",phoneDisplay:"08033231712",whatsappNumber:"2348033231712",address:"Alaba International Market, Ojo, Lagos, Nigeria",hours:"Open 24 hours",deliveryArea:"Nigeria and across Africa",catalogueMode:"demo",priceLabel:"Current price on request",apiBase:"http://localhost:8000",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Alaba+International+Market",whatsappUrl:"https://wa.me/2348033231712"
+  "1":"https://cdnimg.webstaurantstore.com/images/products/large/80827/3078348.jpg",
+  "23":"https://cdnimg.webstaurantstore.com/images/products/large/183112/1215467.jpg",
+  "118":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/U/Z/234625_1725649969.jpg",
+  "151":"https://i0.wp.com/www.paramountsports.ng/wp-content/uploads/2020/11/images-16.jpeg?fit=100%2C100&ssl=1",
+  "157":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cfl_lossy%2Cdpr_auto%2Cq_auto%2Cq_auto%2Cw_3840/media/catalog/product/G/I/139578_1533467817.jpg",
+  "169":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/B/E/118566_1774457054.jpg",
+  "175":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/H/194961_1740984751.jpg",
+  "177":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/T/U/246046_1767818035.jpg",
+}onst SITE_CONFIG={name:"Twins Kitchen",email:"Ikegodsunday@gmail.com",phoneDisplay:"08033231712",whatsappNumber:"2348033231712",address:"Alaba International Market, Ojo, Lagos, Nigeria",hours:"Open 24 hours",deliveryArea:"Nigeria and across Africa",catalogueMode:"demo",priceLabel:"Current price on request",apiBase:"http://localhost:8000",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Alaba+International+Market",whatsappUrl:"https://wa.me/2348033231712"
   "160":"https://www.presidentialbilliards.com/wp-content/uploads/2019/11/Espresso-spec-chair-closed-600x450.webp",
   "161":"https://scoreboardsonline.co.uk/cdn/shop/files/G4T_Black_Web_d4a102c4-5782-4e1a-b53d-b953951c7b7f.jpg?v=1760006775&width=1214",
   "189":"https://img.vevorstatic.com/us%2FBLZBWTC3PB2300001V2%2Fgoods_thumb-v8%2Felectric-bain-marie-m100-1.2.jpg?format=webp&timestamp=1637560009000",
@@ -1161,7 +1169,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "162":"https://tiimg.tistatic.com/fp/1/008/101/150-liters-300-watts-power-long-lasting-stainless-steel-water-cooler-264.jpg",
   "163":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD732/2507/23/products/44bca5b6ca-6d87.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100%2Fresize%2Cm_lfit%2Ch_640%2Cw_640",
   "165":"https://www.webstaurantstore.com/images/products/large/190504/903619.jpg",
-  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp", "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
+  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
   "4":"https://i5.walmartimages.com/asr/5dac02af-64d4-4744-8a6f-828dc807c171.69e379764896f6b933af40a8a238734c.jpeg",
   "7":"https://m.media-amazon.com/images/I/61lWjllZmoL._AC_SL1500_.jpg",
   "41":"https://sunshinecoastcoffeemachines.com.au/cdn/shop/files/Expobar_Office_Control_1_group_Coffee_Machine_1e7e5269-54f2-4240-a02e-c08da2728693.webp?v=1740021844&width=900",
@@ -1338,7 +1346,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "commercial shawarma grill":"https://system4.ua/images/product/product_32435_168969/600",
   "commercial coffee machine":"https://canmac.co.uk/cdn/shop/files/MIA5_6-1200x1200_1024x1024.jpg?v=1756647383",
   
-  "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg",
+  "commercial ice maker":"https://m.media-amazon.com/images/I/71Pf%2Bj38NkL.jpg"
   "8":"https://mobileimages.lowes.com/productimages/e24c9c00-f391-4b79-89ca-a1e874307af9/74813158.jpeg?size=pdhz",
   "12":"https://cpimg.tistatic.com/10760726/b/4/Stainless-Steel-Heavy-Duty-Rack..jpg",
   "33":"https://www.lamber.it/it/images/prodotti/gallery/product-113_1463.jpeg",
