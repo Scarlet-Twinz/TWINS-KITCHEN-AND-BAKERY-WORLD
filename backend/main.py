@@ -224,7 +224,7 @@ def media_update(asset_id:str,request:Request,payload:dict):
     if meta["productId"] and not catalogue_product(meta["productId"]): raise HTTPException(status_code=422,detail="Product ID does not exist in canonical catalogue")
     if meta["role"] not in {"primary","front","side","rear","detail","control-panel","installed","contextual"}: raise HTTPException(status_code=422,detail="Unsupported media role")
     with db() as conn:
-        if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id),)).fetchone()): raise HTTPException(status_code=404,detail="Media asset not found")
+        if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id),)).fetchone(): raise HTTPException(status_code=404,detail="Media asset not found")
         conn.execute("""update media_assets set product_legacy_id=%s,source_type=%s,rights_status=%s,provenance=%s,source_url=%s,license=%s,attribution=%s,role=%s,status='REVIEW',updated_at=now() where id=%s""",
         (int(meta["productId"]) if meta["productId"] else None,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],uuid.UUID(asset_id)))
         audit_media_action(conn,actor,"MEDIA_METADATA_UPDATED",asset_id,payload); conn.commit()
