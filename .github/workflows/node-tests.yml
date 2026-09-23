@@ -7,16 +7,13 @@ on:
 jobs:
   media-ingestion-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Run full Node test suite
         run: node --test tools/media-ingestion/test/*.test.js
 
@@ -32,9 +29,11 @@ jobs:
       - name: Install backend dependencies
         run: python -m pip install -r backend/requirements.txt
       - name: Run Media Center syntax checks
-        run: python -m py_compile backend/main.py backend/media_center.py backend/create_owner.py
+        run: python -m py_compile backend/main.py backend/media_center.py backend/create_owner.py backend/migrate.py
       - name: Run Media Center unit tests
         working-directory: backend
         run: python -m unittest discover -p "test_*.py"
+      - name: Run repository backend tests from repo root
+        run: python -m unittest discover -s backend -p "test_*.py"
       - name: Check Media Center browser JavaScript
         run: node --check admin/media/media-center.js
