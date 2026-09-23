@@ -139,7 +139,7 @@ class QuotePayload(BaseModel):
     itemCount:int=Field(default=0,ge=0,le=10000)
 
 @app.post("/api/admin/media/upload",status_code=201)
-async def media_upload(request:Request, files:list[UploadFile]=File(...), metadata:str=Form("{}")):
+async def media_upload(request:Request, files:list[UploadFile]|None=File(None), metadata:str=Form("{}")):
     actor=require_owner(request)
     if not files or len(files)>100: raise HTTPException(status_code=422,detail="Upload between 1 and 100 files")
     try: meta=normalize_metadata(json.loads(metadata or "{}"))
