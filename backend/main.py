@@ -230,6 +230,30 @@ def media_update(asset_id:str,request:Request,payload:dict):
         audit_media_action(conn,actor,"MEDIA_METADATA_UPDATED",asset_id,payload); conn.commit()
     return {"ok":True,"status":"REVIEW"}
 
+@app.post("/api/admin/media/{asset_id}/revalidate")
+def media_revalidate(asset_id:str,request:Request):
+    actor=require_owner(request)
+    root=media_root()
+    with db() as conn:
+        row=conn.execute("""select id,product_legacy_id,filename,storage_path,source_type,rights_status,provenance,source_url,license,attribution,role,batch_id
+        from media_assets where id=%s""",(uuid.UUID(asset_id),)).fetchone()
+    if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+    asset_path=Path(row[3])
+    if not asset_path.is_absolute(): asset_path=Path.cwd()/asset_path
+    if not asset_path.exists(): raise HTTPException(status_code=404,detail="Stored asset is missing")
+    batch_dir=root/"incoming"/str(row[11])
+    if not batch_dir.exists(): batch_dir=asset_path.parent
+    manifest_path=root/"manifests"/f"{asset_id}.revalidate.json"; report_path=root/"manifests"/f"{asset_id}.revalidate.report.json"
+    manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"sourceType":row[4],"rightsStatus":row[5],"source":row[6],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
+    report=run_asset_intake(batch_dir,manifest_path,report_path)
+    result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
+    status=result.get("state","REVIEW") if result else "REVIEW"
+    if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
+    with db() as conn:
+        conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result and result.get("productId") else row[1],status,uuid.UUID(asset_id)))
+        audit_media_action(conn,actor,"MEDIA_REVALIDATED",asset_id,{"result":result}); conn.commit()
+    return {"ok":True,"status":status,"result":result}
+
 @app.post("/api/admin/media/{asset_id}/approve")
 def media_approve(asset_id:str,request:Request):
     actor=require_owner(request)
