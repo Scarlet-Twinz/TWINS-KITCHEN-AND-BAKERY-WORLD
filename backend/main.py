@@ -171,7 +171,7 @@ async def media_upload(request:Request, files:list[UploadFile]=File(...), metada
                     (id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,uploaded_by)
                     values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'QUEUED',%s,%s)""",
                     (asset_id,int(meta["productId"]) if meta["productId"] else None,item["filename"],rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],batch_id,uuid.UUID(actor["sub"])))
-                    manifest.append({"asset":path.name,**meta}); uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
+                    manifest.append({"asset":path.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
                 continue
             if ext in SUPPORTED_DOCUMENT_EXTENSIONS:
                 target=root/"incoming"/(uuid.uuid4().hex+"-"+sanitize_filename(original)); target.write_bytes(data)
@@ -192,7 +192,7 @@ async def media_upload(request:Request, files:list[UploadFile]=File(...), metada
             (id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,uploaded_by)
             values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'QUEUED',%s,%s)""",
             (asset_id,int(meta["productId"]) if meta["productId"] else None,original,rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],batch_id,uuid.UUID(actor["sub"])))
-            manifest.append({"asset":target.name,**meta}); uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
+            manifest.append({"asset":target.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
         conn.commit()
     manifest_path=root/"manifests"/f"{batch_id}.json"; report_path=root/"manifests"/f"{batch_id}.report.json"
     manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":manifest},indent=2),encoding="utf-8")
@@ -244,7 +244,7 @@ def media_revalidate(asset_id:str,request:Request):
     batch_dir=root/"incoming"/str(row[11])
     if not batch_dir.exists(): batch_dir=asset_path.parent
     manifest_path=root/"manifests"/f"{asset_id}.revalidate.json"; report_path=root/"manifests"/f"{asset_id}.revalidate.report.json"
-    manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"sourceType":row[4],"rightsStatus":row[5],"source":row[6],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
+    manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"rights":row[5],"source":row[4],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
     report=run_asset_intake(batch_dir,manifest_path,report_path)
     result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
     status=result.get("state","REVIEW") if result else "REVIEW"
