@@ -1033,17 +1033,6 @@ const RESOURCE_CARDS=[
 ["Delivery planning","Information to confirm before moving large equipment into a location.","delivery.html","Read delivery notes →"],
 ["Frequently asked questions","Quick answers about pricing, availability, enquiries and the current static storefront.","faq.html","Read FAQs →"]
 ];
-const REPAIRED_LEGACY_MEDIA_APPENDIX={
-  "1":"https://cdnimg.webstaurantstore.com/images/products/large/80827/3078348.jpg",
-  "23":"https://cdnimg.webstaurantstore.com/images/products/large/183112/1215467.jpg",
-  "118":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/U/Z/234625_1725649969.jpg",
-  "151":"https://i0.wp.com/www.paramountsports.ng/wp-content/uploads/2020/11/images-16.jpeg?fit=100%2C100&ssl=1",
-  "157":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cfl_lossy%2Cdpr_auto%2Cq_auto%2Cq_auto%2Cw_3840/media/catalog/product/G/I/139578_1533467817.jpg",
-  "169":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/B/E/118566_1774457054.jpg",
-  "175":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/Z/H/194961_1740984751.jpg",
-  "177":"https://www-konga-com-res.cloudinary.com/image/upload/f_auto%2Cq_auto%2Cw_800%2Cc_limit/media/catalog/product/T/U/246046_1767818035.jpg",
-}
-};
 const SITE_CONFIG=IG={name:"Twins Kitchen",email:"Ikegodsunday@gmail.com",phoneDisplay:"08033231712",whatsappNumber:"2348033231712",address:"Alaba International Market, Ojo, Lagos, Nigeria",hours:"Open 24 hours",deliveryArea:"Nigeria and across Africa",catalogueMode:"demo",priceLabel:"Current price on request",apiBase:"http://localhost:8000",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Alaba+International+Market",whatsappUrl:"https://wa.me/2348033231712"
   "160":"https://www.presidentialbilliards.com/wp-content/uploads/2019/11/Espresso-spec-chair-closed-600x450.webp",
   "161":"https://scoreboardsonline.co.uk/cdn/shop/files/G4T_Black_Web_d4a102c4-5782-4e1a-b53d-b953951c7b7f.jpg?v=1760006775&width=1214",
