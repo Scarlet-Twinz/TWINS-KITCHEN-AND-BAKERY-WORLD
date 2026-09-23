@@ -29,6 +29,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Run Media Center syntax checks
+        run: python -m py_compile backend/main.py backend/media_center.py backend/create_owner.py
       - name: Run Media Center unit tests
         working-directory: backend
         run: python -m unittest discover -p "test_*.py"
+      - name: Check Media Center browser JavaScript
+        run: node --check admin/media/media-center.js
