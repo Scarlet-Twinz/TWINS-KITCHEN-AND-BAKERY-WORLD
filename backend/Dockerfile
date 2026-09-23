@@ -3,7 +3,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm && rm -rf /var/lib/apt/lists/*
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY backend/main.py backend/media_center.py ./
+COPY backend/main.py backend/media_center.py backend/create_owner.py ./
 COPY tools ./tools
 COPY data.js ./
 EXPOSE 8000
