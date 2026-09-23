@@ -1,4 +1,4 @@
-const API=(window.TWINS_API_BASE||"").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];
+const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});let d={};try{d=await r.json()}catch{}if(!r.ok){const e=new Error(d.detail||"Request failed");e.status=r.status;throw e}return d}
 function metadata(){return JSON.stringify({productId:$("productId").value.trim()||null,sourceType:$("sourceType").value,rightsStatus:$("rightsStatus").value,provenance:$("provenance").value.trim(),sourceUrl:$("sourceUrl").value.trim(),license:$("license").value.trim(),attribution:$("attribution").value.trim(),role:$("role").value})}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
