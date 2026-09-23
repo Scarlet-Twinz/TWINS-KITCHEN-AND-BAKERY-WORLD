@@ -9,4 +9,4 @@ COPY backend/migrations ./migrations
 COPY tools ./tools
 COPY data.js ./
 EXPOSE 8000
-CMD ["fastapi","run","main.py","--port","8000"]
+CMD ["sh","-c","python migrate.py && exec fastapi run main.py --port 8000"]
