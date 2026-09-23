@@ -1,8 +1,10 @@
 FROM python:3.13-slim
-
 WORKDIR /app
-COPY requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm && rm -rf /var/lib/apt/lists/*
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY main.py .
+COPY backend/main.py backend/media_center.py ./
+COPY tools ./tools
+COPY data.js ./
 EXPOSE 8000
 CMD ["fastapi","run","main.py","--port","8000"]
