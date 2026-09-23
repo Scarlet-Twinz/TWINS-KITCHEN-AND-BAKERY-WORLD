@@ -7,7 +7,7 @@ create table users (
   email text unique not null,
   phone text,
   password_hash text not null,
-  role text not null default 'customer' check (role in ('customer','staff','admin')),
+  role text not null default 'customer' check (role in ('customer','staff','admin','owner','supplier')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
