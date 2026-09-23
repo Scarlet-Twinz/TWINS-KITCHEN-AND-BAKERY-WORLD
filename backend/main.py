@@ -275,7 +275,7 @@ def media_approve(asset_id:str,request:Request):
 def media_reject(asset_id:str,request:Request):
     actor=require_owner(request)
     with db() as conn:
-        if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id),)).fetchone()): raise HTTPException(status_code=404,detail="Media asset not found")
+        if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id), )).fetchone(): raise HTTPException(status_code=404,detail="Media asset not found")
         conn.execute("update media_assets set status='REJECTED',updated_at=now() where id=%s",(uuid.UUID(asset_id),))
         audit_media_action(conn,actor,"MEDIA_REJECTED",asset_id); conn.commit()
     return {"ok":True,"status":"REJECTED"}
