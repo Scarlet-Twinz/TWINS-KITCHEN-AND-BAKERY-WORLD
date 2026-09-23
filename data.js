@@ -111,7 +111,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
   "162":"https://tiimg.tistatic.com/fp/1/008/101/150-liters-300-watts-power-long-lasting-stainless-steel-water-cooler-264.jpg",
   "163":"https://ueeshop.ly200-cdn.com/u_file/UPBD/UPBD732/2507/23/products/44bca5b6ca-6d87.jpg?x-oss-process=image%2Fformat%2Cwebp%2Fquality%2Cq_100%2Fresize%2Cm_lfit%2Ch_640%2Cw_640",
   "165":"https://www.webstaurantstore.com/images/products/large/190504/903619.jpg",
-  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp"    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
+  "166":"https://www.supergeneral.com/media/products/628/1687865945-artboard-1-copy-7-1.webp",    "3":"https://img.vevorstatic.com/us%2FQCCKPSYKXSTA19BPH001V1%2Fgoods_img_big-v4%2Fcommercial-convection-oven-f4.jpg?format=webp&format=webp&timestamp=1755658326000",
   "4":"https://i5.walmartimages.com/asr/5dac02af-64d4-4744-8a6f-828dc807c171.69e379764896f6b933af40a8a238734c.jpeg",
   "7":"https://m.media-amazon.com/images/I/61lWjllZmoL._AC_SL1500_.jpg",
   "41":"https://sunshinecoastcoffeemachines.com.au/cdn/shop/files/Expobar_Office_Control_1_group_Coffee_Machine_1e7e5269-54f2-4240-a02e-c08da2728693.webp?v=1740021844&width=900",
@@ -205,7 +205,7 @@ const CATALOG_MEDIA_OVERRIDES_BY_ID={
 ,
   "256":"https://tmwardcoffee.com/cdn/shop/files/NETTUNO-07-MAIN-1000x1000-03_1200x630.jpg?v=1761123650"
 ,
-  "257":"https://timscoffee.com/wp-content/uploads/2023/12/unic-aura-front-600x600.png"
+  "257":"https://timscoffee.com/wp-content/uploads/2023/12/unic-aura-front-600x600.png",
   "17":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/14/1907814/1.jpg?9803=",
   "120":"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/32/4051172/1.jpg?1669=",
   "122":"https://www.ahmicrowave.com/uploads/202322313/1-2m-offset-satellite-dish-antennaf2807782-7b6b-4cb8-a18f-9d8e30fad03b.jpg",
