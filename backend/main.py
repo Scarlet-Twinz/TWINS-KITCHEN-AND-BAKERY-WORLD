@@ -1,11 +1,13 @@
-import base64, hashlib, hmac, json, secrets, uuid
+import base64, hashlib, hmac, json, secrets, uuid, os, shutil, subprocess, zipfile
 from datetime import datetime, timedelta, timezone
 from typing import Any
 import bcrypt, psycopg
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pathlib import Path
+from media_center import inspect_image_bytes, extract_zip, normalize_metadata, sanitize_filename, SUPPORTED_IMAGE_EXTENSIONS, SUPPORTED_DOCUMENT_EXTENSIONS, MAX_ZIP_BYTES
 
 class Settings(BaseSettings):
     database_url: str=""
@@ -13,6 +15,8 @@ class Settings(BaseSettings):
     frontend_origins: str="http://127.0.0.1:5500,http://localhost:5500,http://localhost:3000"
     port: int=8000
     cookie_secure: bool=False
+    media_storage_root: str="../storage/media-intake"
+    media_node_command: str="node"
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
@@ -43,8 +47,42 @@ def require_session(request:Request):
 
 def require_admin(request:Request):
     s=require_session(request)
-    if s.get("role") not in ("admin","staff"):raise HTTPException(status_code=403,detail="Staff access required")
+    if s.get("role") not in ("admin","staff","owner"):raise HTTPException(status_code=403,detail="Staff access required")
     return s
+
+def require_owner(request:Request):
+    s=require_session(request)
+    if s.get("role") != "owner": raise HTTPException(status_code=403,detail="Owner access required")
+    return s
+
+def media_root():
+    root=Path(settings.media_storage_root)
+    root.mkdir(parents=True,exist_ok=True)
+    for name in ("incoming","processed","rejected","duplicates","manifests"):
+        (root/name).mkdir(parents=True,exist_ok=True)
+    return root
+
+def catalogue_product(product_id):
+    script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); const p=loadCatalogue().P.find(x=>String(x.id)===String(process.argv[1])); console.log(JSON.stringify(p||null));"
+    try:
+        result=subprocess.run([settings.media_node_command,"-e",script,str(product_id)],cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=15,check=True)
+        return json.loads(result.stdout.strip() or "null")
+    except Exception:
+        raise HTTPException(status_code=503,detail="Catalogue validation service is unavailable")
+
+def audit_media_action(conn,actor,action,asset_id=None,metadata=None):
+    conn.execute("insert into audit_logs (actor_user_id,action,entity_type,entity_id,metadata) values (%s,%s,'media_asset',%s,%s)",
+                 (uuid.UUID(actor["sub"]),action,uuid.UUID(asset_id) if asset_id else None,json.dumps(metadata or {})))
+
+def run_asset_intake(batch_dir,manifest_path,report_path):
+    command=[settings.media_node_command,"tools/media-ingestion/index.js","asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
+    result=subprocess.run(command,cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=120)
+    if result.returncode != 0:
+        raise HTTPException(status_code=422,detail="Asset-intake validation failed")
+    return json.loads(report_path.read_text(encoding="utf-8"))
+
+def media_metadata_from_row(row):
+    return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
 
 class AuthPayload(BaseModel):
     name:str|None=Field(default=None,min_length=2,max_length=120)
