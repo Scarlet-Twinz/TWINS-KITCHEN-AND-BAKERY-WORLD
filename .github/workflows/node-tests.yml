@@ -19,3 +19,16 @@ jobs:
 
       - name: Run full Node test suite
         run: node --test tools/media-ingestion/test/*.test.js
+
+  media-center-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run Media Center unit tests
+        working-directory: backend
+        run: python -m unittest discover -p "test_*.py"
