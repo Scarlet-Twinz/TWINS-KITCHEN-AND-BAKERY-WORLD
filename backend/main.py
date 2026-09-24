@@ -212,7 +212,7 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
     require_owner(request)
     with db() as conn:
         rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at
-        from media_assets where (%s is null or status=%s) and (%s is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
+        from media_assets where (%s::text is null or status=%s) and (%s::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
     return {"assets":[media_metadata_from_row(r) for r in rows]}
 
