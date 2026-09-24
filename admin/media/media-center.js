@@ -1,5 +1,41 @@
 const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});let d={};try{d=await r.json()}catch{}if(!r.ok){const e=new Error(d.detail||"Request failed");e.status=r.status;throw e}return d}
+function normalizeCatalogueMediaPath(src){
+  if(!src)return "";
+  const value=String(src).trim();
+  return value.indexOf("assets/media/")===0?"/"+value:value;
+}
+function selectedProductById(){
+  const value=$("productId").value.trim();
+  if(!value)return null;
+  if(typeof P==="undefined"||!Array.isArray(P))return null;
+  return P.find(p=>String(p.id)===value)||null;
+}
+function selectedProductMedia(product){
+  if(!product)return "";
+  const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
+  const override=overrides[String(product.id)]||overrides[product.id]||"";
+  const image=override||(product.media&&Array.isArray(product.media.images)&&product.media.images[0])||product.i||"";
+  return normalizeCatalogueMediaPath(image);
+}
+function renderProductPreview(){
+  const box=$("productPreview");
+  const value=$("productId").value.trim();
+  if(!value){box.classList.add("hidden");box.innerHTML="";return}
+  const product=selectedProductById();
+  if(!product){
+    box.classList.remove("hidden");
+    box.innerHTML='<div class="product-preview-copy"><strong>Product not found</strong><span>Enter a valid canonical catalogue Product ID.</span></div>';
+    return;
+  }
+  const src=selectedProductMedia(product);
+  box.classList.remove("hidden");
+  if(!src){
+    box.innerHTML='<div class="product-preview-copy"><strong>'+escapeHtml(product.n)+'</strong><span>No existing catalogue image is assigned to this product.</span></div>';
+    return;
+  }
+  box.innerHTML='<div class="product-preview-image"><img src="'+escapeHtml(src)+'" alt="'+escapeHtml(product.n)+'" onerror="this.closest(\'.product-preview-image\').classList.add(\'image-error\');this.remove()"></div><div class="product-preview-copy"><strong>'+escapeHtml(product.n)+'</strong><span>Catalogue Product ID: '+escapeHtml(product.id)+'</span></div>';
+}
 function metadata(){return JSON.stringify({productId:$("productId").value.trim()||null,sourceType:$("sourceType").value,rightsStatus:$("rightsStatus").value,provenance:$("provenance").value.trim(),sourceUrl:$("sourceUrl").value.trim(),license:$("license").value.trim(),attribution:$("attribution").value.trim(),role:$("role").value})}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
 function renderSummary(d){$("summary").innerHTML='<div class="summary"><b>Batch '+d.batchId+'</b> · '+d.uploaded.length+' queued · '+d.duplicates.length+' exact duplicates · '+d.supportingDocuments.length+' supporting documents</div>'}
@@ -9,7 +45,7 @@ async function updateAsset(id){const p=document.querySelector('[data-id="'+id+'"
 async function revalidate(id){await api("/api/admin/media/"+id+"/revalidate",{method:"POST"});await refresh()}
 async function approveAsset(id){if(!confirm("Approve this asset? It will create a protected mapping but will not publish automatically."))return;await api("/api/admin/media/"+id+"/approve",{method:"POST"});await refresh()}
 async function rejectAsset(id){if(!confirm("Reject this asset?"))return;await api("/api/admin/media/"+id+"/reject",{method:"POST"});await refresh()}
-$("files").addEventListener("change",e=>{selected=[...e.target.files];$("uploadBtn").disabled=!selected.length;$("progressText").textContent=selected.length+" file(s) selected"});
+$("productId").addEventListener("input",renderProductPreview);$("productId").addEventListener("change",renderProductPreview);$("files").addEventListener("change",e=>{selected=[...e.target.files];$("uploadBtn").disabled=!selected.length;$("progressText").textContent=selected.length+" file(s) selected"});
 $("dropzone").addEventListener("click",()=> $("files").click());
 $("dropzone").addEventListener("dragover",e=>{e.preventDefault()});
 $("dropzone").addEventListener("drop",e=>{e.preventDefault();selected=[...e.dataTransfer.files];$("uploadBtn").disabled=!selected.length;$("progressText").textContent=selected.length+" file(s) selected"});
