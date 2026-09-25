@@ -208,8 +208,8 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
         conn.commit()
     return {"batchId":str(batch_id),"uploaded":uploaded,"duplicates":duplicates,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
 
-@app.get("/api/admin/media/{asset_id}/content")
-def media_content(asset_id:str,request:Request):
+@app.get("/api/admin/media/{asset_id}/file")
+def media_file(asset_id:str,request:Request):
     require_owner(request)
     try:
         asset_uuid=uuid.UUID(asset_id)
@@ -232,7 +232,7 @@ def media_content(asset_id:str,request:Request):
         raise HTTPException(status_code=403,detail="Media asset is outside the protected storage root")
     if not path.is_file():
         raise HTTPException(status_code=404,detail="Stored media asset is missing")
-    return FileResponse(path,media_type=row[1],filename=Path(row[2]).name)
+    return FileResponse(path,media_type=row[1])
 
 @app.delete("/api/admin/media/{asset_id}")
 def media_delete(asset_id:str,request:Request):

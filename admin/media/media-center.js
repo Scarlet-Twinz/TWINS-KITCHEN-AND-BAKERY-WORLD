@@ -61,7 +61,7 @@ function setActionStatus(id,message,type){
   node.className="action-status "+(type||"");
   node.textContent=message;
 }
-function mediaContentUrl(id){return API+"/api/admin/media/"+encodeURIComponent(id)+"/content"}
+function mediaContentUrl(id){return API+"/api/admin/media/"+encodeURIComponent(id)+"/file"}
 function setQueueFeedback(message,type){
   const node=$("queueFeedback");
   node.className="operation-feedback "+(type||"");
