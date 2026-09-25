@@ -3,7 +3,7 @@ async function api(path,opts={}){const r=await fetch(API+path,{credentials:"incl
 function normalizeCatalogueMediaPath(src){
   if(!src)return "";
   let value=String(src).trim().replace(/\\/g,"/");
-  if(/^https?:\\/\\//i.test(value))return value;
+  if(/^https?:\/\//i.test(value))return value;
   const marker="assets/media/";
   const markerIndex=value.indexOf(marker);
   if(markerIndex>=0)return "/"+value.slice(markerIndex).replace(/^\\/+/, "");
