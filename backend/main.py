@@ -234,6 +234,56 @@ def media_file(asset_id:str,request:Request):
         raise HTTPException(status_code=404,detail="Stored media asset is missing")
     return FileResponse(path,media_type=row[1])
 
+@app.delete("/api/admin/media/queue")
+def media_delete_queue(request:Request):
+    actor=require_owner(request)
+    root=media_root().resolve()
+    with db() as conn:
+        rows=conn.execute("""select ma.id,ma.storage_path,ma.filename
+        from media_assets ma
+        where ma.status='QUEUED'
+        and not exists (select 1 from media_production_mappings m where m.asset_id=ma.id)
+        for update""").fetchall()
+        protected_row=conn.execute("""select count(*)
+        from media_assets ma
+        where ma.status='QUEUED'
+        and exists (select 1 from media_production_mappings m where m.asset_id=ma.id)""").fetchone()
+        protected_count=int(protected_row[0] if protected_row else 0)
+        if not rows:
+            return {"ok":True,"status":"DELETED","deletedCount":0,"protectedCount":protected_count,"queueRemaining":protected_count}
+        staged=[]
+        try:
+            for asset_id,storage_path,filename in rows:
+                path=Path(storage_path)
+                if not path.is_absolute():
+                    path=Path.cwd()/path
+                path=path.resolve()
+                try:
+                    path.relative_to(root)
+                except ValueError:
+                    raise HTTPException(status_code=403,detail="Media asset is outside the protected storage root: "+str(filename))
+                if not path.is_file():
+                    raise HTTPException(status_code=404,detail="Stored media asset is missing: "+str(filename))
+                trash=root/"rejected"/(".delete-queue-"+uuid.uuid4().hex+"-"+sanitize_filename(filename))
+                trash.parent.mkdir(parents=True,exist_ok=True)
+                shutil.move(str(path),str(trash))
+                staged.append((asset_id,path,trash,filename))
+            ids=[item[0] for item in staged]
+            deleted=conn.execute("delete from media_assets where id = any(%s) and status='QUEUED' and not exists (select 1 from media_production_mappings m where m.asset_id=media_assets.id)",(ids,))
+            if deleted.rowcount!=len(ids):
+                raise HTTPException(status_code=409,detail="Queue changed while Delete All was running; no queued assets were removed.")
+            for asset_id,_,_,filename in staged:
+                audit_media_action(conn,actor,"MEDIA_DELETED",str(asset_id),{"filename":filename,"status":"QUEUED","bulk":True})
+            conn.commit()
+        except Exception:
+            for _,path,trash,_ in reversed(staged):
+                if trash.exists() and not path.exists():
+                    shutil.move(str(trash),str(path))
+            raise
+    for _,_,trash,_ in staged:
+        trash.unlink(missing_ok=True)
+    return {"ok":True,"status":"DELETED","deletedCount":len(staged),"protectedCount":protected_count,"queueRemaining":protected_count}
+
 @app.delete("/api/admin/media/{asset_id}")
 def media_delete(asset_id:str,request:Request):
     actor=require_owner(request)
