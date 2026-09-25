@@ -186,8 +186,37 @@ $("uploadBtn").addEventListener("click",()=>{
   xhr.onerror=()=>{const message="Upload failed: network request could not be completed.";$("progressText").textContent="Upload failed";setUploadFeedback(message,"error");button.textContent="Upload & validate";button.disabled=!selected.length};
   xhr.send(fd);
 });
-$("search").addEventListener("input",render);
+$("search").addEventListener("input",render);$("deleteAllQueue").addEventListener("click",deleteAllQueue);
 $("status").addEventListener("change",async()=>{try{await refresh(false);setQueueFeedback($("status").value?"Filtered to "+$("status").value+".":"Showing all statuses.","success")}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}});
+async function deleteAllQueue(){
+  const dialog=$("deleteAllDialog"),confirmButton=$("deleteAllConfirm"),cancelButton=$("deleteAllCancel"),trigger=$("deleteAllQueue");
+  if(dialog.open)return;
+  dialog.showModal();
+  const confirmed=await new Promise(resolve=>{
+    const finish=value=>{
+      dialog.close();
+      resolve(value);
+    };
+    cancelButton.onclick=()=>finish(false);
+    confirmButton.onclick=()=>finish(true);
+  });
+  if(!confirmed)return;
+  trigger.disabled=true;confirmButton.disabled=true;cancelButton.disabled=true;trigger.textContent="Deleting…";
+  setQueueFeedback("Deleting all queued assets…","pending");
+  try{
+    const result=await api("/api/admin/media/queue",{method:"DELETE"});
+    await refresh(false);
+    const deleted=Number(result.deletedCount||0);
+    const protectedCount=Number(result.protectedCount||0);
+    const remaining=Number(result.queueRemaining??protectedCount);
+    const suffix=protectedCount?" "+protectedCount+" protected queued asset(s) were left untouched.":"";
+    setQueueFeedback("Delete All completed: "+deleted+" queued asset(s) deleted; "+remaining+" queued asset(s) remain."+suffix,"success");
+  }catch(e){
+    setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");
+  }finally{
+    trigger.disabled=false;confirmButton.disabled=false;cancelButton.disabled=false;trigger.textContent="Delete All Queue";
+  }
+}
 $("refresh").addEventListener("click",async()=>{
   const button=$("refresh");button.disabled=true;button.textContent="Refreshing…";setQueueFeedback("Refreshing…","pending");
   try{await refresh(false);setQueueFeedback("Queue refreshed","success")}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
