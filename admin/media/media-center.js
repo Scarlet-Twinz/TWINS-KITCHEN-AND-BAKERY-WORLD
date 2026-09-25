@@ -2,11 +2,11 @@ const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");con
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
 function normalizeCatalogueMediaPath(src){
   if(!src)return "";
-  let value=String(src).trim().replace(/\\/g,"/");
-  if(/^https?:\/\//i.test(value))return value;
+  let value=String(src).trim().split(String.fromCharCode(92)).join("/");
+  if(value.startsWith("http://")||value.startsWith("https://"))return value;
   const marker="assets/media/";
   const markerIndex=value.indexOf(marker);
-  if(markerIndex>=0)return "/"+value.slice(markerIndex).replace(/^\\/+/, "");
+  if(markerIndex>=0)return "/"+value.slice(markerIndex);
   return value.startsWith("/")?value:"/"+value;
 }
 function selectedProductById(){
