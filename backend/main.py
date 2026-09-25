@@ -241,14 +241,12 @@ def media_delete_queue(request:Request):
     with db() as conn:
         rows=conn.execute("""select ma.id,ma.storage_path,ma.filename
         from media_assets ma
-        where ma.status in ('QUEUED','REVIEW','UNRESOLVED')
-        and ma.status <> 'APPROVED'
+        where ma.status <> 'APPROVED'
         and not exists (select 1 from media_production_mappings m where m.asset_id=ma.id)
         for update""").fetchall()
         protected_row=conn.execute("""select count(*)
         from media_assets ma
-        where ma.status in ('QUEUED','REVIEW','UNRESOLVED')
-        and exists (select 1 from media_production_mappings m where m.asset_id=ma.id)""").fetchone()
+        where (ma.status='APPROVED' or exists (select 1 from media_production_mappings m where m.asset_id=ma.id))""").fetchone()
         protected_count=int(protected_row[0] if protected_row else 0)
         if not rows:
             return {"ok":True,"status":"DELETED","deletedCount":0,"protectedCount":protected_count,"queueRemaining":protected_count}
@@ -270,7 +268,7 @@ def media_delete_queue(request:Request):
                 shutil.move(str(path),str(trash))
                 staged.append((asset_id,path,trash,filename))
             ids=[item[0] for item in staged]
-            deleted=conn.execute("delete from media_assets where id = any(%s) and status in ('QUEUED','REVIEW','UNRESOLVED') and not exists (select 1 from media_production_mappings m where m.asset_id=media_assets.id)",(ids,))
+            deleted=conn.execute("delete from media_assets where id = any(%s) and status <> 'APPROVED' and not exists (select 1 from media_production_mappings m where m.asset_id=media_assets.id)",(ids,))
             if deleted.rowcount!=len(ids):
                 raise HTTPException(status_code=409,detail="Queue changed while Delete All was running; no queued assets were removed.")
             for asset_id,_,_,filename in staged:
