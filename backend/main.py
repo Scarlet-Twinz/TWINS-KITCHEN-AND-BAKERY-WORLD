@@ -4,6 +4,7 @@ from typing import Any
 import bcrypt, psycopg
 from fastapi import FastAPI, HTTPException, Request, Response, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
@@ -206,6 +207,73 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
             conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else None,status,uuid.UUID(item["id"])))
         conn.commit()
     return {"batchId":str(batch_id),"uploaded":uploaded,"duplicates":duplicates,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
+
+@app.get("/api/admin/media/{asset_id}/content")
+def media_content(asset_id:str,request:Request):
+    require_owner(request)
+    try:
+        asset_uuid=uuid.UUID(asset_id)
+    except ValueError:
+        raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    root=media_root().resolve()
+    with db() as conn:
+        row=conn.execute("select storage_path,mime_type,filename from media_assets where id=%s",(asset_uuid,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=404,detail="Media asset not found")
+    if row[1] not in {"image/jpeg","image/png","image/webp"}:
+        raise HTTPException(status_code=404,detail="Media asset is not an image")
+    path=Path(row[0])
+    if not path.is_absolute():
+        path=Path.cwd()/path
+    path=path.resolve()
+    try:
+        path.relative_to(root)
+    except ValueError:
+        raise HTTPException(status_code=403,detail="Media asset is outside the protected storage root")
+    if not path.is_file():
+        raise HTTPException(status_code=404,detail="Stored media asset is missing")
+    return FileResponse(path,media_type=row[1],filename=Path(row[2]).name)
+
+@app.delete("/api/admin/media/{asset_id}")
+def media_delete(asset_id:str,request:Request):
+    actor=require_owner(request)
+    try:
+        asset_uuid=uuid.UUID(asset_id)
+    except ValueError:
+        raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    root=media_root().resolve()
+    with db() as conn:
+        row=conn.execute("select id,storage_path,filename,status from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404,detail="Media asset not found")
+        mapping=conn.execute("select id from media_production_mappings where asset_id=%s",(asset_uuid,)).fetchone()
+        if row[3]=="APPROVED" or mapping:
+            raise HTTPException(status_code=409,detail="Approved or protected media assets cannot be deleted")
+        path=Path(row[1])
+        if not path.is_absolute():
+            path=Path.cwd()/path
+        path=path.resolve()
+        try:
+            path.relative_to(root)
+        except ValueError:
+            raise HTTPException(status_code=403,detail="Media asset is outside the protected storage root")
+        if not path.is_file():
+            raise HTTPException(status_code=404,detail="Stored media asset is missing")
+        trash=root/"rejected"/(".delete-"+uuid.uuid4().hex+"-"+sanitize_filename(row[2]))
+        trash.parent.mkdir(parents=True,exist_ok=True)
+        shutil.move(str(path),str(trash))
+        try:
+            deleted=conn.execute("delete from media_assets where id=%s",(asset_uuid,))
+            if deleted.rowcount!=1:
+                raise HTTPException(status_code=404,detail="Media asset not found")
+            audit_media_action(conn,actor,"MEDIA_DELETED",asset_id,{"filename":row[2],"status":row[3]})
+            conn.commit()
+        except Exception:
+            if trash.exists() and not path.exists():
+                shutil.move(str(trash),str(path))
+            raise
+    trash.unlink(missing_ok=True)
+    return {"ok":True,"status":"DELETED","assetId":asset_id}
 
 @app.get("/api/admin/media")
 def media_list(request:Request,status:str|None=None,q:str|None=None):
