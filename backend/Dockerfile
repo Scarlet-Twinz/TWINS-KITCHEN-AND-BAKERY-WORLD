@@ -9,5 +9,6 @@ COPY backend/migrations ./migrations
 COPY tools/media-ingestion ./tools/media-ingestion
 RUN test -f /app/tools/media-ingestion/index.js && test -f /app/tools/media-ingestion/validator.js && test -f /app/tools/media-ingestion/asset-intake.js
 COPY data.js ./
+COPY app.js ./
 EXPOSE 8000
 CMD ["sh","-c","python migrate.py && exec fastapi run main.py --port 8000"]
