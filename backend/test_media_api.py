@@ -125,10 +125,10 @@ class MediaApiAuthorizationTests(unittest.TestCase):
                 result=run_asset_intake(root,root/"manifest.json",report)
             self.assertEqual(result["results"],[])
             command=run.call_args.args[0]
-            expected=Path(__file__).resolve().parent.parent/"tools"/"media-ingestion"/"index.js"
+            expected=Path(__file__).resolve().parent/"tools"/"media-ingestion"/"index.js"
             self.assertEqual(Path(command[1]).resolve(),expected.resolve())
             self.assertTrue(Path(command[1]).is_absolute())
-            self.assertEqual(run.call_args.kwargs["cwd"],Path(__file__).resolve().parent.parent)
+            self.assertEqual(run.call_args.kwargs["cwd"],Path(__file__).resolve().parent)
 
     def test_catalogue_suggestions_only_use_canonical_candidates_and_max_five(self):
         from main import catalogue_suggestions
