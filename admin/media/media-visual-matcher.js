@@ -55,7 +55,7 @@
     if(Number(top.score)>=cfg.mediumThreshold&&margin>=cfg.mediumMargin){
       return{status:"MEDIUM",suggestions:clean.slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM"})),reason:"visual similarity is plausible but requires human review"};
     }
-    return{status:"UNRESOLVED",suggestions:clean.slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"LOW"})),reason:"visual evidence is insufficient or ambiguous"};
+    return{status:"UNRESOLVED",suggestions:[],reason:"visual evidence is insufficient or ambiguous"};
   }
 
   function signatureFromPixels(pixels,width,height,grid=8){
