@@ -96,6 +96,8 @@ class MediaApiAuthorizationTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             report=Path(tmp)/"report.json"
+            manifest=Path(tmp)/"manifest.json"
+            manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
             report.write_text('{"results":[{"asset":"whatsapp.jpeg","state":"UNRESOLVED","reason":"Product assignment is required for validation"}]}',encoding="utf-8")
             completed=MagicMock(returncode=1,stderr="",stdout="")
             with patch("main.subprocess.run",return_value=completed):
@@ -119,6 +121,8 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
             report=root/"report.json"
+            manifest=root/"manifest.json"
+            manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
             report.write_text('{"results":[],"counts":{}}',encoding="utf-8")
             completed=MagicMock(returncode=0,stderr="",stdout="")
             with patch("main.subprocess.run",return_value=completed) as run:
