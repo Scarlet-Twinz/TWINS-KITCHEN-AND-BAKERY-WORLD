@@ -53,7 +53,7 @@
       return{status:"HIGH",suggestions:[{...top,confidence:"HIGH"}],reason:"strong visual similarity with a clear margin"};
     }
     if(Number(top.score)>=cfg.mediumThreshold&&margin>=cfg.mediumMargin){
-      return{status:"MEDIUM",suggestions:clean.slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM"})),reason:"visual similarity is plausible but requires human review"};
+      return{status:"MEDIUM",suggestions:clean.filter(x=>Number(x.score)>=cfg.mediumThreshold).slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM"})),reason:"visual similarity is plausible but requires human review"};
     }
     return{status:"UNRESOLVED",suggestions:[],reason:"visual evidence is insufficient or ambiguous"};
   }
