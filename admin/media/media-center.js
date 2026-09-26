@@ -1,4 +1,63 @@
-const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];
+const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
+function visualReferenceUrl(product){
+  return selectedProductMedia(product);
+}
+function loadVisualSignature(url){
+  if(!visualMatcher||!url)return Promise.resolve(null);
+  const key=String(url);
+  if(visualSignatureCache.has(key))return visualSignatureCache.get(key);
+  const promise=new Promise(resolve=>{
+    const image=new Image();
+    if(/^https?:\/\//i.test(key)&&!key.startsWith(location.origin))image.crossOrigin="anonymous";
+    image.onload=()=>{
+      try{
+        const size=32,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+        const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(image,0,0,size,size);
+        resolve(visualMatcher.signatureFromPixels(ctx.getImageData(0,0,size,size).data,size,size));
+      }catch(e){resolve(null)}
+    };
+    image.onerror=()=>resolve(null);
+    image.src=key;
+  });
+  visualSignatureCache.set(key,promise);
+  return promise;
+}
+async function identifyAssetVisually(asset){
+  if(!visualMatcher||!asset||asset.productId)return null;
+  const source=await loadVisualSignature(mediaContentUrl(asset.id));
+  if(!source)return null;
+  const products=typeof P!=="undefined"&&Array.isArray(P)?P:[];
+  const ranked=[];
+  for(const product of products){
+    if(!product||product.id==null||!product.n)continue;
+    const url=visualReferenceUrl(product);
+    if(!url)continue;
+    const reference=await loadVisualSignature(url);
+    if(!reference)continue;
+    ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference)});
+  }
+  return visualMatcher.classifyVisualMatches(ranked);
+}
+async function enrichVisualSuggestions(){
+  if(!visualMatcher)return;
+  const run=++visualRun;
+  const targets=assets.filter(a=>!a.productId);
+  for(const asset of targets){
+    if(run!==visualRun)return;
+    try{
+      const result=await identifyAssetVisually(asset);
+      if(!result)continue;
+      if(result.status==="HIGH"||result.status==="MEDIUM"){
+        asset.suggestions=result.suggestions;
+        asset.suggestionSource="visual";
+      }else if(!Array.isArray(asset.suggestions)||!asset.suggestions.length){
+        asset.suggestions=[];
+        asset.suggestionSource="visual";
+      }
+      if(run===visualRun)render();
+    }catch(e){}
+  }
+}
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
 function normalizeCatalogueMediaPath(src){
   if(!src)return "";
@@ -78,7 +137,7 @@ function render(){
   $("queue").innerHTML=list.length?list.map(a=>{
     const suggestionHtml=a.productId?"":`
       <div class="suggestions">
-        <strong>Suggested products</strong>
+        <strong>Suggested products<span class="suggestion-source"> · visual matching first</span></strong>
         ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
           <div class="suggestion">
             <div>
