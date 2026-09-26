@@ -105,6 +105,26 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
+    def test_asset_intake_uses_absolute_repository_script_path(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        from main import run_asset_intake
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            report=root/"report.json"
+            report.write_text('{"results":[],"counts":{}}',encoding="utf-8")
+            completed=MagicMock(returncode=0,stderr="",stdout="")
+            with patch("main.subprocess.run",return_value=completed) as run:
+                result=run_asset_intake(root,root/"manifest.json",report)
+            self.assertEqual(result["results"],[])
+            command=run.call_args.args[0]
+            expected=Path(__file__).resolve().parent.parent/"tools"/"media-ingestion"/"index.js"
+            self.assertEqual(Path(command[1]).resolve(),expected.resolve())
+            self.assertTrue(Path(command[1]).is_absolute())
+            self.assertEqual(run.call_args.kwargs["cwd"],Path(__file__).resolve().parent.parent)
+
     def test_catalogue_suggestions_only_use_canonical_candidates_and_max_five(self):
         from main import catalogue_suggestions
         asset={"filename":"commercial bread slicer.jpg","provenance":"","sourceUrl":"","license":"","attribution":"","role":"primary"}
