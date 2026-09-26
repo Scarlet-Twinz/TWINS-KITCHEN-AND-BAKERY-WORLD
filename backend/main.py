@@ -113,7 +113,11 @@ def audit_media_action(conn,actor,action,asset_id=None,metadata=None):
                  (uuid.UUID(actor["sub"]),action,uuid.UUID(asset_id) if asset_id else None,json.dumps(metadata or {})))
 
 def run_asset_intake(batch_dir,manifest_path,report_path):
-    command=[settings.media_node_command,"tools/media-ingestion/index.js","asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
+    repo_root=Path(__file__).resolve().parent.parent
+    intake_script=repo_root/"tools"/"media-ingestion"/"index.js"
+    if not intake_script.is_file():
+        raise HTTPException(status_code=500,detail="Asset-intake service is not installed in the backend image")
+    command=[settings.media_node_command,str(intake_script),"asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
     result=subprocess.run(command,cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=120)
     if result.returncode != 0:
         details=""
