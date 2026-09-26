@@ -125,6 +125,20 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         asset={"filename":"WhatsApp Image 2026-09-19 at 2.27.49 PM.jpeg","provenance":"","sourceUrl":"","license":"","attribution":"","role":"primary"}
         self.assertEqual(catalogue_suggestions(asset,[{"id":1,"n":"Mixer"},{"id":2,"n":"Dishwasher"}]),[])
 
+    def test_media_list_stays_available_when_catalogue_suggestions_service_is_unavailable(self):
+        from unittest.mock import MagicMock, patch
+        token=sign_session(str(uuid.uuid4()),"owner")
+        conn=MagicMock()
+        conn.__enter__.return_value=conn
+        conn.__exit__.return_value=False
+        rows=MagicMock()
+        rows.fetchall.return_value=[]
+        conn.execute.return_value=rows
+        with patch("main.db",return_value=conn), patch("main.catalogue_products",side_effect=__import__("fastapi").HTTPException(status_code=503,detail="Catalogue validation service is unavailable")):
+            r=self.client.get("/api/admin/media",cookies={"twins_session":token})
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["assets"],[])
+
     def test_non_owner_upload_returns_403(self):
         token=sign_session(str(uuid.uuid4()),"admin")
         r=self.client.post("/api/admin/media/upload",cookies={"twins_session":token})
