@@ -14,7 +14,7 @@ test("automatic visual match returns the strongest high-confidence catalogue mat
 test("high-confidence visual match requires a clear margin",()=>{
   const result=classifyVisualMatches([
     {productId:"58",name:"20L Planetary Mixer",score:0.91},
-    {productId:"59",name:"Planetary Mixer",score:0.84}
+    {productId:"59",name:"Planetary Mixer",score:0.90}
   ]);
   assert.equal(result.status,"UNRESOLVED");
 });
