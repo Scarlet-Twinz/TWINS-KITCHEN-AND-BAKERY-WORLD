@@ -24,7 +24,8 @@ test("high-confidence visual match requires a clear margin",()=>{
 test("medium visual match returns candidates for human review",()=>{
   const result=classifyVisualMatches([
     {productId:"58",name:"20L Planetary Mixer",score:0.80},
-    {productId:"59",name:"Planetary Mixer",score:0.75}
+    {productId:"59",name:"Planetary Mixer",score:0.75},
+    {productId:"33",name:"Commercial Dishwasher",score:0.40}
   ]);
   assert.equal(result.status,"MEDIUM");
   assert.deepEqual(result.suggestions.map(x=>x.productId),["58","59"]);
