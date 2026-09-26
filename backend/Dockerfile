@@ -6,7 +6,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/main.py backend/media_center.py backend/create_owner.py backend/migrate.py ./
 COPY backend/test_*.py ./
 COPY backend/migrations ./migrations
-COPY tools ./tools
+COPY tools/media-ingestion ./tools/media-ingestion
+RUN test -f /app/tools/media-ingestion/index.js && test -f /app/tools/media-ingestion/validator.js && test -f /app/tools/media-ingestion/asset-intake.js
 COPY data.js ./
 EXPOSE 8000
 CMD ["sh","-c","python migrate.py && exec fastapi run main.py --port 8000"]
