@@ -117,8 +117,23 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
     intake_script=repo_root/"tools"/"media-ingestion"/"index.js"
     if not intake_script.is_file():
         raise HTTPException(status_code=500,detail="Asset-intake service is not installed in the backend image")
+    batch_dir=Path(batch_dir).resolve()
+    manifest_path=Path(manifest_path).resolve()
+    report_path=Path(report_path).resolve()
+    if not batch_dir.is_dir():
+        raise HTTPException(status_code=422,detail=f"Asset-intake batch directory is missing: {batch_dir}")
+    if not manifest_path.is_file():
+        raise HTTPException(status_code=422,detail=f"Asset-intake manifest is missing: {manifest_path}")
     command=[settings.media_node_command,str(intake_script),"asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
-    result=subprocess.run(command,cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=120)
+    try:
+        result=subprocess.run(command,cwd=repo_root,text=True,capture_output=True,timeout=120)
+    except subprocess.TimeoutExpired as exc:
+        details=(exc.stderr or exc.stdout or "").strip() if isinstance(exc.stderr,str) or isinstance(exc.stdout,str) else ""
+        if not details:
+            details="asset-intake exceeded the 120-second execution limit"
+        raise HTTPException(status_code=422,detail=f"Asset-intake validation failed: {details}")
+    except OSError as exc:
+        raise HTTPException(status_code=500,detail=f"Unable to start asset-intake service: {exc}")
     if result.returncode != 0:
         details=""
         if report_path.exists():
@@ -133,8 +148,15 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         message="Asset-intake validation failed"
         if details: message+=": "+details
         raise HTTPException(status_code=422,detail=message)
-    return json.loads(report_path.read_text(encoding="utf-8"))
-
+    if not report_path.is_file():
+        details=(result.stderr or result.stdout or "").strip()
+        message="Asset-intake completed without producing a report"
+        if details: message+=f": {details}"
+        raise HTTPException(status_code=500,detail=message)
+    try:
+        return json.loads(report_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}")
 def media_metadata_from_row(row):
     return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
 
