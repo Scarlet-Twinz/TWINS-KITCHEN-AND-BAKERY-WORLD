@@ -105,6 +105,11 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
+    def test_asset_intake_script_exists_in_repository(self):
+        from pathlib import Path
+        script=Path(__file__).resolve().parent.parent/"tools"/"media-ingestion"/"index.js"
+        self.assertTrue(script.is_file(), f"Missing asset-intake script: {script}")
+
     def test_asset_intake_uses_absolute_repository_script_path(self):
         import tempfile
         from pathlib import Path
