@@ -105,6 +105,26 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
+    def test_catalogue_suggestions_only_use_canonical_candidates_and_max_five(self):
+        from main import catalogue_suggestions
+        asset={"filename":"commercial bread slicer.jpg","provenance":"","sourceUrl":"","license":"","attribution":"","role":"primary"}
+        products=[{"id":i,"n":("Commercial Bread Slicer" if i==303 else "Commercial Bread Cutter" if i==304 else "Bread Slicer Model "+str(i)),"category":"Bakery Equipment"} for i in range(1,9)]
+        suggestions=catalogue_suggestions(asset,products)
+        self.assertLessEqual(len(suggestions),5)
+        self.assertTrue(all(str(x["productId"]) in {str(p["id"]) for p in products} for x in suggestions))
+
+    def test_catalogue_suggestions_do_not_assign_assets(self):
+        from main import catalogue_suggestions
+        asset={"filename":"cup sealer.jpg","provenance":"","sourceUrl":"","license":"","attribution":"","role":"primary","productId":None}
+        suggestions=catalogue_suggestions(asset,[{"id":58,"n":"Cup Sealing Machine","category":"Packaging Equipment"}])
+        self.assertEqual(suggestions[0]["productId"],"58")
+        self.assertIsNone(asset["productId"])
+
+    def test_catalogue_suggestions_whatsapp_filename_is_unresolved_without_other_evidence(self):
+        from main import catalogue_suggestions
+        asset={"filename":"WhatsApp Image 2026-09-19 at 2.27.49 PM.jpeg","provenance":"","sourceUrl":"","license":"","attribution":"","role":"primary"}
+        self.assertEqual(catalogue_suggestions(asset,[{"id":1,"n":"Mixer"},{"id":2,"n":"Dishwasher"}]),[])
+
     def test_non_owner_upload_returns_403(self):
         token=sign_session(str(uuid.uuid4()),"admin")
         r=self.client.post("/api/admin/media/upload",cookies={"twins_session":token})

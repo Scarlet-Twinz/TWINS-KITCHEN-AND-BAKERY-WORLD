@@ -63,6 +63,43 @@ def media_root():
         (root/name).mkdir(parents=True,exist_ok=True)
     return root
 
+def catalogue_products():
+    script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); console.log(JSON.stringify(loadCatalogue().P));"
+    try:
+        result=subprocess.run([settings.media_node_command,"-e",script],cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=15,check=True)
+        return json.loads(result.stdout.strip() or "[]")
+    except Exception:
+        raise HTTPException(status_code=503,detail="Catalogue validation service is unavailable")
+
+def _suggestion_tokens(value):
+    import re
+    stop={"the","and","for","with","from","this","that","image","photo","commercial","machine","equipment"}
+    return {x for x in re.findall(r"[a-z0-9]+",str(value or "").lower()) if len(x)>=3 and x not in stop}
+
+def catalogue_suggestions(asset,products,max_results=5):
+    evidence=" ".join(str(asset.get(k) or "") for k in ("filename","provenance","sourceUrl","license","attribution","role"))
+    evidence_tokens=_suggestion_tokens(evidence)
+    if not evidence_tokens:
+        return []
+    scored=[]
+    for product in products:
+        if not isinstance(product,dict) or product.get("id") is None or not product.get("n"):
+            continue
+        fields=[]
+        for key,value in product.items():
+            if key in {"i","media"}: continue
+            if isinstance(value,(str,int,float)): fields.append(str(value))
+            elif isinstance(value,list): fields.extend(str(x) for x in value if isinstance(x,(str,int,float)))
+        product_tokens=_suggestion_tokens(" ".join(fields))
+        overlap=evidence_tokens & product_tokens
+        if not overlap: continue
+        score=min(0.99,0.45+(0.12*len(overlap))+(0.08 if str(product.get("n","")).lower() in evidence.lower() else 0))
+        band="HIGH" if score>=0.78 else "MEDIUM" if score>=0.60 else "LOW"
+        category=product.get("category") or product.get("categoryName") or product.get("c") or product.get("tag") or ""
+        scored.append((score,{"productId":str(product["id"]),"name":str(product["n"]),"category":str(category) if category else "","confidence":band,"score":round(score,3),"evidence":sorted(overlap)}))
+    scored.sort(key=lambda x:(-x[0],x[1]["name"],x[1]["productId"]))
+    return [x[1] for x in scored[:max_results]]
+
 def catalogue_product(product_id):
     script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); const p=loadCatalogue().P.find(x=>String(x.id)===String(process.argv[1])); console.log(JSON.stringify(p||null));"
     try:
@@ -343,7 +380,13 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
         rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at
         from media_assets where (nullif(%s,'')::text is null or status=%s) and (nullif(%s,'')::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
-    return {"assets":[media_metadata_from_row(r) for r in rows]}
+    products=catalogue_products()
+    assets=[]
+    for row in rows:
+        item=media_metadata_from_row(row)
+        item["suggestions"]=[] if item["productId"] else catalogue_suggestions(item,products)
+        assets.append(item)
+    return {"assets":assets}
 
 @app.patch("/api/admin/media/{asset_id}")
 def media_update(asset_id:str,request:Request,payload:dict):
