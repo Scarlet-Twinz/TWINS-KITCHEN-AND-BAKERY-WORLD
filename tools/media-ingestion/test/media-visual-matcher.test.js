@@ -53,9 +53,8 @@ test("visual signatures and similarity are deterministic",()=>{
   assert.equal(visualSimilarity(a,b),1);
 });
 
-test("manual picker remains independent of visual confidence",()=>{
+test("low-confidence visual evidence remains unresolved without a suggested product",()=>{
   const unresolved=classifyVisualMatches([{productId:"58",name:"20L Planetary Mixer",score:0.40}]);
   assert.equal(unresolved.status,"UNRESOLVED");
-  assert.equal(unresolved.suggestions.length,1);
-  assert.equal(unresolved.suggestions[0].confidence,"LOW");
+  assert.deepEqual(unresolved.suggestions,[]);
 });
