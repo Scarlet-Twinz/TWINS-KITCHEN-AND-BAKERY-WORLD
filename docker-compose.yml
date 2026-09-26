@@ -31,6 +31,7 @@ services:
       - "8000:8000"
     volumes:
       - twins_media_intake:/app/storage/media-intake
+      - ./tools/media-ingestion:/app/tools/media-ingestion:ro
     depends_on:
       postgres:
         condition: service_healthy
