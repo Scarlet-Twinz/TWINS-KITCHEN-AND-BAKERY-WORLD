@@ -27,14 +27,16 @@ async function identifyAssetVisually(asset){
   const source=await loadVisualSignature(mediaContentUrl(asset.id));
   if(!source)return null;
   const products=typeof P!=="undefined"&&Array.isArray(P)?P:[];
+  const candidates=products.map(product=>({product,url:visualReferenceUrl(product)})).filter(x=>x.product&&x.product.id!=null&&x.product.n&&x.url);
   const ranked=[];
-  for(const product of products){
-    if(!product||product.id==null||!product.n)continue;
-    const url=visualReferenceUrl(product);
-    if(!url)continue;
-    const reference=await loadVisualSignature(url);
-    if(!reference)continue;
-    ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference)});
+  for(let start=0;start<candidates.length;start+=8){
+    const batch=candidates.slice(start,start+8);
+    const refs=await Promise.all(batch.map(x=>loadVisualSignature(x.url)));
+    refs.forEach((reference,index)=>{
+      const product=batch[index].product;
+      if(!reference)return;
+      ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference)});
+    });
   }
   return visualMatcher.classifyVisualMatches(ranked);
 }
