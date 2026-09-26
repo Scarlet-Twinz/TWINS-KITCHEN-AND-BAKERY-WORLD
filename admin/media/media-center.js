@@ -310,4 +310,16 @@ $("refresh").addEventListener("click",async()=>{
   try{await refresh(false);setQueueFeedback("Queue refreshed","success")}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
   finally{button.disabled=false;button.textContent="Refresh queue"}
 });
-(async()=>{try{const d=await api("/api/account/me");if(d.user.role!=="owner")throw new Error("Owner access required");$("identity").textContent=d.user.name+" · OWNER";$("app").classList.remove("hidden");await refresh()}catch(e){$("locked").classList.remove("hidden")}})();
+(async()=>{
+  try{
+    const d=await api("/api/account/me");
+    if(d.user.role!=="owner")throw new Error("Owner access required");
+    $("identity").textContent=d.user.name+" · OWNER";
+    $("locked").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    await refresh();
+  }catch(e){
+    $("app").classList.add("hidden");
+    $("locked").classList.remove("hidden");
+  }
+})();
