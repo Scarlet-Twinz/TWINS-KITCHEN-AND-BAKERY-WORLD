@@ -1,3 +1,5 @@
+const fs=require("node:fs");
+const path=require("node:path");
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const {classifyVisualMatches,visualSimilarity,signatureFromPixels}=require("../../../admin/media/media-visual-matcher.js");
@@ -51,6 +53,13 @@ test("visual signatures and similarity are deterministic",()=>{
   const a=signatureFromPixels(pixels,2,2);
   const b=signatureFromPixels(pixels,2,2);
   assert.equal(visualSimilarity(a,b),1);
+});
+
+test("Media Center makes visual matching primary and keeps manual picker as fallback",()=>{
+  const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
+  assert.match(source,/await enrichVisualSuggestions\(\)/);
+  assert.match(source,/a\.suggestions=\[\];/);
+  assert.match(source,/function selectCatalogueProduct\(/);
 });
 
 test("low-confidence visual evidence remains unresolved without a suggested product",()=>{
