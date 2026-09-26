@@ -72,7 +72,31 @@ function setUploadFeedback(message,type){
   node.className="operation-feedback "+(type||"");
   node.textContent=message||"";
 }
-function render(){const q=$("search").value.trim().toLowerCase(),s=$("status").value;const list=assets.filter(a=>(!q||a.filename.toLowerCase().includes(q)||(a.productId??"").toString().includes(q)||productLabel(a.productId).toLowerCase().includes(q)));$("queue").innerHTML=list.length?list.map(a=>'<article class="asset-card"><div class="asset-thumb">'+(a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+'</div><div class="asset-meta"><strong>'+escapeHtml(a.filename)+'</strong><span class="badge">'+escapeHtml(a.status)+'</span><small>Product: '+escapeHtml(productLabel(a.productId))+' · '+a.width+'×'+a.height+' · '+escapeHtml(a.sha256.slice(0,16))+'…</small><small>Rights: '+escapeHtml(a.rightsStatus)+' · Source: '+escapeHtml(a.sourceType)+'</small><small>'+escapeHtml(a.provenance||"No provenance recorded")+'</small></div><div class="actions">'+(a.productId?"":"<div class=\"suggestions\"><strong>Suggested products</strong>"+(Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>'<div class=\"suggestion\"><div><strong>'+escapeHtml((i+1)+". "+s.name)+'</strong><span>ID: '+escapeHtml(s.productId)+(s.category?' · '+escapeHtml(s.category):"")+' · Confidence: '+escapeHtml(s.confidence)+'</span></div><button type=\"button\" class=\"btn light\" data-suggestion-asset=\"'+escapeHtml(a.id)+'\" data-suggestion-product=\"'+escapeHtml(s.productId)+'\" onclick=\"selectSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)\">Select</button></div>').join(""):'<div class=\"suggestion-empty\">UNRESOLVED — insufficient local catalogue evidence.</div>')+'<button type=\"button\" class=\"btn light\" onclick=\"keepUnresolved(this)\">Keep Unresolved</button></div>")+'+productPickerHtml(a)+'<input data-id="'+a.id+'" data-field="role" value="'+escapeHtml(a.role)+'" placeholder="role"><button class="btn light" data-action-id="'+a.id+'" onclick="updateAsset(this.dataset.actionId)">Save metadata</button><button class="btn light" data-action-id="'+a.id+'" onclick="revalidate(this.dataset.actionId)">Revalidate</button><button class="btn red" data-action-id="'+a.id+'" onclick="approveAsset(this.dataset.actionId)">Owner approve</button><button class="btn light" data-action-id="'+a.id+'" onclick="rejectAsset(this.dataset.actionId)">Reject</button><button class="btn light danger-outline" data-action-id="'+a.id+'" onclick="deleteAsset(this.dataset.actionId)">Delete</button><div class="action-status" data-status-id="'+a.id+'" aria-live="polite"></div></div></article>').join(""):'<div class="panel"><h3>No media assets match.</h3><p class="muted">Upload a batch or change the filters.</p></div>'}
+function render(){
+  const q=$("search").value.trim().toLowerCase();
+  const list=assets.filter(a=>!q||a.filename.toLowerCase().includes(q)||(a.productId??"").toString().includes(q)||productLabel(a.productId).toLowerCase().includes(q));
+  $("queue").innerHTML=list.length?list.map(a=>{
+    const suggestionHtml=a.productId?"":`
+      <div class="suggestions">
+        <strong>Suggested products</strong>
+        ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
+          <div class="suggestion">
+            <div>
+              <strong>${escapeHtml((i+1)+". "+s.name)}</strong>
+              <span>ID: ${escapeHtml(s.productId)}${s.category?" · "+escapeHtml(s.category):""} · Confidence: ${escapeHtml(s.confidence)}</span>
+            </div>
+            <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(s.productId)}" onclick="selectSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Select</button>
+          </div>
+        `).join(""):'<div class="suggestion-empty">UNRESOLVED — insufficient local catalogue evidence.</div>'}
+        <button type="button" class="btn light" onclick="keepUnresolved(this)">Keep Unresolved</button>
+      </div>`;
+    return '<article class="asset-card"><div class="asset-thumb">'+
+      (a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+
+      '</div><div class="asset-meta"><strong>'+escapeHtml(a.filename)+'</strong><span class="badge">'+escapeHtml(a.status)+'</span><small>Product: '+escapeHtml(productLabel(a.productId))+' · '+a.width+'×'+a.height+' · '+escapeHtml(a.sha256.slice(0,16))+'…</small><small>Rights: '+escapeHtml(a.rightsStatus)+' · Source: '+escapeHtml(a.sourceType)+'</small><small>'+escapeHtml(a.provenance||"No provenance recorded")+'</small></div><div class="actions">'+
+      suggestionHtml+productPickerHtml(a)+
+      '<input data-id="'+a.id+'" data-field="role" value="'+escapeHtml(a.role)+'" placeholder="role"><button class="btn light" data-action-id="'+a.id+'" onclick="updateAsset(this.dataset.actionId)">Save metadata</button><button class="btn light" data-action-id="'+a.id+'" onclick="revalidate(this.dataset.actionId)">Revalidate</button><button class="btn red" data-action-id="'+a.id+'" onclick="approveAsset(this.dataset.actionId)">Owner approve</button><button class="btn light" data-action-id="'+a.id+'" onclick="rejectAsset(this.dataset.actionId)">Reject</button><button class="btn light danger-outline" data-action-id="'+a.id+'" onclick="deleteAsset(this.dataset.actionId)">Delete</button><div class="action-status" data-status-id="'+a.id+'" aria-live="polite"></div></div></article>';
+  }).join(""):'<div class="panel"><h3>No media assets match.</h3><p class="muted">Upload a batch or change the filters.</p></div>';
+}
 async function refresh(showFeedback=false){
   try{
     const d=await api("/api/admin/media?status="+encodeURIComponent($("status").value)+"&q="+encodeURIComponent($("search").value));
