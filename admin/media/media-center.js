@@ -41,24 +41,27 @@ async function identifyAssetVisually(asset){
   return visualMatcher.classifyVisualMatches(ranked);
 }
 async function enrichVisualSuggestions(){
-  if(!visualMatcher)return;
+  if(!visualMatcher)return false;
   const run=++visualRun;
   const targets=assets.filter(a=>!a.productId);
   for(const asset of targets){
-    if(run!==visualRun)return;
+    if(run!==visualRun)return false;
     try{
       const result=await identifyAssetVisually(asset);
-      if(!result)continue;
-      if(result.status==="HIGH"||result.status==="MEDIUM"){
-        asset.suggestions=result.suggestions;
-        asset.suggestionSource="visual";
-      }else if(!Array.isArray(asset.suggestions)||!asset.suggestions.length){
-        asset.suggestions=[];
-        asset.suggestionSource="visual";
-      }
+      asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
+      asset.suggestionSource="visual";
+      asset.suggestionStatus=result?.status||"UNRESOLVED";
+      asset.suggestionReason=result?.reason||"visual evidence unavailable";
       if(run===visualRun)render();
-    }catch(e){}
+    }catch(e){
+      asset.suggestions=[];
+      asset.suggestionSource="visual";
+      asset.suggestionStatus="UNRESOLVED";
+      asset.suggestionReason="visual matching could not inspect the uploaded image";
+      if(run===visualRun)render();
+    }
   }
+  return true;
 }
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
 function normalizeCatalogueMediaPath(src){
@@ -162,7 +165,16 @@ async function refresh(showFeedback=false){
   try{
     const d=await api("/api/admin/media?status="+encodeURIComponent($("status").value)+"&q="+encodeURIComponent($("search").value));
     assets=d.assets||[];
-    render();
+    if(visualMatcher){
+      assets.filter(a=>!a.productId).forEach(a=>{
+        a.suggestions=[];
+        a.suggestionSource="visual";
+        a.suggestionStatus="UNRESOLVED";
+      });
+      await enrichVisualSuggestions();
+    }else{
+      render();
+    }
     if(showFeedback)setQueueFeedback("Queue refreshed","success");
     return d;
   }catch(e){
