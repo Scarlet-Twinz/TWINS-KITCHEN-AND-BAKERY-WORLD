@@ -87,6 +87,24 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(r.json()["status"],"DELETED")
             self.assertFalse(image.exists())
 
+
+    def test_asset_intake_failure_returns_underlying_reason(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        from fastapi import HTTPException
+
+        with tempfile.TemporaryDirectory() as tmp:
+            report=Path(tmp)/"report.json"
+            report.write_text('{"results":[{"asset":"whatsapp.jpeg","state":"UNRESOLVED","reason":"Product assignment is required for validation"}]}',encoding="utf-8")
+            completed=MagicMock(returncode=1,stderr="",stdout="")
+            with patch("main.subprocess.run",return_value=completed):
+                from main import run_asset_intake
+                with self.assertRaises(HTTPException) as ctx:
+                    run_asset_intake(Path(tmp),Path(tmp)/"manifest.json",report)
+            self.assertEqual(ctx.exception.status_code,422)
+            self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
+
     def test_non_owner_upload_returns_403(self):
         token=sign_session(str(uuid.uuid4()),"admin")
         r=self.client.post("/api/admin/media/upload",cookies={"twins_session":token})

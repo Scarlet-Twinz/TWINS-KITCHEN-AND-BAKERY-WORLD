@@ -79,7 +79,19 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
     command=[settings.media_node_command,"tools/media-ingestion/index.js","asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
     result=subprocess.run(command,cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=120)
     if result.returncode != 0:
-        raise HTTPException(status_code=422,detail="Asset-intake validation failed")
+        details=""
+        if report_path.exists():
+            try:
+                failed_report=json.loads(report_path.read_text(encoding="utf-8"))
+                reasons=[str(item.get("reason","")).strip() for item in failed_report.get("results",[]) if item.get("reason")]
+                if reasons: details="; ".join(dict.fromkeys(reasons))
+            except Exception:
+                pass
+        if not details:
+            details=(result.stderr or result.stdout or "").strip()
+        message="Asset-intake validation failed"
+        if details: message+=": "+details
+        raise HTTPException(status_code=422,detail=message)
     return json.loads(report_path.read_text(encoding="utf-8"))
 
 def media_metadata_from_row(row):
