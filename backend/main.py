@@ -380,7 +380,12 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
         rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at
         from media_assets where (nullif(%s,'')::text is null or status=%s) and (nullif(%s,'')::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
-    products=catalogue_products()
+    try:
+        products=catalogue_products()
+    except HTTPException as exc:
+        if exc.status_code != 503:
+            raise
+        products=[]
     assets=[]
     for row in rows:
         item=media_metadata_from_row(row)
