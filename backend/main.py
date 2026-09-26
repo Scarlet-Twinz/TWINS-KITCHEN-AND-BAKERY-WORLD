@@ -66,7 +66,7 @@ def media_root():
 def catalogue_products():
     script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); console.log(JSON.stringify(loadCatalogue().P));"
     try:
-        result=subprocess.run([settings.media_node_command,"-e",script],cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=15,check=True)
+        result=subprocess.run([settings.media_node_command,"-e",script],cwd=Path(__file__).resolve().parent,text=True,capture_output=True,timeout=15,check=True)
         return json.loads(result.stdout.strip() or "[]")
     except Exception:
         raise HTTPException(status_code=503,detail="Catalogue validation service is unavailable")
@@ -103,7 +103,7 @@ def catalogue_suggestions(asset,products,max_results=5):
 def catalogue_product(product_id):
     script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); const p=loadCatalogue().P.find(x=>String(x.id)===String(process.argv[1])); console.log(JSON.stringify(p||null));"
     try:
-        result=subprocess.run([settings.media_node_command,"-e",script,str(product_id)],cwd=Path(__file__).resolve().parent.parent,text=True,capture_output=True,timeout=15,check=True)
+        result=subprocess.run([settings.media_node_command,"-e",script,str(product_id)],cwd=Path(__file__).resolve().parent,text=True,capture_output=True,timeout=15,check=True)
         return json.loads(result.stdout.strip() or "null")
     except Exception:
         raise HTTPException(status_code=503,detail="Catalogue validation service is unavailable")
@@ -113,7 +113,7 @@ def audit_media_action(conn,actor,action,asset_id=None,metadata=None):
                  (uuid.UUID(actor["sub"]),action,uuid.UUID(asset_id) if asset_id else None,json.dumps(metadata or {})))
 
 def run_asset_intake(batch_dir,manifest_path,report_path):
-    repo_root=Path(__file__).resolve().parent.parent
+    repo_root=Path(__file__).resolve().parent
     intake_script=repo_root/"tools"/"media-ingestion"/"index.js"
     if not intake_script.is_file():
         raise HTTPException(status_code=500,detail="Asset-intake service is not installed in the backend image")
