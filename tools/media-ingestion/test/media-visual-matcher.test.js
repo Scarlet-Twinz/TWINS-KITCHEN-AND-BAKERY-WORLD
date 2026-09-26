@@ -1,6 +1,6 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {classifyVisualMatches,visualSimilarity,signatureFromPixels}=require("../../admin/media/media-visual-matcher.js");
+const {classifyVisualMatches,visualSimilarity,signatureFromPixels}=require("../../../admin/media/media-visual-matcher.js");
 
 test("automatic visual match returns the strongest high-confidence catalogue match",()=>{
   const result=classifyVisualMatches([
