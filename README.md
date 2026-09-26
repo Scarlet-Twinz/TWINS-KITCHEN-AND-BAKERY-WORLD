@@ -27,34 +27,9 @@ A commerce-style static storefront for **Twins Kitchen**, designed around profes
 - External reference imagery is clearly labelled separately from supplied Twins media
 - Red / white / black visual system ready for the final Twins logo
 
-## Run locally in VS Code
+## Local development
 
-### 1. Clone the repository
-
-Open PowerShell or the VS Code terminal and run:
-
-```powershell
-cd Desktop
-git clone https://github.com/Scarlet-Twinz/TWINS-KITCHEN-AND-BAKERY-WORLD.git
-cd TWINS-KITCHEN-AND-BAKERY-WORLD
-code .
-```
-
-If your Projects folder is elsewhere, replace `Desktop` with that location.
-
-### 2. Open the site
-
-In VS Code, install **Live Server** if you do not already have it.
-
-Then:
-
-1. Open `index.html`.
-2. Right-click inside the file.
-3. Choose **Open with Live Server**.
-4. The storefront will open in your browser.
-5. Click through the catalogue, product pages, saved products, comparison, cart, planner and dashboard.
-
-You can also open the repository normally in VS Code without Live Server and edit the files directly.
+This repository is proprietary. Development access and setup instructions are intentionally kept out of the public README.
 
 ## Important architecture decision
 
