@@ -62,11 +62,20 @@ def media_root():
     for name in ("incoming","processed","rejected","duplicates","manifests"):
         (root/name).mkdir(parents=True,exist_ok=True)
     return root
+def repository_root():
+    root=Path(__file__).resolve().parent
+    if (root/"tools"/"media-ingestion"/"index.js").is_file():
+        return root
+    parent=root.parent
+    if (parent/"tools"/"media-ingestion"/"index.js").is_file():
+        return parent
+    return root
+
 
 def catalogue_products():
     script="const {loadCatalogue}=require('./tools/media-ingestion/validator'); console.log(JSON.stringify(loadCatalogue().P));"
     try:
-        result=subprocess.run([settings.media_node_command,"-e",script],cwd=Path(__file__).resolve().parent,text=True,capture_output=True,timeout=15,check=True)
+        result=subprocess.run([settings.media_node_command,"-e",script],cwd=repository_root(),text=True,capture_output=True,timeout=15,check=True)
         return json.loads(result.stdout.strip() or "[]")
     except Exception:
         raise HTTPException(status_code=503,detail="Catalogue validation service is unavailable")
@@ -113,7 +122,7 @@ def audit_media_action(conn,actor,action,asset_id=None,metadata=None):
                  (uuid.UUID(actor["sub"]),action,uuid.UUID(asset_id) if asset_id else None,json.dumps(metadata or {})))
 
 def run_asset_intake(batch_dir,manifest_path,report_path):
-    repo_root=Path(__file__).resolve().parent
+    repo_root=repository_root()
     intake_script=repo_root/"tools"/"media-ingestion"/"index.js"
     if not intake_script.is_file():
         raise HTTPException(status_code=500,detail="Asset-intake service is not installed in the backend image")
