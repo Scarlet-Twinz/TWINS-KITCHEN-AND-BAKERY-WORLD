@@ -18,6 +18,29 @@ test("reference ranking deduplicates multiple images for one product",()=>{
   assert.equal(ranked[0].score,0.83);
 });
 
+test("product-level aggregation retains multiple supporting references",()=>{
+  const ranked=matcher.rankVisualMatches([
+    {productId:"60",name:"30kg Planetary Mixer",score:0.91,referenceUrl:"/a.jpg"},
+    {productId:"60",name:"30kg Planetary Mixer",score:0.88,referenceUrl:"/b.jpg"},
+    {productId:"61",name:"40kg Planetary Mixer",score:0.89,referenceUrl:"/c.jpg"}
+  ]);
+  assert.equal(ranked[0].productId,"60");
+  assert.equal(ranked[0].supportingReferenceCount,2);
+  assert.equal(ranked[0].supportingReferences.length,2);
+  assert.equal(ranked[0].supportingReferences[0].referenceUrl,"/a.jpg");
+});
+
+test("high-confidence result exposes supporting-reference evidence",()=>{
+  const result=matcher.classifyVisualMatches([
+    {productId:"60",name:"30kg Planetary Mixer",score:0.91,referenceUrl:"/a.jpg"},
+    {productId:"60",name:"30kg Planetary Mixer",score:0.88,referenceUrl:"/b.jpg"},
+    {productId:"61",name:"40kg Planetary Mixer",score:0.70,referenceUrl:"/c.jpg"}
+  ]);
+  assert.equal(result.status,"HIGH");
+  assert.equal(result.suggestions[0].supportingReferenceCount,2);
+  assert.equal(result.suggestions[0].supportingReferences.length,2);
+});
+
 test("clear top embedding candidate is HIGH",()=>{
   const result=matcher.classifyVisualMatches([
     {productId:"58",name:"20L Planetary Mixer",score:0.91},
