@@ -328,6 +328,40 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         self.assertEqual(r.status_code,200)
         self.assertEqual(r.json()["assets"],[])
 
+    def test_owner_upload_without_product_id_creates_unresolved_asset_without_running_asset_intake(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        import io
+
+        actor_id=uuid.uuid4()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            lookup=MagicMock()
+            lookup.fetchone.return_value=None
+            conn.execute.return_value=lookup
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake") as intake:
+                r=self.client.post(
+                    "/api/admin/media/upload",
+                    cookies={"twins_session":token},
+                    files={"files":("new-product.png",io.BytesIO(bytes([137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,160,0,0,0,160,8,2,0,0,0,0,0,0,0,0,73,69,78,68,174,66,96,130])),"image/png")},
+                    data={"metadata":'{"sourceType":"owned","rightsStatus":"owned","provenance":"owner upload"}'}
+                )
+            self.assertEqual(r.status_code,201)
+            self.assertEqual(len(r.json()["uploaded"]),1)
+            intake.assert_not_called()
+            insert_calls=[call for call in conn.execute.call_args_list if "insert into media_assets" in str(call.args[0]).lower()]
+            self.assertEqual(len(insert_calls),1)
+            params=insert_calls[0].args[1]
+            self.assertIsNone(params[1])
+            self.assertEqual(params[16],"REVIEW")
+            self.assertEqual(params[17],"UNRESOLVED")
+            self.assertEqual(params[18],"UNREVIEWED")
+
     def test_non_owner_upload_returns_403(self):
         token=sign_session(str(uuid.uuid4()),"admin")
         r=self.client.post("/api/admin/media/upload",cookies={"twins_session":token})
