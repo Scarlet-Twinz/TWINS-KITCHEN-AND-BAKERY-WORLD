@@ -171,6 +171,40 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         self.assertEqual(r.json()["result"]["productId"],"94")
         self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
 
+    def test_revalidate_unresolved_maps_to_canonical_review_and_preserves_assignment(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        batch_id=uuid.uuid4()
+        existing_product_id=303
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            image=root/"incoming"/str(batch_id)/"uploaded.jpg"
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b"fake-jpeg")
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            conn.execute.return_value.fetchone.return_value=(asset_id,existing_product_id,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
+            report={"results":[{"asset":"uploaded.jpg","productId":None,"state":"UNRESOLVED","reason":"No sufficiently strong visual match"}],"counts":{"UNRESOLVED":1}}
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",return_value=report):
+                r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["status"],"REVIEW")
+        self.assertEqual(r.json()["result"]["state"],"UNRESOLVED")
+        self.assertIsNone(r.json()["result"]["productId"])
+        self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
+        update_calls=[call for call in conn.execute.call_args_list if str(call.args[0]).lower().startswith("update media_assets set")]
+        self.assertEqual(len(update_calls),1)
+        params=update_calls[0].args[1]
+        self.assertEqual(params[0],existing_product_id)
+        self.assertEqual(params[1],"REVIEW")
+        self.assertNotEqual(params[1],"UNRESOLVED")
+
     def test_revalidate_unexpected_failure_returns_structured_json_500_with_cors(self):
         import tempfile
         from pathlib import Path
