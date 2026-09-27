@@ -465,6 +465,7 @@ def media_revalidate(asset_id:str,request:Request):
         asset_uuid=uuid.UUID(asset_id)
         stage="load media asset"
         root=media_root()
+        (root/"manifests").mkdir(parents=True,exist_ok=True)
         with db() as conn:
             row=conn.execute("""select id,product_legacy_id,filename,storage_path,source_type,rights_status,provenance,source_url,license,attribution,role,batch_id
             from media_assets where id=%s""",(asset_uuid,)).fetchone()
