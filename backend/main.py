@@ -138,6 +138,7 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         raise HTTPException(status_code=422,detail=f"Asset-intake batch directory is missing: {batch_dir}")
     if not manifest_path.is_file():
         raise HTTPException(status_code=422,detail=f"Asset-intake manifest is missing: {manifest_path}")
+    report_path.parent.mkdir(parents=True,exist_ok=True)
     command=[settings.media_node_command,str(intake_script),"asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
     try:
         result=subprocess.run(command,cwd=repo_root,text=True,capture_output=True,timeout=120)
@@ -163,12 +164,14 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         if details: message+=": "+details
         raise HTTPException(status_code=422,detail=message)
     if result.stdout.strip():
-        try:
-            report=json.loads(result.stdout)
-            if isinstance(report,dict) and isinstance(report.get("results"),list):
-                return report
-        except json.JSONDecodeError:
-            pass
+        stdout_lines=[line.strip() for line in result.stdout.splitlines() if line.strip()]
+        for candidate in reversed(stdout_lines):
+            try:
+                report=json.loads(candidate)
+                if isinstance(report,dict) and isinstance(report.get("results"),list):
+                    return report
+            except json.JSONDecodeError:
+                continue
     if not report_path.is_file():
         details=(result.stderr or result.stdout or "").strip()
         message="Asset-intake completed without producing a report"
@@ -477,7 +480,8 @@ def media_revalidate(asset_id:str,request:Request):
         if not asset_path.exists(): raise HTTPException(status_code=404,detail="Stored asset is missing")
 
         stage="resolve intake batch"
-        batch_dir=root/"incoming"/str(row[11])
+        batch_id=row[11] if len(row)>11 else None
+        batch_dir=root/"incoming"/str(batch_id) if batch_id else asset_path.parent
         if not batch_dir.exists(): batch_dir=asset_path.parent
         if not batch_dir.is_dir(): raise HTTPException(status_code=422,detail=f"Asset-intake batch directory is missing: {batch_dir}")
 
