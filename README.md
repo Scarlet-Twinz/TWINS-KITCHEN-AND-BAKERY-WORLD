@@ -6,7 +6,7 @@ A commerce-style static storefront for **Twins Kitchen**, designed around profes
 
 - Large responsive storefront homepage
 - Searchable equipment catalogue
-- 1,030 structured catalogue references (530 base records + 500 Phase 6 generated references)
+- 530 canonical catalogue products
 - Category discovery
 - Business-type equipment planner
 - Project planning brief with saved project context
@@ -101,6 +101,10 @@ The repository now includes a separate community marketplace layer: `marketplace
 
 The intended production flow is quote-first for variable Twins equipment pricing. Once confirmed prices/inventory exist, customer checkout can use a Nigerian/African payment gateway such as Paystack or Flutterwave. Seller memberships and promoted listings can use the same gateway, with payment confirmation handled by server-side webhooks rather than trusting browser state.
 
+
+## License
+
+This repository is proprietary. See [LICENSE](LICENSE). No open-source license is granted.
 
 ## Admin implementation status
 
