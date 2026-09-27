@@ -213,7 +213,6 @@
         index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceUrl:url,embedding:result.embedding});
         usable++;
       }
-      if(!urls.length)unavailable++;
       completed++;
       if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});
       await new Promise(resolve=>setTimeout(resolve,0));
