@@ -576,13 +576,19 @@ def media_revalidate(asset_id:str,request:Request):
         result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
         if result is None:
             raise HTTPException(status_code=422,detail="Asset-intake completed without a result for the stored asset")
-        status=result.get("state","REVIEW")
+        result_state=result.get("state","UNRESOLVED")
+        status=result_state
         if status=="UNRESOLVED": status="REVIEW"
         if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
+        candidate_ids=[str(x.get("productId")) for x in result.get("candidates",[]) if isinstance(x,dict) and x.get("productId") is not None]
+        confidence=result.get("confidence")
+        review_state="CONFIRMED" if result_state=="VERIFIED" else "REJECTED" if result_state=="REJECTED" else "UNRESOLVED" if result_state=="UNRESOLVED" else "REVIEW_REQUIRED"
 
         stage="persist revalidation result"
         with db() as conn:
-            conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else row[1],status,asset_uuid))
+            conn.execute("""update media_assets set product_legacy_id=%s,status=%s,ai_state=%s,candidate_product_ids=%s::jsonb,confidence=%s,review_state=%s,updated_at=now()
+            where id=%s""",
+            (int(result["productId"]) if result.get("productId") else row[1],status,result_state,json.dumps(candidate_ids),float(confidence) if confidence is not None else None,review_state,asset_uuid))
             audit_media_action(conn,actor,"MEDIA_REVALIDATED",asset_id,{"result":result})
             conn.commit()
         return {"ok":True,"status":status,"result":result}
