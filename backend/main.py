@@ -270,7 +270,9 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                     (id,product_legacy_id,filename,original_filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,ai_state,review_state,batch_id,uploaded_by,uploaded_at)
                     values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (asset_id,int(meta["productId"]) if meta["productId"] else None,item["filename"],item["filename"],rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],"QUEUED" if meta["productId"] else "REVIEW","UNRESOLVED","UNREVIEWED",batch_id,uuid.UUID(actor["sub"]),datetime.now(timezone.utc)))
-                    manifest.append({"asset":path.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
+                    if meta["productId"]:
+                        manifest.append({"asset":path.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]})
+                    uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
                 continue
             if ext in SUPPORTED_DOCUMENT_EXTENSIONS:
                 target=root/"incoming"/(uuid.uuid4().hex+"-"+sanitize_filename(original)); target.write_bytes(data)
@@ -291,7 +293,9 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
             (id,product_legacy_id,filename,original_filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,ai_state,review_state,batch_id,uploaded_by,uploaded_at)
             values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             (asset_id,int(meta["productId"]) if meta["productId"] else None,original,original,rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],"QUEUED" if meta["productId"] else "REVIEW","UNRESOLVED","UNREVIEWED",batch_id,uuid.UUID(actor["sub"]),datetime.now(timezone.utc)))
-            manifest.append({"asset":target.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
+            if meta["productId"]:
+                manifest.append({"asset":target.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]})
+            uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
         conn.commit()
     manifest_path=root/"manifests"/f"{batch_id}.json"; report_path=root/"manifests"/f"{batch_id}.report.json"
     manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":manifest},indent=2),encoding="utf-8")
