@@ -37,3 +37,5 @@ jobs:
         run: python -m unittest discover -s backend -p "test_*.py"
       - name: Check Media Center browser JavaScript
         run: node --check admin/media/media-center.js
+      - name: Check Media Center vision matcher JavaScript
+        run: node --check admin/media/media-visual-matcher.js
