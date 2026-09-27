@@ -32,6 +32,7 @@
     const top=clean[0],second=clean[1],margin=second?Number(top.score)-Number(second.score):Number(top.score);
     if(Number(top.score)>=cfg.highThreshold&&margin>=cfg.highMargin)return{status:"HIGH",suggestions:[{...top,confidence:"HIGH"}],reason:"strong local visual similarity with a clear margin"};
     if(Number(top.score)>=cfg.mediumThreshold&&margin>=cfg.mediumMargin)return{status:"MEDIUM",suggestions:clean.filter(x=>Number(x.score)>=cfg.mediumThreshold).slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM"})),reason:"local visual similarity is plausible but requires human review"};
+    if(Number(top.score)>=0.45&&margin>=0.02)return{status:"MEDIUM",suggestions:clean.slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"REVIEW"})),reason:"local visual evidence is suggestive but below automatic-match confidence; human review is required"};
     return{status:"UNRESOLVED",suggestions:[],reason:"local visual evidence is insufficient or ambiguous"};
   }
   function classifySemanticVisualMatch(result,candidates,localScores={}){
