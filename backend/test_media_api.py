@@ -118,7 +118,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             report=root/"report.json"
             manifest=root/"manifest.json"
             manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
-            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\\n')
+            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\n')
             with patch("main.subprocess.run",return_value=completed):
                 result=run_asset_intake(root,manifest,report)
             self.assertEqual(result["results"],[])
@@ -165,7 +165,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             conn=MagicMock()
             conn.__enter__.return_value=conn
             conn.__exit__.return_value=False
-            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","primary",batch_id)
+            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
             token=sign_session(str(actor_id),"owner")
             with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",side_effect=HTTPException(status_code=422,detail="Product assignment is required for validation")):
                 r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
