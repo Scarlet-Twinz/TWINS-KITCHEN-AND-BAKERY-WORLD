@@ -68,3 +68,28 @@ test("low-confidence visual evidence remains unresolved without a suggested prod
   assert.equal(unresolved.status,"UNRESOLVED");
   assert.deepEqual(unresolved.suggestions,[]);
 });
+
+test("semantic vision can produce a high-confidence automatic match only with local supporting evidence",()=>{
+  const matcher=require("../../../admin/media/media-visual-matcher.js");
+  const result=matcher.classifySemanticVisualMatch({result:"MATCH",productId:"58",confidence:"HIGH",reason:"same product"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.61});
+  assert.equal(result.status,"HIGH");
+  assert.equal(result.suggestions[0].productId,"58");
+});
+test("semantic vision produces medium-confidence candidates for human review",()=>{
+  const matcher=require("../../../admin/media/media-visual-matcher.js");
+  const result=matcher.classifySemanticVisualMatch({result:"AMBIGUOUS",productId:"58",confidence:"MEDIUM",reason:"plausible"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.45});
+  assert.equal(result.status,"MEDIUM");
+});
+test("semantic vision never forces an unresolved image",()=>{
+  const matcher=require("../../../admin/media/media-visual-matcher.js");
+  const result=matcher.classifySemanticVisualMatch({result:"NO_MATCH",productId:null,confidence:"LOW",reason:"unclear"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.90});
+  assert.equal(result.status,"UNRESOLVED");
+  assert.deepEqual(result.suggestions,[]);
+});
+test("Media Center uses on-device vision when available and preserves the manual picker fallback",()=>{
+  const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
+  assert.match(source,/semanticVisualMatch/);
+  assert.match(source,/visualReferenceUrls/);
+  assert.match(source,/function selectCatalogueProduct\(/);
+  assert.match(source,/on-device vision when available/);
+});

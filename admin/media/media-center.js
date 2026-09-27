@@ -1,6 +1,13 @@
 const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
+function visualReferenceUrls(product){
+  if(!product)return [];
+  const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
+  const override=overrides[String(product.id)]||overrides[product.id]||"";
+  const values=[override,...(product.media&&Array.isArray(product.media.images)?product.media.images:[]),product.i||""];
+  return [...new Set(values.map(normalizeCatalogueMediaPath).filter(src=>/^\/assets\/media\//.test(src)))];
+}
 function visualReferenceUrl(product){
-  return selectedProductMedia(product);
+  return visualReferenceUrls(product)[0]||"";
 }
 function loadVisualSignature(url){
   if(!visualMatcher||!url)return Promise.resolve(null);
@@ -8,10 +15,9 @@ function loadVisualSignature(url){
   if(visualSignatureCache.has(key))return visualSignatureCache.get(key);
   const promise=new Promise(resolve=>{
     const image=new Image();
-    if(/^https?:\/\//i.test(key)&&!key.startsWith(location.origin))image.crossOrigin="anonymous";
     image.onload=()=>{
       try{
-        const size=32,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+        const size=40,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
         const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(image,0,0,size,size);
         resolve(visualMatcher.signatureFromPixels(ctx.getImageData(0,0,size,size).data,size,size));
       }catch(e){resolve(null)}
@@ -22,23 +28,55 @@ function loadVisualSignature(url){
   visualSignatureCache.set(key,promise);
   return promise;
 }
+async function loadVisualBlob(url){
+  try{
+    const response=await fetch(url,{credentials:"include",cache:"force-cache"});
+    if(!response.ok)return null;
+    return await response.blob();
+  }catch{return null;}
+}
 async function identifyAssetVisually(asset){
   if(!visualMatcher||!asset||asset.productId)return null;
-  const source=await loadVisualSignature(mediaContentUrl(asset.id));
+  const sourceUrl=mediaContentUrl(asset.id);
+  const source=await loadVisualSignature(sourceUrl);
   if(!source)return null;
   const products=typeof P!=="undefined"&&Array.isArray(P)?P:[];
-  const candidates=products.map(product=>({product,url:visualReferenceUrl(product)})).filter(x=>x.product&&x.product.id!=null&&x.product.n&&x.url);
+  const candidates=[];
+  for(const product of products){
+    if(!product||product.id==null||!product.n)continue;
+    for(const url of visualReferenceUrls(product))candidates.push({product,url});
+  }
   const ranked=[];
   for(let start=0;start<candidates.length;start+=8){
     const batch=candidates.slice(start,start+8);
     const refs=await Promise.all(batch.map(x=>loadVisualSignature(x.url)));
     refs.forEach((reference,index)=>{
-      const product=batch[index].product;
+      const item=batch[index],product=item.product;
       if(!reference)return;
-      ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference)});
+      ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference),referenceUrl:item.url});
     });
   }
-  return visualMatcher.classifyVisualMatches(ranked);
+  const rankedProducts=visualMatcher.rankVisualMatches(ranked);
+  const localResult=visualMatcher.classifyVisualMatches(rankedProducts);
+  if(!rankedProducts.length)return localResult;
+  const sourceBlob=await loadVisualBlob(sourceUrl);
+  if(sourceBlob&&visualMatcher.semanticVisualMatch){
+    const semanticCandidates=[];
+    for(const item of rankedProducts.slice(0,8)){
+      const blob=await loadVisualBlob(item.referenceUrl);
+      if(blob)semanticCandidates.push({...item,blob});
+    }
+    if(semanticCandidates.length){
+      const semantic=await visualMatcher.semanticVisualMatch(sourceBlob,semanticCandidates);
+      if(semantic){
+        const localScores=Object.fromEntries(rankedProducts.map(item=>[String(item.productId),Number(item.score)]));
+        const semanticResult=visualMatcher.classifySemanticVisualMatch(semantic,semanticCandidates,localScores);
+        if(semanticResult.status!=="UNRESOLVED")return{...semanticResult,engine:"on-device vision"};
+        return{...semanticResult,engine:"on-device vision"};
+      }
+    }
+  }
+  return{...localResult,engine:"local visual similarity"};
 }
 async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
@@ -49,13 +87,13 @@ async function enrichVisualSuggestions(){
     try{
       const result=await identifyAssetVisually(asset);
       asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
-      asset.suggestionSource="visual";
+      asset.suggestionSource=result?.engine||"local visual similarity";
       asset.suggestionStatus=result?.status||"UNRESOLVED";
       asset.suggestionReason=result?.reason||"visual evidence unavailable";
       if(run===visualRun)render();
     }catch(e){
       asset.suggestions=[];
-      asset.suggestionSource="visual";
+      asset.suggestionSource="local visual similarity";
       asset.suggestionStatus="UNRESOLVED";
       asset.suggestionReason="visual matching could not inspect the uploaded image";
       if(run===visualRun)render();
@@ -142,7 +180,7 @@ function render(){
   $("queue").innerHTML=list.length?list.map(a=>{
     const suggestionHtml=a.productId?"":`
       <div class="suggestions">
-        <strong>Suggested products<span class="suggestion-source"> · visual matching first</span></strong>
+        <strong>Suggested products<span class="suggestion-source"> · on-device vision when available · local visual fallback</span></strong>
         ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
           <div class="suggestion">
             <div>
