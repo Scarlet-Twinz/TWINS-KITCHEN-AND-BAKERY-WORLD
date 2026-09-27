@@ -5,6 +5,7 @@ const { writePendingManifest } = require('./collector');
 const { discover } = require('./discovery');
 const { buildPendingAssetManifest, writePendingAssetManifest, loadAssetManifest, processAssets, buildAppliedManifest, DEFAULT_ASSET_ROOT, DEFAULT_PENDING_OUTPUT, DEFAULT_REPORT_OUTPUT, DEFAULT_APPLIED_OUTPUT } = require('./asset-intake');
 const { buildReferenceManifest, writeReferenceManifest } = require('./reference-index');
+const { buildPublicMediaAudit } = require('./public-media-audit');
 
 function arg(name, fallback = null) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : fallback; }
 function productIdsArg() { const value = arg('--product-ids'); if (!value) return null; const ids = value.split(',').map(x => x.trim()).filter(Boolean); if (!ids.length || ids.some(x => !/^\\d+$/.test(x))) throw new Error('--product-ids must be a comma-separated list of numeric product IDs'); return [...new Set(ids)]; }
@@ -29,8 +30,14 @@ function assetManifestArg() { return arg('--asset-manifest', null); }
 
 async function main() {
   const command = process.argv[2] || 'dry-run';
-  if (!['dry-run','apply','audit','pending-manifest','reference-audit','reference-manifest','discover','asset-intake-manifest','asset-intake-dry-run','asset-intake-apply'].includes(command)) throw new Error('Usage: node tools/media-ingestion/index.js <audit|pending-manifest|reference-audit|reference-manifest|asset-intake-manifest|asset-intake-dry-run|asset-intake-apply|discover|dry-run|apply> [options]');
+  if (!['dry-run','apply','audit','pending-manifest','reference-audit','reference-manifest','public-media-audit','discover','asset-intake-manifest','asset-intake-dry-run','asset-intake-apply'].includes(command)) throw new Error('Usage: node tools/media-ingestion/index.js <audit|pending-manifest|reference-audit|reference-manifest|asset-intake-manifest|asset-intake-dry-run|asset-intake-apply|discover|dry-run|apply> [options]');
   if (command === 'pending-manifest') { const target = arg('--output', 'tools/media-ingestion/manifests/pending-catalogue.json'); const manifest = writePendingManifest(path.resolve(process.cwd(), target)); console.log(JSON.stringify({ output: target, ...manifest.counts }, null, 2)); return; }
+  if (command === 'public-media-audit') {
+    const audit = buildPublicMediaAudit();
+    console.log(JSON.stringify(audit, null, 2));
+    if (audit.duplicateUrlGroups || audit.externalCandidates) process.exitCode = 1;
+    return;
+  }
   if (command === 'reference-audit' || command === 'reference-manifest') {
     const target = arg('--output', 'tools/media-ingestion/manifests/reference-index.json');
     const manifest = writeReferenceManifest(path.resolve(process.cwd(), target));
