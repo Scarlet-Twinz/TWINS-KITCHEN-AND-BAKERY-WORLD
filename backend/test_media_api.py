@@ -118,7 +118,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             report=root/"report.json"
             manifest=root/"manifest.json"
             manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
-            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\\n')
+            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\n')
             with patch("main.subprocess.run",return_value=completed):
                 result=run_asset_intake(root,manifest,report)
             self.assertEqual(result["results"],[])
