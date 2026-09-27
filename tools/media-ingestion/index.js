@@ -35,7 +35,7 @@ async function main() {
   if (command === 'public-media-audit') {
     const audit = buildPublicMediaAudit();
     console.log(JSON.stringify(audit, null, 2));
-    if (audit.duplicateUrlGroups) process.exitCode = 1;
+    if (audit.published.some(item => !String(item.url).startsWith("assets/media/") && !String(item.url).startsWith("/assets/media/"))) process.exitCode = 1;
     return;
   }
   if (command === 'reference-audit' || command === 'reference-manifest') {
