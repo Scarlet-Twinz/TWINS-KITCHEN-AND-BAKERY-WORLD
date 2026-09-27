@@ -180,12 +180,14 @@
       await putCachedEmbedding(key,embedding,{kind:"reference",url});
       return{embedding,cached:false,referenceUnavailable:false};
     }catch(error){
-      return{embedding:null,cached:false,referenceUnavailable:true,error:String(error?.message||error)};
+      return{embedding:null,cached:false,referenceUnavailable:true,status:"REFERENCE_UNAVAILABLE",error:String(error?.message||error)};
     }
   }
 
-  async function buildReferenceIndex(products,referenceResolver,onProgress,onStatus){
+  async function buildReferenceIndex(products,referenceResolver,onProgress,onStatus,options={}){
     const index=[];
+    const unavailableReferences=[];
+    const embedReference=typeof options.embedReference==="function"?options.embedReference:embeddingForReference;
     const candidates=(Array.isArray(products)?products:[]).filter(product=>product&&product.id!=null&&product.n);
     let usable=0,unavailable=0,completed=0;
     for(const product of candidates){
@@ -193,8 +195,8 @@
       if(!urls.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
       let added=false;
       for(const url of urls){
-        const result=await embeddingForReference(url,onStatus);
-        if(!result.embedding){unavailable++;continue;}
+        const result=await embedReference(url,onStatus);
+        if(!result.embedding){unavailable++;unavailableReferences.push({url,status:"REFERENCE_UNAVAILABLE",error:result.error||""});continue;}
         index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceUrl:url,embedding:result.embedding});
         usable++;added=true;break;
       }
@@ -203,7 +205,7 @@
       if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});
       await new Promise(resolve=>setTimeout(resolve,0));
     }
-    return{index,usable,unavailable,totalProducts:candidates.length};
+    return{index,usable,unavailable,unavailableReferences,totalProducts:candidates.length};
   }
 
   function rankByEmbedding(sourceEmbedding,index){
