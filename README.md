@@ -1,129 +1,126 @@
 # Twins Kitchen
 
-A commerce-style static storefront for **Twins Kitchen**, designed around professional kitchen, bakery, catering, restaurant and hospitality equipment.
+A commerce-focused web platform for **Twins Kitchen**, a Nigerian supplier of professional kitchen, bakery, catering, restaurant, and hospitality equipment.
 
-## What is in this version
+## Purpose
 
-- Large responsive storefront homepage
-- Searchable equipment catalogue
-- 530 canonical catalogue products
-- Category discovery
-- Business-type equipment planner
-- Project planning brief with saved project context
-- Product detail pages with related equipment and structured specifications
-- Recently viewed products
-- Saved / wishlist products
+Twins Kitchen is designed to give customers a clear way to discover equipment, compare products, save selections, request quotations, and contact the business.
+
+The project combines a customer-facing storefront with a separate operations interface and a planned backend boundary. The frontend is data-driven so catalogue information, product relationships, media, and customer interactions can evolve without duplicating product data across individual pages.
+
+## What the platform provides
+
+- Responsive equipment storefront
+- Searchable catalogue with **530 canonical products**
+- Category and business-type equipment discovery
+- Product detail pages with specifications and related equipment
 - Product comparison
-- Persistent cart with quantity controls and reusable saved equipment lists
-- Quotation request flow
+- Saved products and recently viewed products
+- Persistent shopping cart and saved equipment lists
+- Project planning and saved project context
+- Quote-request workflow
 - WhatsApp enquiry flow
-- Customer login/signup with real backend sessions when the API is configured; localhost-only demo auth for static development
-- Customer dashboard
-- FAQ and delivery information
-- Contact, directions and business information
-- Responsive mobile layouts
-- Expanded visual media gallery with supplied Twins equipment photography and video records
-- GitHub Pages-ready static architecture
-- External reference imagery is clearly labelled separately from supplied Twins media
-- Red / white / black visual system ready for the final Twins logo
+- Customer account and dashboard interfaces
+- FAQ, delivery, contact, directions, and business information
+- Product photography and video records supplied for the Twins catalogue
+- Separate community marketplace interfaces for seller listings
+- Responsive layouts for desktop and mobile
+- GitHub Pages-ready static storefront architecture
 
-## Local development
+## Storefront architecture
 
-This repository is proprietary. Development access and setup instructions are intentionally kept out of the public README.
+The current storefront intentionally uses **HTML, CSS, and vanilla JavaScript**.
 
-## Important architecture decision
+Catalogue records are maintained in `data.js`, while shared application logic handles rendering, search, filtering, comparison, cart state, saved products, project planning, and other interactions.
 
-This phase is intentionally **HTML + CSS + vanilla JavaScript**.
+The project also includes:
 
-GitHub can store the source code and GitHub Pages can publish this static HTML/CSS/JavaScript site. A server backend is **not required** for the storefront, catalogue discovery, browser cart, saved products or demo customer workspace.
+- Shared responsive styling in `styles.css`
+- Shared application logic in `app.js`
+- Supplied Twins media under `assets/media/`
+- Runtime metadata and canonical URLs
+- LocalBusiness structured data
+- `robots.txt` and `sitemap.xml`
+- Static-site validation through GitHub Actions
+- Quote-first product pricing instead of hardcoded market prices
 
-A real backend can be added later when Twins needs things such as:
+## Customer experience
 
-- real customer accounts
-- database-backed inventory
-- real stock availability
-- admin catalogue management
-- real orders
-- payment processing
-- delivery management
-- staff access
-- server-side quotation records
+The storefront is built around a discovery-to-enquiry workflow rather than assuming fixed online prices for every product.
 
-The storefront does not need to be thrown away when that happens. The current UI can become the frontend for that backend.
+Customers can browse equipment, inspect product information, compare options, save products, build a cart or equipment list, and submit a quotation request or WhatsApp enquiry.
 
-## Current demo data
+Customer authentication and account features support both the static development experience and the planned server-backed production model.
 
-Product names and specifications are structured catalogue/reference data until Twins confirms the exact commercial catalogue. The storefront deliberately distinguishes verified/supplied media from items marked `PHOTO PENDING`. Pricing is intentionally quote-first because market and supplier prices can change. The frontend is data-driven: catalogue records live in `data.js`, while rendering, filtering, comparison, cart and planning logic consume that data rather than duplicating product information across pages. Before a production launch, replace them with Twins' actual inventory, actual prices, real specifications, real availability, final business policies and the real logo.
+## Operations and administration
 
-Business:
+The repository contains a dedicated admin workspace separate from the public storefront.
+
+The admin interface covers catalogue operations, inventory, quotations, orders, customers and staff, payments, delivery, marketplace moderation, audit information, and settings.
+
+Server-side authorization remains the source of truth for privileged operations. Browser storage is not treated as the authority for catalogue, inventory, order, payment, delivery, or audit records.
+
+## Backend boundary
+
+The repository includes the planned backend contract under `backend/`, including documentation and database schema definitions.
+
+The backend is intentionally treated as a separate boundary from the static storefront. It is not presented as a deployed production backend.
+
+The production architecture is intended to support capabilities such as:
+
+- Authenticated customer and staff accounts
+- Database-backed catalogue and inventory
+- Real stock availability
+- Server-side quotation records
+- Orders and fulfilment
+- Payment processing and webhooks
+- Delivery management
+- Staff access control
+- Marketplace moderation
+- Persistent audit records
+
+## Media and catalogue data
+
+The catalogue contains **530 canonical products**. Product information is data-driven, and supplied Twins media is kept distinct from external reference imagery.
+
+Media is expected to represent the actual product it is assigned to. When a suitable supplied photograph is not available, the product can remain marked as pending rather than being given an unrelated or generic image.
+
+Pricing is intentionally quote-first because equipment prices and supplier availability can change.
+
+## Twins Marketplace
+
+The project includes a separate marketplace layer through:
+
+- `marketplace.html`
+- `sell-on-twins.html`
+- `seller-dashboard.html`
+
+Community seller listings are kept separate from official Twins catalogue stock.
+
+The current frontend supports the marketplace experience as a static prototype. Production seller publishing will require authenticated seller accounts, server-side media storage, moderation, reporting, payment handling, and backend persistence.
+
+## Payments
+
+The intended commercial flow is quote-first for variable equipment pricing.
+
+When confirmed catalogue prices and inventory are available, customer checkout can be connected to a Nigerian/African payment provider such as Paystack or Flutterwave. Payment confirmation should be handled through server-side webhooks rather than trusted browser state.
+
+## Business
 
 **Twins Kitchen**  
 Alaba International Market, Nigeria  
 **08033231712**  
 Open 24 hours
 
-
-## Architecture status
-
-The project now separates the static storefront from the planned production backend boundary.
-
-### Storefront
-- Data-driven catalogue in data.js
-- Shared rendering and interaction layer in app.js
-- Global responsive styling in styles.css
-- Real supplied Twins media under assets/media/
-- Quote-first catalogue pricing: current price is requested rather than hardcoded
-- Local browser workspace for cart, saved lists, project plans and quote drafts
-- Responsive navigation with equipment-area and business discovery menus
-- Runtime metadata, canonical URLs and LocalBusiness structured data
-- robots.txt, sitemap.xml and a static-site GitHub Actions validation workflow
-
-### Operations / admin
-- admin.html is the dedicated internal operations console entry point
-- admin.css contains the admin-only visual system and responsive layout
-- admin.js provides the complete admin navigation and workspace surfaces
-- Admin access is denied unless the browser has a server-authenticated staff/admin session
-- Current admin modules: Overview, Catalogue, Inventory, Quotes, Orders, Customers & Staff, Payments, Delivery, Marketplace Moderation, Audit Log and Settings
-- Catalogue and quotation views can consume the existing data/API without modifying storefront data.js
-- Inventory, Orders, Delivery and Audit Log are connected to the backend persistence layer; Payments remain gateway-ready until merchant credentials and webhooks are configured
-- Payments intentionally stop at a gateway-ready operations surface; merchant credentials and webhooks are not hardcoded into the frontend
-- Production admin authorization remains server-side in backend/
-
-### Backend boundary
-See backend/README.md, backend/openapi.yaml and backend/schema.sql. The backend is deliberately not claimed as deployed yet; it is the implementation contract for the next stage.
-
-
-## Twins Marketplace
-
-The repository now includes a separate community marketplace layer: `marketplace.html`, `sell-on-twins.html` and `seller-dashboard.html`. Community seller submissions are deliberately separated from official Twins stock. The current static prototype stores drafts locally; production publishing requires authenticated seller accounts, server-side media storage, moderation, reports and payment webhooks.
-
-## Payments
-
-The intended production flow is quote-first for variable Twins equipment pricing. Once confirmed prices/inventory exist, customer checkout can use a Nigerian/African payment gateway such as Paystack or Flutterwave. Seller memberships and promoted listings can use the same gateway, with payment confirmation handled by server-side webhooks rather than trusting browser state.
-
-
 ## License
 
-This repository is proprietary. See [LICENSE](LICENSE). No open-source license is granted.
+This repository is proprietary. See [LICENSE](LICENSE).
 
-## Admin implementation status
+No open-source license is granted.
 
-The admin frontend is now mapped as a complete operations workspace. The interface is intentionally separated from the public storefront so administrative navigation, tables, detail drawers, status indicators and responsive behaviour do not depend on storefront rendering.
+## Project status
 
-### Available admin areas
+The storefront and administrative frontend provide the current product and operations experience. The backend directory defines the planned server-side persistence and API boundary for production development.
 
-1. **Overview** — catalogue/area KPIs, recent server quote requests and operational shortcuts.
-2. **Catalogue** — searchable/filterable product management surface using the current data-driven catalogue without mutating data.js.
-3. **Inventory** — stock, availability and adjustment workspace reserved for server inventory records.
-4. **Quotes** — server-persisted quotation requests with customer/project detail inspection.
-5. **Orders** — order lifecycle and fulfilment workspace backed by the backend order service.
-6. **Customers & Staff** — account and role boundary documentation inside the admin console.
-7. **Payments** — gateway-ready transaction workspace; Paystack/Flutterwave credentials and webhooks are intentionally deferred.
-8. **Delivery** — dispatch, destination, status and completion workspace backed by backend delivery records.
-9. **Marketplace** — community-listing moderation surface kept separate from official Twins catalogue stock.
-10. **Audit Log** — operational/security event surface backed by server-written audit records.
-11. **Settings** — API, payment and production-readiness configuration surface.
+The project is intentionally documented around the implementation that exists rather than presenting planned backend capabilities as already deployed.
 
-### Backend integration boundary
-
-The frontend admin workspace is complete as an operations UI, but server-side mutations remain the source of truth. Do not implement catalogue, inventory, order, payment or delivery authority in browser localStorage. Those modules should connect to authenticated FastAPI endpoints and PostgreSQL tables when the production backend work begins.
