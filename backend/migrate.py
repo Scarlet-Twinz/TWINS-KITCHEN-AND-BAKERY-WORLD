@@ -34,7 +34,7 @@ alter table media_assets add column if not exists ai_state text not null default
 alter table media_assets add column if not exists candidate_product_ids jsonb not null default '[]'::jsonb;
 alter table media_assets add column if not exists confidence numeric(7,6);
 alter table media_assets add column if not exists review_state text not null default 'UNREVIEWED'
-  check (review_state in ('UNREVIEWED','REVIEW_REQUIRED','CONFIRMED','REJECTED'));
+  check (review_state in ('UNREVIEWED','REVIEW_REQUIRED','CONFIRMED','UNRESOLVED','REJECTED'));
 alter table media_assets alter column product_legacy_id drop not null;
 update media_assets
 set original_filename=coalesce(original_filename,filename),
