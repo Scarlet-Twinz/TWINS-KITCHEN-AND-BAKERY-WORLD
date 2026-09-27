@@ -18,6 +18,8 @@ jobs:
         run: node --test tools/media-ingestion/test/*.test.js
       - name: Run Phase 1 reference coverage audit
         run: node tools/media-ingestion/index.js reference-audit --output /tmp/twins-reference-index.json
+      - name: Run Phase 6 public media audit
+        run: node tools/media-ingestion/index.js public-media-audit
 
   media-center-tests:
     runs-on: ubuntu-latest
