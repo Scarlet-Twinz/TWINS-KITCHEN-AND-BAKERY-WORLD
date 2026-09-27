@@ -63,10 +63,20 @@ test("Media Center makes visual matching primary and keeps manual picker as fall
   assert.match(source,/function selectCatalogueProduct\(/);
 });
 
-test("low-confidence visual evidence remains unresolved without a suggested product",()=>{
+test("very weak visual evidence remains unresolved without a suggested product",()=>{
   const unresolved=classifyVisualMatches([{productId:"58",name:"20L Planetary Mixer",score:0.40}]);
   assert.equal(unresolved.status,"UNRESOLVED");
   assert.deepEqual(unresolved.suggestions,[]);
+});
+
+test("suggestive local visual evidence is surfaced for human review",()=>{
+  const review=classifyVisualMatches([
+    {productId:"58",name:"20L Planetary Mixer",score:0.50},
+    {productId:"33",name:"Commercial Dishwasher",score:0.42}
+  ]);
+  assert.equal(review.status,"MEDIUM");
+  assert.deepEqual(review.suggestions.map(x=>x.productId),["58","33"]);
+  assert.ok(review.suggestions.every(x=>x.confidence==="REVIEW"));
 });
 
 test("semantic vision can produce a high-confidence automatic match only with local supporting evidence",()=>{
