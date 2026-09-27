@@ -107,7 +107,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
-    def test_asset_intake_prefers_clean_json_report_from_stdout(self):
+    # The intake process emits one clean JSON report on stdout; this test guards that API boundary.\n    def test_asset_intake_prefers_clean_json_report_from_stdout(self):
         import tempfile
         from pathlib import Path
         from unittest.mock import MagicMock, patch
