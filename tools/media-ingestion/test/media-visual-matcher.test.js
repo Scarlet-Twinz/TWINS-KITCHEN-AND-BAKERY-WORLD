@@ -32,12 +32,14 @@ test("medium visual match returns candidates for human review",()=>{
   assert.ok(result.suggestions.every(x=>x.confidence==="MEDIUM"));
 });
 
-test("ambiguous or weak visual evidence remains unresolved",()=>{
+test("ambiguous visual evidence is surfaced for human review",()=>{
   const result=classifyVisualMatches([
     {productId:"58",name:"20L Planetary Mixer",score:0.71},
     {productId:"33",name:"Commercial Dishwasher",score:0.69}
   ]);
-  assert.equal(result.status,"UNRESOLVED");
+  assert.equal(result.status,"MEDIUM");
+  assert.deepEqual(result.suggestions.map(x=>x.productId),["58","33"]);
+  assert.ok(result.suggestions.every(x=>x.confidence==="REVIEW"));
 });
 
 test("no visual reference candidates never forces a product",()=>{
