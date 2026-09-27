@@ -42,14 +42,17 @@ var __twinsFinalMediaById=null;
 function buildFinalMediaMap(){
  if(__twinsFinalMediaById)return __twinsFinalMediaById;
  __twinsFinalMediaById={};
- var seen={};
+ var counts={};
  P.forEach(function(p){
    var candidate=mediaCandidateFor(p);
-   if(candidate.src&&seen[candidate.src]){
+   if(candidate.src)counts[candidate.src]=(counts[candidate.src]||0)+1;
+ });
+ P.forEach(function(p){
+   var candidate=mediaCandidateFor(p);
+   if(candidate.src&&counts[candidate.src]>1){
      __twinsFinalMediaById[p.id]={src:"",status:"pending",source:"duplicate media blocked; product photo verification required"};
      return;
    }
-   if(candidate.src)seen[candidate.src]=true;
    __twinsFinalMediaById[p.id]=candidate;
  });
  return __twinsFinalMediaById;
