@@ -10,7 +10,7 @@ test("public media audit never counts external URLs as publishable",()=>{
   const audit=buildPublicMediaAudit({data,rules:{blocklist:{} }});
   assert.equal(audit.catalogue,2);
   assert.equal(audit.publicEligible,1);
-  assert.equal(audit.externalCandidates,1);
+  assert.equal(audit.externalCandidates.length,1);
   assert.deepEqual(audit.published.map(x=>x.productId),["1"]);
 });
 
