@@ -203,6 +203,10 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         params=update_calls[0].args[1]
         self.assertEqual(params[0],existing_product_id)
         self.assertEqual(params[1],"REVIEW")
+        self.assertEqual(params[2],"UNRESOLVED")
+        self.assertEqual(params[3],"[]")
+        self.assertIsNone(params[4])
+        self.assertEqual(params[5],"UNRESOLVED")
         self.assertNotEqual(params[1],"UNRESOLVED")
 
     def test_revalidate_unexpected_failure_returns_structured_json_500_with_cors(self):
@@ -327,6 +331,100 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             r=self.client.get("/api/admin/media",cookies={"twins_session":token})
         self.assertEqual(r.status_code,200)
         self.assertEqual(r.json()["assets"],[])
+
+    def test_owner_upload_without_product_id_creates_unresolved_asset_without_running_asset_intake(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        import io
+
+        actor_id=uuid.uuid4()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as tmp:
+            root=Path(tmp)
+            (root/"manifests").mkdir(parents=True)
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            lookup=MagicMock()
+            lookup.fetchone.return_value=None
+            conn.execute.return_value=lookup
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake") as intake:
+                r=self.client.post(
+                    "/api/admin/media/upload",
+                    cookies={"twins_session":token},
+                    files={"files":("new-product.png",io.BytesIO(bytes([137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,160,0,0,0,160,8,2,0,0,0,0,0,0,0,0,73,69,78,68,174,66,96,130])),"image/png")},
+                    data={"metadata":'{"sourceType":"owned","rightsStatus":"owned","provenance":"owner upload"}'}
+                )
+            self.assertEqual(r.status_code,201)
+            self.assertEqual(len(r.json()["uploaded"]),1)
+            intake.assert_not_called()
+            insert_calls=[call for call in conn.execute.call_args_list if "insert into media_assets" in str(call.args[0]).lower()]
+            self.assertEqual(len(insert_calls),1)
+            params=insert_calls[0].args[1]
+            self.assertIsNone(params[1])
+            self.assertEqual(params[16],"REVIEW")
+            self.assertEqual(params[17],"UNRESOLVED")
+            self.assertEqual(params[18],"UNREVIEWED")
+
+    def test_owner_can_record_visual_match_result(self):
+        from unittest.mock import MagicMock, patch
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        conn=MagicMock()
+        conn.__enter__.return_value=conn
+        conn.__exit__.return_value=False
+        conn.execute.return_value.fetchone.return_value=(asset_id,)
+        token=sign_session(str(actor_id),"owner")
+        with patch("main.db",return_value=conn), patch("main.audit_media_action"):
+            r=self.client.post("/api/admin/media/"+str(asset_id)+"/match-result",cookies={"twins_session":token},json={
+                "state":"MEDIUM","candidates":[{"productId":"60","score":0.82},{"productId":"61","score":0.79}],
+                "confidence":0.82,"margin":0.03,"evidence":{"reason":"close visual candidates"}
+            })
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["state"],"MEDIUM")
+        self.assertEqual(r.json()["candidateProductIds"],["60","61"])
+        self.assertTrue(any("insert into media_match_results" in str(call.args[0]).lower() for call in conn.execute.call_args_list))
+        self.assertTrue(any("update media_assets set candidate_product_ids" in str(call.args[0]).lower() for call in conn.execute.call_args_list))
+
+    def test_owner_can_confirm_visual_match_without_publishing(self):
+        from unittest.mock import MagicMock, patch
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        conn=MagicMock()
+        conn.__enter__.return_value=conn
+        conn.__exit__.return_value=False
+        conn.execute.return_value.fetchone.return_value=(asset_id,None,"photo.jpg","abc123")
+        token=sign_session(str(actor_id),"owner")
+        with patch("main.db",return_value=conn), patch("main.catalogue_product",return_value={"id":60,"n":"30kg Planetary Mixer"}), patch("main.audit_media_action"):
+            r=self.client.post("/api/admin/media/"+str(asset_id)+"/match-decision",cookies={"twins_session":token},json={
+                "action":"CONFIRM","productId":"60","candidateProductIds":["60","61"],"confidence":0.91
+            })
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["status"],"REVIEW")
+        self.assertEqual(r.json()["state"],"VERIFIED")
+        self.assertEqual(r.json()["productId"],60)
+        self.assertTrue(any("update media_assets set product_legacy_id" in str(call.args[0]).lower() for call in conn.execute.call_args_list))
+        self.assertTrue(any("insert into media_match_results" in str(call.args[0]).lower() for call in conn.execute.call_args_list))
+
+    def test_owner_can_create_new_product_candidate_without_assigning_id(self):
+        from unittest.mock import MagicMock, patch
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        conn=MagicMock()
+        conn.__enter__.return_value=conn
+        conn.__exit__.return_value=False
+        conn.execute.return_value.fetchone.return_value=(asset_id,None,"new.jpg","abc123")
+        token=sign_session(str(actor_id),"owner")
+        with patch("main.db",return_value=conn), patch("main.audit_media_action"):
+            r=self.client.post("/api/admin/media/"+str(asset_id)+"/match-decision",cookies={"twins_session":token},json={
+                "action":"CREATE_NEW_PRODUCT","suggestedName":"Commercial Dough Sheeter","category":"Bakery Equipment",
+                "sourceAssetIds":[str(asset_id)],"evidence":{"reason":"no reliable existing product match"}
+            })
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["state"],"NEW_PRODUCT_CANDIDATE")
+        self.assertTrue(r.json()["candidateId"])
+        self.assertTrue(any("insert into media_product_candidates" in str(call.args[0]).lower() for call in conn.execute.call_args_list))
 
     def test_non_owner_upload_returns_403(self):
         token=sign_session(str(uuid.uuid4()),"admin")

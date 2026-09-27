@@ -36,9 +36,22 @@
       if(!item||item.productId==null||!Number.isFinite(Number(item.score)))continue;
       const id=String(item.productId);
       const existing=byProduct.get(id);
-      if(!existing||Number(item.score)>Number(existing.score))byProduct.set(id,{...item,productId:id});
+      if(!existing){
+        byProduct.set(id,{...item,productId:id,supportingReferences:[{referenceUrl:item.referenceUrl,score:Number(item.score)}],supportingReferenceCount:1});
+        continue;
+      }
+      existing.supportingReferences.push({referenceUrl:item.referenceUrl,score:Number(item.score)});
+      existing.supportingReferences.sort((a,b)=>Number(b.score)-Number(a.score));
+      existing.supportingReferenceCount=existing.supportingReferences.length;
+      if(Number(item.score)>Number(existing.score)){
+        existing.score=Number(item.score);
+        existing.referenceUrl=item.referenceUrl;
+      }
     }
-    return [...byProduct.values()].sort((a,b)=>Number(b.score)-Number(a.score)||String(a.productId).localeCompare(String(b.productId),undefined,{numeric:true}));
+    return [...byProduct.values()].map(item=>({
+      ...item,
+      supportingReferences:item.supportingReferences.slice(0,5)
+    })).sort((a,b)=>Number(b.score)-Number(a.score)||String(a.productId).localeCompare(String(b.productId),undefined,{numeric:true}));
   }
 
   function classifyVisualMatches(ranked,options={}){
@@ -47,13 +60,14 @@
     if(!clean.length)return{status:"UNRESOLVED",suggestions:[],reason:"no usable catalogue reference embeddings are available"};
     const top=clean[0],second=clean[1];
     const margin=second?Number(top.score)-Number(second.score):Number(top.score);
+    const evidence={supportingReferenceCount:Number(top.supportingReferenceCount||1),supportingReferences:top.supportingReferences||[],margin};
     if(Number(top.score)>=cfg.highThreshold&&margin>=cfg.highMargin){
-      return{status:"HIGH",suggestions:[{...top,confidence:"HIGH"}],reason:"strong vision-embedding similarity with a clear candidate margin"};
+      return{status:"HIGH",suggestions:[{...top,confidence:"HIGH",...evidence}],reason:"strong vision-embedding similarity with a clear candidate margin"};
     }
     if(Number(top.score)>=cfg.mediumThreshold&&margin>=cfg.mediumMargin){
-      return{status:"MEDIUM",suggestions:clean.filter(x=>Number(x.score)>=cfg.mediumThreshold).slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM"})),reason:"vision-embedding similarity is plausible but requires human review"};
+      return{status:"MEDIUM",suggestions:clean.filter(x=>Number(x.score)>=cfg.mediumThreshold).slice(0,cfg.maxSuggestions).map(x=>({...x,confidence:"MEDIUM",supportingReferenceCount:Number(x.supportingReferenceCount||1),supportingReferences:x.supportingReferences||[],margin:Number(x.score)-Number(second?.score||0)})),reason:"vision-embedding similarity is plausible but requires human review"};
     }
-    return{status:"UNRESOLVED",suggestions:[],reason:"vision-embedding evidence is weak or ambiguous"};
+    return{status:"UNRESOLVED",suggestions:[],reason:"vision-embedding evidence is weak or ambiguous",margin};
   }
 
   function openDb(){
@@ -193,14 +207,12 @@
     for(const product of candidates){
       const urls=Array.isArray(referenceResolver(product))?referenceResolver(product):[];
       if(!urls.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
-      let added=false;
       for(const url of urls){
         const result=await embedReference(url,onStatus);
         if(!result.embedding){unavailable++;unavailableReferences.push({url,status:"REFERENCE_UNAVAILABLE",error:result.error||""});continue;}
         index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceUrl:url,embedding:result.embedding});
-        usable++;added=true;break;
+        usable++;
       }
-      if(!added&&urls.length)unavailable++;
       completed++;
       if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});
       await new Promise(resolve=>setTimeout(resolve,0));

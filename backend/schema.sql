@@ -234,3 +234,56 @@ create table if not exists media_supporting_documents (
 );
 create index if not exists idx_media_supporting_documents_batch on media_supporting_documents(batch_id,created_at);
 
+
+
+-- Phase 2: independent media-library state and review metadata.
+alter table media_assets add column if not exists original_filename text;
+alter table media_assets add column if not exists uploaded_at timestamptz not null default now();
+alter table media_assets add column if not exists ai_state text not null default 'UNRESOLVED'
+  check (ai_state in ('UNRESOLVED','REVIEW','VERIFIED','REJECTED','DUPLICATE'));
+alter table media_assets add column if not exists candidate_product_ids jsonb not null default '[]'::jsonb;
+alter table media_assets add column if not exists confidence numeric(7,6);
+alter table media_assets add column if not exists review_state text not null default 'UNREVIEWED'
+  check (review_state in ('UNREVIEWED','REVIEW_REQUIRED','CONFIRMED','UNRESOLVED','REJECTED'));
+alter table media_assets alter column product_legacy_id drop not null;
+update media_assets
+set original_filename=coalesce(original_filename,filename),
+    uploaded_at=coalesce(uploaded_at,created_at),
+    ai_state=case
+      when status='REJECTED' then 'REJECTED'
+      when status in ('VERIFIED','APPROVED','MAPPED') then 'VERIFIED'
+      when status='DUPLICATE' then 'DUPLICATE'
+      else 'REVIEW'
+    end
+where original_filename is null;
+create index if not exists idx_media_assets_ai_state on media_assets(ai_state,created_at desc);
+create index if not exists idx_media_assets_review_state on media_assets(review_state,created_at desc);
+
+
+-- Phase 3: persisted human-review decisions and new-product candidates.
+create table if not exists media_match_results (
+ id uuid primary key,
+ asset_id uuid not null references media_assets(id) on delete cascade,
+ candidate_product_id integer,
+ confidence numeric(7,6),
+ margin numeric(7,6),
+ evidence jsonb not null default '{}'::jsonb,
+ state text not null check (state in ('HIGH','MEDIUM','UNRESOLVED','VERIFIED','REJECTED')),
+ created_at timestamptz not null default now()
+);
+create index if not exists idx_media_match_results_asset on media_match_results(asset_id,created_at desc);
+create index if not exists idx_media_match_results_candidate on media_match_results(candidate_product_id,created_at desc);
+
+create table if not exists media_product_candidates (
+ id uuid primary key,
+ asset_id uuid not null references media_assets(id) on delete cascade,
+ suggested_name text,
+ category text,
+ source_asset_ids jsonb not null default '[]'::jsonb,
+ evidence jsonb not null default '{}'::jsonb,
+ status text not null default 'PENDING_OWNER' check (status in ('PENDING_OWNER','CREATED','MERGED','KEPT_UNRESOLVED','REJECTED')),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create index if not exists idx_media_product_candidates_asset on media_product_candidates(asset_id,created_at desc);
+create index if not exists idx_media_product_candidates_status on media_product_candidates(status,created_at desc);

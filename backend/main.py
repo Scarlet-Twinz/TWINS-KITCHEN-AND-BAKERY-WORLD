@@ -178,7 +178,10 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must contain a results array")
     return report
 def media_metadata_from_row(row):
-    return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
+    item={"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
+    if len(row)>19:
+        item.update({"originalFilename":row[19],"uploadedAt":row[20].isoformat() if row[20] else None,"aiState":row[21],"candidateProductIds":row[22],"confidence":float(row[23]) if row[23] is not None else None,"reviewState":row[24]})
+    return item
 
 class AuthPayload(BaseModel):
     name:str|None=Field(default=None,min_length=2,max_length=120)
@@ -264,10 +267,12 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                         duplicates.append({"filename":item["filename"],"sha256":digest,"existingAssetId":str(existing[0])}); continue
                     asset_id=uuid.uuid4(); rel=str(path.relative_to(Path.cwd())).replace("\\","/")
                     conn.execute("""insert into media_assets
-                    (id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,uploaded_by)
-                    values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'QUEUED',%s,%s)""",
-                    (asset_id,int(meta["productId"]) if meta["productId"] else None,item["filename"],rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],batch_id,uuid.UUID(actor["sub"])))
-                    manifest.append({"asset":path.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
+                    (id,product_legacy_id,filename,original_filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,ai_state,review_state,batch_id,uploaded_by,uploaded_at)
+                    values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    (asset_id,int(meta["productId"]) if meta["productId"] else None,item["filename"],item["filename"],rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],"QUEUED" if meta["productId"] else "REVIEW","UNRESOLVED","UNREVIEWED",batch_id,uuid.UUID(actor["sub"]),datetime.now(timezone.utc)))
+                    if meta["productId"]:
+                        manifest.append({"asset":path.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]})
+                    uploaded.append({"id":str(asset_id),"filename":item["filename"],"asset":path.name,"sha256":digest})
                 continue
             if ext in SUPPORTED_DOCUMENT_EXTENSIONS:
                 target=root/"incoming"/(uuid.uuid4().hex+"-"+sanitize_filename(original)); target.write_bytes(data)
@@ -285,10 +290,12 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
             target=batch/(uuid.uuid4().hex+"-"+sanitize_filename(original)); target.write_bytes(data)
             asset_id=uuid.uuid4(); rel=str(target.relative_to(Path.cwd())).replace("\\","/")
             conn.execute("""insert into media_assets
-            (id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,uploaded_by)
-            values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'QUEUED',%s,%s)""",
-            (asset_id,int(meta["productId"]) if meta["productId"] else None,original,rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],batch_id,uuid.UUID(actor["sub"])))
-            manifest.append({"asset":target.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]}); uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
+            (id,product_legacy_id,filename,original_filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,ai_state,review_state,batch_id,uploaded_by,uploaded_at)
+            values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (asset_id,int(meta["productId"]) if meta["productId"] else None,original,original,rel,digest,inspection.mime_type,inspection.width,inspection.height,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],"QUEUED" if meta["productId"] else "REVIEW","UNRESOLVED","UNREVIEWED",batch_id,uuid.UUID(actor["sub"]),datetime.now(timezone.utc)))
+            if meta["productId"]:
+                manifest.append({"asset":target.name,"productId":meta["productId"],"rights":meta["rightsStatus"],"source":meta["sourceType"],"sourceUrl":meta["sourceUrl"],"license":meta["license"],"attribution":meta["attribution"],"role":meta["role"]})
+            uploaded.append({"id":str(asset_id),"filename":original,"asset":target.name,"sha256":digest})
         conn.commit()
     manifest_path=root/"manifests"/f"{batch_id}.json"; report_path=root/"manifests"/f"{batch_id}.report.json"
     manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":manifest},indent=2),encoding="utf-8")
@@ -297,9 +304,15 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
         for result in report.get("results",[]):
             item=next((x for x in uploaded if x["asset"]==result.get("asset")),None)
             if not item: continue
-            status=result.get("state","REVIEW")
+            result_state=result.get("state","UNRESOLVED")
+            status=result_state
+            if status=="UNRESOLVED": status="REVIEW"
             if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
-            conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else None,status,uuid.UUID(item["id"])))
+            candidate_ids=[str(x.get("productId")) for x in result.get("candidates",[]) if isinstance(x,dict) and x.get("productId") is not None]
+            confidence=result.get("confidence")
+            review_state="CONFIRMED" if result_state=="VERIFIED" else "REJECTED" if result_state=="REJECTED" else "REVIEW_REQUIRED"
+            conn.execute("""update media_assets set product_legacy_id=%s,status=%s,ai_state=%s,candidate_product_ids=%s::jsonb,confidence=%s,review_state=%s,updated_at=now()
+            where id=%s""",(int(result["productId"]) if result.get("productId") else None,status,result_state,json.dumps(candidate_ids),confidence,review_state,uuid.UUID(item["id"])))
         conn.commit()
     return {"batchId":str(batch_id),"uploaded":uploaded,"duplicates":duplicates,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
 
@@ -423,7 +436,7 @@ def media_delete(asset_id:str,request:Request):
 def media_list(request:Request,status:str|None=None,q:str|None=None):
     require_owner(request)
     with db() as conn:
-        rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at
+        rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at,original_filename,uploaded_at,ai_state,candidate_product_ids,confidence,review_state
         from media_assets where (nullif(%s,'')::text is null or status=%s) and (nullif(%s,'')::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
     try:
@@ -448,10 +461,86 @@ def media_update(asset_id:str,request:Request,payload:dict):
     if meta["role"] not in {"primary","front","side","rear","detail","control-panel","installed","contextual"}: raise HTTPException(status_code=422,detail="Unsupported media role")
     with db() as conn:
         if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id),)).fetchone(): raise HTTPException(status_code=404,detail="Media asset not found")
-        conn.execute("""update media_assets set product_legacy_id=%s,source_type=%s,rights_status=%s,provenance=%s,source_url=%s,license=%s,attribution=%s,role=%s,status='REVIEW',updated_at=now() where id=%s""",
+        conn.execute("""update media_assets set product_legacy_id=%s,source_type=%s,rights_status=%s,provenance=%s,source_url=%s,license=%s,attribution=%s,role=%s,status='REVIEW',ai_state='REVIEW',review_state='REVIEW_REQUIRED',updated_at=now() where id=%s""",
         (int(meta["productId"]) if meta["productId"] else None,meta["sourceType"],meta["rightsStatus"],meta["provenance"],meta["sourceUrl"],meta["license"],meta["attribution"],meta["role"],uuid.UUID(asset_id)))
         audit_media_action(conn,actor,"MEDIA_METADATA_UPDATED",asset_id,payload); conn.commit()
     return {"ok":True,"status":"REVIEW"}
+
+@app.post("/api/admin/media/{asset_id}/match-result")
+def media_match_result(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    state=str(payload.get("state") or "UNRESOLVED").upper()
+    if state not in {"HIGH","MEDIUM","UNRESOLVED"}: raise HTTPException(status_code=422,detail="Unsupported match result state")
+    candidates=payload.get("candidates") if isinstance(payload.get("candidates"),list) else []
+    candidate_ids=[str(x.get("productId")) for x in candidates if isinstance(x,dict) and x.get("productId") is not None]
+    top=candidates[0] if candidates and isinstance(candidates[0],dict) else {}
+    candidate_product_id=int(top["productId"]) if top.get("productId") is not None else None
+    confidence=payload.get("confidence",top.get("score"))
+    margin=payload.get("margin")
+    evidence=payload.get("evidence") if isinstance(payload.get("evidence"),dict) else {"reason":payload.get("reason","")}
+    with db() as conn:
+        row=conn.execute("select id from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+        conn.execute("""insert into media_match_results
+        (id,asset_id,candidate_product_id,confidence,margin,evidence,state)
+        values (%s,%s,%s,%s,%s,%s::jsonb,%s)""",
+        (uuid.uuid4(),asset_uuid,candidate_product_id,float(confidence) if confidence is not None else None,float(margin) if margin is not None else None,json.dumps(evidence),state))
+        conn.execute("""update media_assets set candidate_product_ids=%s::jsonb,confidence=%s,ai_state=%s,
+        status='REVIEW',review_state='REVIEW_REQUIRED',updated_at=now() where id=%s""",
+        (json.dumps(candidate_ids),float(confidence) if confidence is not None else None,state,asset_uuid))
+        audit_media_action(conn,actor,"MEDIA_MATCH_RECORDED",asset_id,{"state":state,"candidateProductIds":candidate_ids,"confidence":confidence,"margin":margin})
+        conn.commit()
+    return {"ok":True,"status":"REVIEW","state":state,"candidateProductIds":candidate_ids}
+
+@app.post("/api/admin/media/{asset_id}/match-decision")
+def media_match_decision(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    action=str(payload.get("action") or "").upper()
+    if action not in {"CONFIRM","CHANGE_PRODUCT","KEEP_UNRESOLVED","CREATE_NEW_PRODUCT"}:
+        raise HTTPException(status_code=422,detail="Unsupported match decision")
+    with db() as conn:
+        row=conn.execute("select id,product_legacy_id,filename,sha256 from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+        if action in {"CONFIRM","CHANGE_PRODUCT"}:
+            product_id=payload.get("productId")
+            if product_id in (None,""): raise HTTPException(status_code=422,detail="Product selection is required")
+            if not catalogue_product(product_id): raise HTTPException(status_code=422,detail="Product ID does not exist in canonical catalogue")
+            candidate_ids=payload.get("candidateProductIds") if isinstance(payload.get("candidateProductIds"),list) else [str(product_id)]
+            confidence=payload.get("confidence")
+            conn.execute("""update media_assets set product_legacy_id=%s,status='REVIEW',ai_state='VERIFIED',
+            review_state='CONFIRMED',candidate_product_ids=%s::jsonb,confidence=%s,updated_at=now() where id=%s""",
+            (int(product_id),json.dumps([str(x) for x in candidate_ids]),float(confidence) if confidence is not None else None,asset_uuid))
+            conn.execute("""insert into media_match_results
+            (id,asset_id,candidate_product_id,confidence,margin,evidence,state)
+            values (%s,%s,%s,%s,%s,%s::jsonb,'VERIFIED')""",
+            (uuid.uuid4(),asset_uuid,int(product_id),float(confidence) if confidence is not None else None,None,json.dumps({"decision":action,"filename":row[2]})))
+            audit_media_action(conn,actor,"MEDIA_MATCH_CONFIRMED",asset_id,{"productId":int(product_id),"decision":action})
+            conn.commit()
+            return {"ok":True,"status":"REVIEW","state":"VERIFIED","productId":int(product_id)}
+        if action=="KEEP_UNRESOLVED":
+            conn.execute("""update media_assets set product_legacy_id=case when product_legacy_id is null then null else product_legacy_id end,
+            status='REVIEW',ai_state='UNRESOLVED',review_state='UNRESOLVED',updated_at=now() where id=%s""",(asset_uuid,))
+            audit_media_action(conn,actor,"MEDIA_MATCH_KEPT_UNRESOLVED",asset_id,{"filename":row[2]})
+            conn.commit()
+            return {"ok":True,"status":"REVIEW","state":"UNRESOLVED","productId":row[1]}
+        suggested_name=str(payload.get("suggestedName") or "").strip()
+        category=str(payload.get("category") or "").strip()
+        source_asset_ids=payload.get("sourceAssetIds") if isinstance(payload.get("sourceAssetIds"),list) else [asset_id]
+        evidence=payload.get("evidence") if isinstance(payload.get("evidence"),dict) else {}
+        candidate_id=uuid.uuid4()
+        conn.execute("""insert into media_product_candidates
+        (id,asset_id,suggested_name,category,source_asset_ids,evidence,status)
+        values (%s,%s,%s,%s,%s::jsonb,%s::jsonb,'PENDING_OWNER')""",
+        (candidate_id,asset_uuid,suggested_name or None,category or None,json.dumps([str(x) for x in source_asset_ids]),json.dumps(evidence)))
+        conn.execute("""update media_assets set status='REVIEW',ai_state='UNRESOLVED',
+        review_state='REVIEW_REQUIRED',updated_at=now() where id=%s""",(asset_uuid,))
+        audit_media_action(conn,actor,"MEDIA_NEW_PRODUCT_CANDIDATE_CREATED",asset_id,{"candidateId":str(candidate_id),"suggestedName":suggested_name,"category":category})
+        conn.commit()
+    return {"ok":True,"status":"REVIEW","state":"NEW_PRODUCT_CANDIDATE","candidateId":str(candidate_id)}
 
 @app.post("/api/admin/media/{asset_id}/revalidate")
 def media_revalidate(asset_id:str,request:Request):
@@ -487,13 +576,19 @@ def media_revalidate(asset_id:str,request:Request):
         result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
         if result is None:
             raise HTTPException(status_code=422,detail="Asset-intake completed without a result for the stored asset")
-        status=result.get("state","REVIEW")
+        result_state=result.get("state","UNRESOLVED")
+        status=result_state
         if status=="UNRESOLVED": status="REVIEW"
         if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
+        candidate_ids=[str(x.get("productId")) for x in result.get("candidates",[]) if isinstance(x,dict) and x.get("productId") is not None]
+        confidence=result.get("confidence")
+        review_state="CONFIRMED" if result_state=="VERIFIED" else "REJECTED" if result_state=="REJECTED" else "UNRESOLVED" if result_state=="UNRESOLVED" else "REVIEW_REQUIRED"
 
         stage="persist revalidation result"
         with db() as conn:
-            conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else row[1],status,asset_uuid))
+            conn.execute("""update media_assets set product_legacy_id=%s,status=%s,ai_state=%s,candidate_product_ids=%s::jsonb,confidence=%s,review_state=%s,updated_at=now()
+            where id=%s""",
+            (int(result["productId"]) if result.get("productId") else row[1],status,result_state,json.dumps(candidate_ids),float(confidence) if confidence is not None else None,review_state,asset_uuid))
             audit_media_action(conn,actor,"MEDIA_REVALIDATED",asset_id,{"result":result})
             conn.commit()
         return {"ok":True,"status":status,"result":result}
@@ -515,7 +610,7 @@ def media_approve(asset_id:str,request:Request):
         conflict=conn.execute("select id from media_production_mappings where product_legacy_id=%s and role=%s and published=true",(row[1],row[3])).fetchone()
         if conflict: raise HTTPException(status_code=409,detail="A published mapping already exists for this product and role")
         mapping_id=uuid.uuid4()
-        conn.execute("update media_assets set status='APPROVED',approved_at=now(),approved_by=%s,verified_at=coalesce(verified_at,now()),verified_by=coalesce(verified_by,%s),updated_at=now() where id=%s",(uuid.UUID(actor["sub"]),uuid.UUID(actor["sub"]),uuid.UUID(asset_id)))
+        conn.execute("update media_assets set status='APPROVED',ai_state='VERIFIED',review_state='CONFIRMED',approved_at=now(),approved_by=%s,verified_at=coalesce(verified_at,now()),verified_by=coalesce(verified_by,%s),updated_at=now() where id=%s",(uuid.UUID(actor["sub"]),uuid.UUID(actor["sub"]),uuid.UUID(asset_id)))
         conn.execute("insert into media_production_mappings (id,asset_id,product_legacy_id,role,published,created_by) values (%s,%s,%s,%s,false,%s)",(mapping_id,uuid.UUID(asset_id),row[1],row[3],uuid.UUID(actor["sub"])))
         audit_media_action(conn,actor,"MEDIA_APPROVED",asset_id,{"mappingId":str(mapping_id),"published":False}); conn.commit()
     return {"ok":True,"status":"APPROVED","published":False}
@@ -525,7 +620,7 @@ def media_reject(asset_id:str,request:Request):
     actor=require_owner(request)
     with db() as conn:
         if not conn.execute("select id from media_assets where id=%s",(uuid.UUID(asset_id), )).fetchone(): raise HTTPException(status_code=404,detail="Media asset not found")
-        conn.execute("update media_assets set status='REJECTED',updated_at=now() where id=%s",(uuid.UUID(asset_id),))
+        conn.execute("update media_assets set status='REJECTED',ai_state='REJECTED',review_state='REJECTED',updated_at=now() where id=%s",(uuid.UUID(asset_id),))
         audit_media_action(conn,actor,"MEDIA_REJECTED",asset_id); conn.commit()
     return {"ok":True,"status":"REJECTED"}
 

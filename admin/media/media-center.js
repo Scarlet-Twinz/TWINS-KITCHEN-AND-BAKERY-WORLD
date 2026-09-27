@@ -65,7 +65,10 @@ async function identifyAssetVisually(asset){
   const referenceResult=await getVisualReferenceIndex(products);
   const ranked=visualMatcher.rankByEmbedding(sourceResult.embedding,referenceResult.index);
   const localResult=visualMatcher.classifyVisualMatches(ranked);
-  return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length};
+  const top=Array.isArray(localResult.suggestions)&&localResult.suggestions[0]?localResult.suggestions[0]:null;
+  const second=Array.isArray(localResult.suggestions)&&localResult.suggestions[1]?localResult.suggestions[1]:null;
+  const margin=top&&second?Number(top.score)-Number(second.score):null;
+  return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length,margin};
 }
 async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
@@ -79,6 +82,15 @@ async function enrichVisualSuggestions(){
       asset.suggestionSource=result?.engine||"local visual similarity";
       asset.suggestionStatus=result?.status||"UNRESOLVED";
       asset.suggestionReason=result?.reason||"visual evidence unavailable";
+      try{
+        await api("/api/admin/media/"+encodeURIComponent(asset.id)+"/match-result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          state:asset.suggestionStatus,
+          candidates:asset.suggestions,
+          confidence:asset.suggestions[0]?.score??null,
+          margin:result?.margin??null,
+          evidence:{reason:asset.suggestionReason,engine:asset.suggestionSource,referenceCount:result?.referenceCount??0}
+        })});
+      }catch{}
       if(run===visualRun)render();
     }catch(e){
       asset.suggestions=[];
@@ -177,9 +189,11 @@ function render(){
               <span>ID: ${escapeHtml(s.productId)}${s.category?" · "+escapeHtml(s.category):""} · Confidence: ${escapeHtml(s.confidence)}</span>
             </div>
             <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(s.productId)}" onclick="selectSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Select</button>
+              <button type="button" class="btn red" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(s.productId)}" onclick="confirmSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Confirm</button>
           </div>
         `).join(""):'<div class="suggestion-empty">UNRESOLVED — insufficient local catalogue evidence.</div>'}
-        <button type="button" class="btn light" onclick="keepUnresolved(this)">Keep Unresolved</button>
+        <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" onclick="keepUnresolved(this.dataset.suggestionAsset)">Keep Unresolved</button>
+        <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" onclick="createNewProductCandidate(this.dataset.suggestionAsset)">Create New Product</button>
       </div>`;
     return '<article class="asset-card"><div class="asset-thumb">'+
       (a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+
@@ -293,7 +307,27 @@ document.addEventListener("click",event=>{
   });
 });
 function selectSuggestedProduct(assetId,productId){selectCatalogueProduct(assetId,productId);}
-function keepUnresolved(button){button.textContent="Kept Unresolved";button.disabled=true;}
+async function confirmSuggestedProduct(assetId,productId){
+  const asset=assets.find(item=>String(item.id)===String(assetId));
+  const suggestion=asset?.suggestions?.find(item=>String(item.productId)===String(productId));
+  return runAssetAction(assetId,()=>api("/api/admin/media/"+encodeURIComponent(assetId)+"/match-decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    action:"CONFIRM",productId:String(productId),candidateProductIds:(asset?.suggestions||[]).map(item=>String(item.productId)),confidence:suggestion?.score??null
+  })}),result=>"Product confirmed: "+productLabel(result?.productId||productId));
+}
+async function keepUnresolved(assetId){
+  return runAssetAction(assetId,()=>api("/api/admin/media/"+encodeURIComponent(assetId)+"/match-decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"KEEP_UNRESOLVED"})}),()=> "Asset kept unresolved for review.");
+}
+async function createNewProductCandidate(assetId){
+  const name=window.prompt("Suggested product name:");
+  if(name===null)return;
+  const category=window.prompt("Suggested category:","Kitchen & Bakery Equipment");
+  if(category===null)return;
+  const asset=assets.find(item=>String(item.id)===String(assetId));
+  return runAssetAction(assetId,()=>api("/api/admin/media/"+encodeURIComponent(assetId)+"/match-decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    action:"CREATE_NEW_PRODUCT",suggestedName:name.trim(),category:category.trim(),sourceAssetIds:[String(assetId)],
+    evidence:{reason:asset?.suggestionReason||"Owner-created candidate from unresolved visual review"}
+  })}),result=>"New product candidate created: "+(result?.candidateId||"pending owner review"));
+}
 async function updateAsset(id){
   const p=document.querySelector('[data-id="'+id+'"][data-field="productId"]'),r=document.querySelector('[data-id="'+id+'"][data-field="role"]');
   return runAssetAction(id,()=>api("/api/admin/media/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId:p&&p.value.trim()?p.value.trim():null,sourceType:$("sourceType").value,rightsStatus:$("rightsStatus").value,provenance:$("provenance").value.trim(),sourceUrl:$("sourceUrl").value.trim(),license:$("license").value.trim(),attribution:$("attribution").value.trim(),role:r.value})}),result=>"Metadata saved. Product: "+(result&&result.status?result.status:"REVIEW"));
