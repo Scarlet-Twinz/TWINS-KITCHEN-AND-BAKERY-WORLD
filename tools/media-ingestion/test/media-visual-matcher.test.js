@@ -2,104 +2,118 @@ const fs=require("node:fs");
 const path=require("node:path");
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {classifyVisualMatches,visualSimilarity,signatureFromPixels}=require("../../../admin/media/media-visual-matcher.js");
+const matcher=require("../../../admin/media/media-visual-matcher.js");
 
-test("automatic visual match returns the strongest high-confidence catalogue match",()=>{
-  const result=classifyVisualMatches([
-    {productId:"58",name:"20L Planetary Mixer",score:0.94},
+test("identical embeddings produce cosine similarity of one",()=>{
+  assert.equal(matcher.cosineSimilarity([1,0,0],[1,0,0]),1);
+});
+
+test("reference ranking deduplicates multiple images for one product",()=>{
+  const ranked=matcher.rankVisualMatches([
+    {productId:"58",name:"20L Planetary Mixer",score:0.71,referenceUrl:"/a.jpg"},
+    {productId:"58",name:"20L Planetary Mixer",score:0.83,referenceUrl:"/b.jpg"},
+    {productId:"33",name:"Commercial Dishwasher",score:0.70,referenceUrl:"/c.jpg"}
+  ]);
+  assert.deepEqual(ranked.map(x=>x.productId),["58","33"]);
+  assert.equal(ranked[0].score,0.83);
+});
+
+test("clear top embedding candidate is HIGH",()=>{
+  const result=matcher.classifyVisualMatches([
+    {productId:"58",name:"20L Planetary Mixer",score:0.91},
     {productId:"33",name:"Commercial Dishwasher",score:0.70}
   ]);
   assert.equal(result.status,"HIGH");
   assert.deepEqual(result.suggestions.map(x=>x.productId),["58"]);
 });
 
-test("high-confidence visual match requires a clear margin",()=>{
-  const result=classifyVisualMatches([
-    {productId:"58",name:"20L Planetary Mixer",score:0.91},
-    {productId:"59",name:"Planetary Mixer",score:0.90}
-  ]);
-  assert.equal(result.status,"UNRESOLVED");
-});
-
-test("medium visual match returns candidates for human review",()=>{
-  const result=classifyVisualMatches([
+test("close embedding candidates are MEDIUM when similarity is reasonable",()=>{
+  const result=matcher.classifyVisualMatches([
     {productId:"58",name:"20L Planetary Mixer",score:0.80},
-    {productId:"59",name:"Planetary Mixer",score:0.75},
-    {productId:"33",name:"Commercial Dishwasher",score:0.40}
+    {productId:"59",name:"Planetary Mixer",score:0.75}
   ]);
   assert.equal(result.status,"MEDIUM");
   assert.deepEqual(result.suggestions.map(x=>x.productId),["58","59"]);
   assert.ok(result.suggestions.every(x=>x.confidence==="MEDIUM"));
 });
 
-test("ambiguous or weak visual evidence remains unresolved",()=>{
-  const result=classifyVisualMatches([
-    {productId:"58",name:"20L Planetary Mixer",score:0.71},
-    {productId:"33",name:"Commercial Dishwasher",score:0.69}
+test("ambiguous embeddings remain unresolved",()=>{
+  const result=matcher.classifyVisualMatches([
+    {productId:"58",name:"20L Planetary Mixer",score:0.61},
+    {productId:"33",name:"Commercial Dishwasher",score:0.60}
   ]);
-  assert.equal(result.status,"UNRESOLVED");
-});
-
-test("no visual reference candidates never forces a product",()=>{
-  const result=classifyVisualMatches([]);
   assert.equal(result.status,"UNRESOLVED");
   assert.deepEqual(result.suggestions,[]);
 });
 
-test("visual signatures and similarity are deterministic",()=>{
-  const pixels=new Uint8ClampedArray([
-    255,0,0,255,255,0,0,255,
-    255,0,0,255,255,0,0,255
-  ]);
-  const a=signatureFromPixels(pixels,2,2);
-  const b=signatureFromPixels(pixels,2,2);
-  assert.equal(visualSimilarity(a,b),1);
-});
-
-test("Media Center makes visual matching primary and keeps manual picker as fallback",()=>{
-  const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
-  assert.match(source,/await enrichVisualSuggestions\(\)/);
-  assert.match(source,/a\.suggestions=\[\];/);
-  assert.match(source,/function selectCatalogueProduct\(/);
-});
-
-test("very weak visual evidence remains unresolved without a suggested product",()=>{
-  const unresolved=classifyVisualMatches([{productId:"58",name:"20L Planetary Mixer",score:0.40}]);
-  assert.equal(unresolved.status,"UNRESOLVED");
-  assert.deepEqual(unresolved.suggestions,[]);
-});
-
-test("suggestive local visual evidence is surfaced for human review",()=>{
-  const review=classifyVisualMatches([
-    {productId:"58",name:"20L Planetary Mixer",score:0.50},
-    {productId:"33",name:"Commercial Dishwasher",score:0.42}
-  ]);
-  assert.equal(review.status,"MEDIUM");
-  assert.deepEqual(review.suggestions.map(x=>x.productId),["58","33"]);
-  assert.ok(review.suggestions.every(x=>x.confidence==="REVIEW"));
-});
-
-test("semantic vision can produce a high-confidence automatic match only with local supporting evidence",()=>{
-  const matcher=require("../../../admin/media/media-visual-matcher.js");
-  const result=matcher.classifySemanticVisualMatch({result:"MATCH",productId:"58",confidence:"HIGH",reason:"same product"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.61});
-  assert.equal(result.status,"HIGH");
-  assert.equal(result.suggestions[0].productId,"58");
-});
-test("semantic vision produces medium-confidence candidates for human review",()=>{
-  const matcher=require("../../../admin/media/media-visual-matcher.js");
-  const result=matcher.classifySemanticVisualMatch({result:"AMBIGUOUS",productId:"58",confidence:"MEDIUM",reason:"plausible"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.45});
-  assert.equal(result.status,"MEDIUM");
-});
-test("semantic vision never forces an unresolved image",()=>{
-  const matcher=require("../../../admin/media/media-visual-matcher.js");
-  const result=matcher.classifySemanticVisualMatch({result:"NO_MATCH",productId:null,confidence:"LOW",reason:"unclear"},[{productId:"58",name:"20L Planetary Mixer"}],{"58":0.90});
+test("weak embeddings remain unresolved",()=>{
+  const result=matcher.classifyVisualMatches([{productId:"58",name:"20L Planetary Mixer",score:0.40}]);
   assert.equal(result.status,"UNRESOLVED");
   assert.deepEqual(result.suggestions,[]);
 });
-test("Media Center uses on-device vision when available and preserves the manual picker fallback",()=>{
+
+test("empty catalogue index remains unresolved",()=>{
+  const result=matcher.classifyVisualMatches([]);
+  assert.equal(result.status,"UNRESOLVED");
+});
+
+test("missing reference embeddings are ignored",async()=>{
+  const result=await matcher.buildReferenceIndex(
+    [
+      {id:58,n:"20L Planetary Mixer"},
+      {id:33,n:"Commercial Dishwasher"}
+    ],
+    product=>product.id===58?["/mixer.jpg"]:["/broken.jpg"],
+    null,
+    null,
+    {embedReference:async url=>url==="/broken.jpg"?{embedding:null,error:"SecurityError",status:"REFERENCE_UNAVAILABLE"}:{embedding:[1,0,0]}}
+  );
+  assert.equal(result.index.length,1);
+  assert.equal(result.index[0].productId,"58");
+  assert.equal(result.unavailableReferences[0].status,"REFERENCE_UNAVAILABLE");
+});
+
+test("catalogue index uses cached reference embeddings without requiring model inference",async()=>{
+  const calls=[];
+  const result=await matcher.buildReferenceIndex(
+    [{id:58,n:"20L Planetary Mixer"}],
+    ()=>["/mixer.jpg"],
+    null,
+    null,
+    {embedReference:async url=>{calls.push(url);return{embedding:[1,0,0]};}}
+  );
+  assert.equal(calls.length,1);
+  assert.equal(result.usable,1);
+});
+
+test("Media Center uses ONNX vision embeddings, persistent indexing, background enrichment and manual picker",()=>{
   const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
-  assert.match(source,/semanticVisualMatch/);
-  assert.match(source,/visualReferenceUrls/);
+  assert.match(source,/buildReferenceIndex/);
+  assert.match(source,/embeddingForBlob/);
+  assert.match(source,/rankByEmbedding/);
+  assert.match(source,/void enrichVisualSuggestions\(\)/);
   assert.match(source,/function selectCatalogueProduct\(/);
-  assert.match(source,/on-device vision when available/);
+  assert.match(source,/ONNX vision \/ Transformers\.js/);
+  assert.doesNotMatch(source,/signatureFromPixels/);
+  assert.doesNotMatch(source,/visualSimilarity/);
+});
+
+test("vision module uses MobileCLIP and supports WebGPU with WASM fallback",()=>{
+  const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-visual-matcher.js"),"utf8");
+  assert.match(source,/Xenova\/mobileclip_s0/);
+  assert.match(source,/CLIPVisionModelWithProjection/);
+  assert.match(source,/device="webgpu"/);
+  assert.match(source,/device="wasm"/);
+  assert.match(source,/dtype="fp16"/);
+  assert.match(source,/dtype="fp32"/);
+  assert.match(source,/useBrowserCache=true/);
+  assert.match(source,/indexedDB/);
+});
+
+test("manual picker and protected workflow remain present",()=>{
+  const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
+  assert.match(source,/function selectCatalogueProduct\(/);
+  assert.match(source,/async function revalidate\(/);
+  assert.match(source,/async function approveAsset\(/);
+  assert.match(source,/published=false/);
 });
