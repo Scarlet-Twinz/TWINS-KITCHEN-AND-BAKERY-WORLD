@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 const {
   loadCatalogue, readExistingRules, computeMediaState
 } = require("../validator");
@@ -30,6 +31,27 @@ function makeAsset(root, relative, buffer=null) {
   const file=path.join(root,relative); fs.mkdirSync(path.dirname(file),{recursive:true}); fs.writeFileSync(file,buffer); return file;
 }
 function pendingState() { return computeMediaState(loadCatalogue(), readExistingRules()); }
+
+test("CLI writes exactly one valid JSON document to --report", () => {
+  const root=tempDir();
+  const manifest=path.join(root,"manifest.json");
+  const report=path.join(root,"report.json");
+  fs.writeFileSync(manifest,JSON.stringify({schemaVersion:1,assets:[]}),"utf8");
+  const result=spawnSync(process.execPath,[
+    path.join(__dirname,"..","index.js"),
+    "asset-intake-dry-run",
+    "--assets",root,
+    "--asset-manifest",manifest,
+    "--report",report
+  ],{encoding:"utf8"});
+  assert.equal(result.status,0,result.stderr);
+  const raw=fs.readFileSync(report,"utf8");
+  const parsed=JSON.parse(raw);
+  assert.equal(typeof parsed,"object");
+  assert.ok(parsed && !Array.isArray(parsed));
+  assert.ok(Array.isArray(parsed.results));
+  assert.match(raw,/^\{[\s\S]*\}\s*$/);
+});
 
 test("pending asset manifest is deterministic, dynamic, and includes expected paths", () => {
   const a=buildPendingAssetManifest(); const b=buildPendingAssetManifest();

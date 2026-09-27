@@ -1,4 +1,4 @@
-import base64, hashlib, hmac, json, secrets, uuid, os, shutil, subprocess, zipfile
+import base64, hashlib, hmac, json, secrets, uuid, os, shutil, subprocess, zipfile, logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
 import bcrypt, psycopg
@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     media_node_command: str="node"
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
+logger=logging.getLogger("twins.media")
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
 app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
@@ -137,6 +138,7 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         raise HTTPException(status_code=422,detail=f"Asset-intake batch directory is missing: {batch_dir}")
     if not manifest_path.is_file():
         raise HTTPException(status_code=422,detail=f"Asset-intake manifest is missing: {manifest_path}")
+    report_path.parent.mkdir(parents=True,exist_ok=True)
     command=[settings.media_node_command,str(intake_script),"asset-intake-dry-run","--assets",str(batch_dir),"--asset-manifest",str(manifest_path),"--report",str(report_path)]
     try:
         result=subprocess.run(command,cwd=repo_root,text=True,capture_output=True,timeout=120)
@@ -161,13 +163,6 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         message="Asset-intake validation failed"
         if details: message+=": "+details
         raise HTTPException(status_code=422,detail=message)
-    if result.stdout.strip():
-        try:
-            report=json.loads(result.stdout)
-            if isinstance(report,dict) and isinstance(report.get("results"),list):
-                return report
-        except json.JSONDecodeError:
-            pass
     if not report_path.is_file():
         details=(result.stderr or result.stdout or "").strip()
         message="Asset-intake completed without producing a report"
@@ -175,11 +170,13 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         raise HTTPException(status_code=500,detail=message)
     try:
         report=json.loads(report_path.read_text(encoding="utf-8"))
-        if not isinstance(report,dict) or not isinstance(report.get("results"),list):
-            raise ValueError("report root must be an object containing results")
-        return report
-    except (json.JSONDecodeError,ValueError) as exc:
-        raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}")
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}") from exc
+    if not isinstance(report,dict):
+        raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must be an object")
+    if not isinstance(report.get("results"),list):
+        raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must contain a results array")
+    return report
 def media_metadata_from_row(row):
     return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
 
@@ -459,26 +456,52 @@ def media_update(asset_id:str,request:Request,payload:dict):
 @app.post("/api/admin/media/{asset_id}/revalidate")
 def media_revalidate(asset_id:str,request:Request):
     actor=require_owner(request)
-    root=media_root()
-    with db() as conn:
-        row=conn.execute("""select id,product_legacy_id,filename,storage_path,source_type,rights_status,provenance,source_url,license,attribution,role,batch_id
-        from media_assets where id=%s""",(uuid.UUID(asset_id),)).fetchone()
-    if not row: raise HTTPException(status_code=404,detail="Media asset not found")
-    asset_path=Path(row[3])
-    if not asset_path.is_absolute(): asset_path=Path.cwd()/asset_path
-    if not asset_path.exists(): raise HTTPException(status_code=404,detail="Stored asset is missing")
-    batch_dir=root/"incoming"/str(row[11])
-    if not batch_dir.exists(): batch_dir=asset_path.parent
-    manifest_path,report_path=revalidation_report_paths(root,asset_id)
-    manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"rights":row[5],"source":row[4],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
-    report=run_asset_intake(batch_dir,manifest_path,report_path)
-    result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
-    status=result.get("state","REVIEW") if result else "REVIEW"
-    if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
-    with db() as conn:
-        conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result and result.get("productId") else row[1],status,uuid.UUID(asset_id)))
-        audit_media_action(conn,actor,"MEDIA_REVALIDATED",asset_id,{"result":result}); conn.commit()
-    return {"ok":True,"status":status,"result":result}
+    stage="validate asset ID"
+    try:
+        asset_uuid=uuid.UUID(asset_id)
+        stage="load media asset"
+        root=media_root()
+        (root/"manifests").mkdir(parents=True,exist_ok=True)
+        with db() as conn:
+            row=conn.execute("""select id,product_legacy_id,filename,storage_path,source_type,rights_status,provenance,source_url,license,attribution,role,batch_id
+            from media_assets where id=%s""",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+
+        stage="resolve stored asset"
+        asset_path=Path(row[3])
+        if not asset_path.is_absolute(): asset_path=Path.cwd()/asset_path
+        if not asset_path.exists(): raise HTTPException(status_code=404,detail="Stored asset is missing")
+
+        stage="resolve intake batch"
+        batch_id=row[11] if len(row)>11 else None
+        batch_dir=root/"incoming"/str(batch_id) if batch_id else asset_path.parent
+        if not batch_dir.exists(): batch_dir=asset_path.parent
+        if not batch_dir.is_dir(): raise HTTPException(status_code=422,detail=f"Asset-intake batch directory is missing: {batch_dir}")
+
+        stage="write revalidation manifest"
+        manifest_path,report_path=revalidation_report_paths(root,asset_id)
+        manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"rights":row[5],"source":row[4],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
+
+        stage="run local asset-intake validator"
+        report=run_asset_intake(batch_dir,manifest_path,report_path)
+        result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
+        if result is None:
+            raise HTTPException(status_code=422,detail="Asset-intake completed without a result for the stored asset")
+        status=result.get("state","REVIEW")
+        if status=="UNRESOLVED": status="REVIEW"
+        if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
+
+        stage="persist revalidation result"
+        with db() as conn:
+            conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else row[1],status,asset_uuid))
+            audit_media_action(conn,actor,"MEDIA_REVALIDATED",asset_id,{"result":result})
+            conn.commit()
+        return {"ok":True,"status":status,"result":result}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("MEDIA REVALIDATE FAILED asset_id=%s stage=%s",asset_id,stage)
+        raise HTTPException(status_code=500,detail=f"Revalidate failed at {stage}: {type(exc).__name__}: {exc}") from exc
 
 @app.post("/api/admin/media/{asset_id}/approve")
 def media_approve(asset_id:str,request:Request):

@@ -9,74 +9,63 @@ function visualReferenceUrls(product){
 function visualReferenceUrl(product){
   return visualReferenceUrls(product)[0]||"";
 }
-function loadVisualSignature(url){
-  if(!visualMatcher||!url)return Promise.resolve(null);
-  const key=String(url);
-  if(visualSignatureCache.has(key))return visualSignatureCache.get(key);
-  const promise=new Promise(resolve=>{
-    const image=new Image();
-    image.onload=()=>{
-      try{
-        const size=40,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
-        const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(image,0,0,size,size);
-        resolve(visualMatcher.signatureFromPixels(ctx.getImageData(0,0,size,size).data,size,size));
-      }catch(e){resolve(null)}
-    };
-    image.onerror=()=>resolve(null);
-    image.src=key;
-  });
-  visualSignatureCache.set(key,promise);
-  return promise;
-}
-async function loadVisualBlob(url){
+async function loadVisualSource(asset){
+  if(!visualMatcher||!asset)return null;
   try{
-    const response=await fetch(url,{credentials:"include",cache:"force-cache"});
+    const response=await fetch(mediaContentUrl(asset.id),{credentials:"include",cache:"no-store"});
     if(!response.ok)return null;
     return await response.blob();
   }catch{return null;}
 }
+let visualIndexPromise=null;
+let visualIndexProductsKey="";
+let visualIndexStatus={message:"Loading model…",state:"loading"};
+function ensureVisualStatus(){
+  let node=document.getElementById("visualAiStatus");
+  if(!node){
+    node=document.createElement("div");
+    node.id="visualAiStatus";
+    node.className="operation-feedback pending";
+    const toolbar=document.querySelector(".toolbar");
+    if(toolbar)toolbar.prepend(node);
+  }
+  node.textContent="AI visual matcher: "+visualIndexStatus.message;
+  node.className="operation-feedback "+(visualIndexStatus.state==="ready"?"success":visualIndexStatus.state==="unavailable"?"error":"pending");
+}
+function updateVisualStatus(info){
+  visualIndexStatus={message:String(info?.message||"Unavailable — visual matching disabled"),state:info?.state||"loading"};
+  ensureVisualStatus();
+}
+async function getVisualReferenceIndex(products){
+  if(!visualMatcher)return{index:[],usable:0,unavailable:0,totalProducts:0};
+  const key=(Array.isArray(products)?products:[]).map(p=>String(p?.id||"")).join(",");
+  if(visualIndexPromise&&visualIndexProductsKey===key)return visualIndexPromise;
+  visualIndexProductsKey=key;
+  visualIndexPromise=visualMatcher.buildReferenceIndex(products,visualReferenceUrls,progress=>{
+    updateVisualStatus({message:"Building visual catalogue index… "+progress.completed+" / "+progress.total,state:"loading"});
+  },updateVisualStatus).then(result=>{
+    if(!result.index.length&&result.totalProducts)updateVisualStatus({message:"Unavailable — no catalogue reference images could be indexed",state:"unavailable"});
+    else if(result.index.length)updateVisualStatus({message:"Ready — "+result.index.length+" reference image embeddings indexed",state:"ready"});
+    return result;
+  }).catch(error=>{
+    visualIndexPromise=null;
+    updateVisualStatus({message:"Unavailable — visual matching disabled",state:"unavailable"});
+    throw error;
+  });
+  return visualIndexPromise;
+}
 async function identifyAssetVisually(asset){
   if(!visualMatcher||!asset||asset.productId)return null;
-  const sourceUrl=mediaContentUrl(asset.id);
-  const source=await loadVisualSignature(sourceUrl);
-  if(!source)return null;
   const products=typeof P!=="undefined"&&Array.isArray(P)?P:[];
-  const candidates=[];
-  for(const product of products){
-    if(!product||product.id==null||!product.n)continue;
-    for(const url of visualReferenceUrls(product))candidates.push({product,url});
-  }
-  const ranked=[];
-  for(let start=0;start<candidates.length;start+=8){
-    const batch=candidates.slice(start,start+8);
-    const refs=await Promise.all(batch.map(x=>loadVisualSignature(x.url)));
-    refs.forEach((reference,index)=>{
-      const item=batch[index],product=item.product;
-      if(!reference)return;
-      ranked.push({productId:String(product.id),name:String(product.n),category:catalogueCategory(product),score:visualMatcher.visualSimilarity(source,reference),referenceUrl:item.url});
-    });
-  }
-  const rankedProducts=visualMatcher.rankVisualMatches(ranked);
-  const localResult=visualMatcher.classifyVisualMatches(rankedProducts);
-  if(!rankedProducts.length)return localResult;
-  const sourceBlob=await loadVisualBlob(sourceUrl);
-  if(sourceBlob&&visualMatcher.semanticVisualMatch){
-    const semanticCandidates=[];
-    for(const item of rankedProducts.slice(0,8)){
-      const blob=await loadVisualBlob(item.referenceUrl);
-      if(blob)semanticCandidates.push({...item,blob});
-    }
-    if(semanticCandidates.length){
-      const semantic=await visualMatcher.semanticVisualMatch(sourceBlob,semanticCandidates);
-      if(semantic){
-        const localScores=Object.fromEntries(rankedProducts.map(item=>[String(item.productId),Number(item.score)]));
-        const semanticResult=visualMatcher.classifySemanticVisualMatch(semantic,semanticCandidates,localScores);
-        if(semanticResult.status!=="UNRESOLVED")return{...semanticResult,engine:"on-device vision"};
-        return{...semanticResult,engine:"on-device vision"};
-      }
-    }
-  }
-  return{...localResult,engine:"local visual similarity"};
+  if(!products.length)return{status:"UNRESOLVED",suggestions:[],reason:"canonical catalogue is unavailable",engine:"ONNX vision"};
+  const sourceBlob=await loadVisualSource(asset);
+  if(!sourceBlob)return{status:"UNRESOLVED",suggestions:[],reason:"uploaded image could not be decoded from the Media API",engine:"ONNX vision"};
+  const identity=asset.sha256||asset.id||asset.filename;
+  const sourceResult=await visualMatcher.embeddingForBlob(sourceBlob,identity,updateVisualStatus);
+  const referenceResult=await getVisualReferenceIndex(products);
+  const ranked=visualMatcher.rankByEmbedding(sourceResult.embedding,referenceResult.index);
+  const localResult=visualMatcher.classifyVisualMatches(ranked);
+  return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length};
 }
 async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
@@ -180,7 +169,7 @@ function render(){
   $("queue").innerHTML=list.length?list.map(a=>{
     const suggestionHtml=a.productId?"":`
       <div class="suggestions">
-        <strong>Suggested products<span class="suggestion-source"> · on-device vision when available · local visual fallback</span></strong>
+        <strong>Suggested products<span class="suggestion-source"> · local ONNX vision · cached catalogue embeddings</span></strong>
         ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
           <div class="suggestion">
             <div>
@@ -209,7 +198,8 @@ async function refresh(showFeedback=false){
         a.suggestionSource="visual";
         a.suggestionStatus="UNRESOLVED";
       });
-      await enrichVisualSuggestions();
+      render();
+      void enrichVisualSuggestions();
     }else{
       render();
     }

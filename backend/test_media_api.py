@@ -107,7 +107,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
-    def test_asset_intake_prefers_clean_json_report_from_stdout(self):
+    def test_asset_intake_reads_only_the_canonical_report_file(self):
         import tempfile
         from pathlib import Path
         from unittest.mock import MagicMock, patch
@@ -118,11 +118,141 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             report=root/"report.json"
             manifest=root/"manifest.json"
             manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
-            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\\n')
+            report.write_text('{"results":[],"counts":{"VERIFIED":0}}\n',encoding="utf-8")
+            completed=MagicMock(returncode=0,stderr="",stdout="progress message\n{not-json}\n")
             with patch("main.subprocess.run",return_value=completed):
                 result=run_asset_intake(root,manifest,report)
             self.assertEqual(result["results"],[])
             self.assertEqual(result["counts"]["VERIFIED"],0)
+
+    def test_asset_intake_malformed_report_returns_structured_500(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        from fastapi import HTTPException
+        from main import run_asset_intake
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            report=root/"report.json"
+            manifest=root/"manifest.json"
+            manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
+            report.write_text('{"results":[]}\n{"results":[]}',encoding="utf-8")
+            completed=MagicMock(returncode=0,stderr="",stdout="")
+            with patch("main.subprocess.run",return_value=completed):
+                with self.assertRaises(HTTPException) as ctx:
+                    run_asset_intake(root,manifest,report)
+            self.assertEqual(ctx.exception.status_code,500)
+            self.assertIn("Asset-intake produced an invalid report: Extra data",str(ctx.exception.detail))
+
+    def test_revalidate_valid_report_succeeds_with_cors(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        batch_id=uuid.uuid4()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            image=root/"incoming"/str(batch_id)/"uploaded.jpg"
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b"fake-jpeg")
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
+            report={"results":[{"asset":"uploaded.jpg","productId":"94","state":"REVIEW","reason":"review required"}],"counts":{"REVIEW":1}}
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",return_value=report):
+                r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["status"],"REVIEW")
+        self.assertEqual(r.json()["result"]["productId"],"94")
+        self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
+
+    def test_revalidate_unresolved_maps_to_canonical_review_and_preserves_assignment(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        batch_id=uuid.uuid4()
+        existing_product_id=303
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            image=root/"incoming"/str(batch_id)/"uploaded.jpg"
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b"fake-jpeg")
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            conn.execute.return_value.fetchone.return_value=(asset_id,existing_product_id,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
+            report={"results":[{"asset":"uploaded.jpg","productId":None,"state":"UNRESOLVED","reason":"No sufficiently strong visual match"}],"counts":{"UNRESOLVED":1}}
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",return_value=report):
+                r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json()["status"],"REVIEW")
+        self.assertEqual(r.json()["result"]["state"],"UNRESOLVED")
+        self.assertIsNone(r.json()["result"]["productId"])
+        self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
+        update_calls=[call for call in conn.execute.call_args_list if str(call.args[0]).lower().startswith("update media_assets set")]
+        self.assertEqual(len(update_calls),1)
+        params=update_calls[0].args[1]
+        self.assertEqual(params[0],existing_product_id)
+        self.assertEqual(params[1],"REVIEW")
+        self.assertNotEqual(params[1],"UNRESOLVED")
+
+    def test_revalidate_unexpected_failure_returns_structured_json_500_with_cors(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        batch_id=uuid.uuid4()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            image=root/"incoming"/str(batch_id)/"uploaded.jpg"
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b"fake-jpeg")
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",side_effect=RuntimeError("asset-intake exploded")):
+                r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
+        self.assertEqual(r.status_code,500)
+        self.assertEqual(r.json()["detail"],"Revalidate failed at run local asset-intake validator: RuntimeError: asset-intake exploded")
+        self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
+
+    def test_revalidate_expected_asset_intake_failure_remains_structured_422(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        from fastapi import HTTPException
+
+        asset_id=uuid.uuid4()
+        actor_id=uuid.uuid4()
+        batch_id=uuid.uuid4()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            image=root/"incoming"/str(batch_id)/"uploaded.jpg"
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b"fake-jpeg")
+            conn=MagicMock()
+            conn.__enter__.return_value=conn
+            conn.__exit__.return_value=False
+            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
+            token=sign_session(str(actor_id),"owner")
+            with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",side_effect=HTTPException(status_code=422,detail="Product assignment is required for validation")):
+                r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
+        self.assertEqual(r.status_code,422)
+        self.assertEqual(r.json()["detail"],"Product assignment is required for validation")
+        self.assertEqual(r.headers.get("access-control-allow-origin"),"http://localhost:5500")
 
     def test_revalidation_report_paths_are_unique_per_run(self):
         import tempfile
