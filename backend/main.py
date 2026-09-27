@@ -163,15 +163,6 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         message="Asset-intake validation failed"
         if details: message+=": "+details
         raise HTTPException(status_code=422,detail=message)
-    if result.stdout.strip():
-        stdout_lines=[line.strip() for line in result.stdout.splitlines() if line.strip()]
-        for candidate in reversed(stdout_lines):
-            try:
-                report=json.loads(candidate)
-                if isinstance(report,dict) and isinstance(report.get("results"),list):
-                    return report
-            except json.JSONDecodeError:
-                continue
     if not report_path.is_file():
         details=(result.stderr or result.stdout or "").strip()
         message="Asset-intake completed without producing a report"
@@ -179,11 +170,13 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         raise HTTPException(status_code=500,detail=message)
     try:
         report=json.loads(report_path.read_text(encoding="utf-8"))
-        if not isinstance(report,dict) or not isinstance(report.get("results"),list):
-            raise ValueError("report root must be an object containing results")
-        return report
-    except (json.JSONDecodeError,ValueError) as exc:
-        raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}")
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}") from exc
+    if not isinstance(report,dict):
+        raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must be an object")
+    if not isinstance(report.get("results"),list):
+        raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must contain a results array")
+    return report
 def media_metadata_from_row(row):
     return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
 
