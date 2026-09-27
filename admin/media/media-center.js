@@ -169,7 +169,7 @@ function render(){
   $("queue").innerHTML=list.length?list.map(a=>{
     const suggestionHtml=a.productId?"":`
       <div class="suggestions">
-        <strong>Suggested products<span class="suggestion-source"> · on-device vision when available · local visual fallback</span></strong>
+        <strong>Suggested products<span class="suggestion-source"> · local ONNX vision · cached catalogue embeddings</span></strong>
         ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
           <div class="suggestion">
             <div>
