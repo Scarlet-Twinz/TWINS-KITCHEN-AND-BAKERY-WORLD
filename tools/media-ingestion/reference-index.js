@@ -27,7 +27,13 @@ function localMediaPath(value, root = ROOT) {
   const resolved = path.resolve(root, relative);
   const mediaRoot = path.resolve(root, "assets", "media");
   try {
-    return { path: resolved, relative: path.relative(root, resolved).replace(/\\/g, "/"), insideMediaRoot: Boolean(path.relative(mediaRoot, resolved)) || resolved === mediaRoot };
+    const relativeToMediaRoot = path.relative(mediaRoot, resolved);
+    const insideMediaRoot = resolved === mediaRoot ||
+      (relativeToMediaRoot !== "" &&
+        !relativeToMediaRoot.startsWith(".." + path.sep) &&
+        relativeToMediaRoot !== ".." &&
+        !path.isAbsolute(relativeToMediaRoot));
+    return { path: resolved, relative: path.relative(root, resolved).replace(/\\/g, "/"), insideMediaRoot };
   } catch {
     return null;
   }
