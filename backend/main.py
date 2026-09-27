@@ -455,7 +455,8 @@ def media_revalidate(asset_id:str,request:Request):
     if not asset_path.exists(): raise HTTPException(status_code=404,detail="Stored asset is missing")
     batch_dir=root/"incoming"/str(row[11])
     if not batch_dir.exists(): batch_dir=asset_path.parent
-    manifest_path=root/"manifests"/f"{asset_id}.revalidate.json"; report_path=root/"manifests"/f"{asset_id}.revalidate.report.json"
+    run_id=uuid.uuid4().hex
+    manifest_path=root/"manifests"/f"{asset_id}.revalidate.{run_id}.json"; report_path=root/"manifests"/f"{asset_id}.revalidate.{run_id}.report.json"
     manifest_path.write_text(json.dumps({"schemaVersion":1,"assets":[{"asset":asset_path.name,"productId":row[1],"rights":row[5],"source":row[4],"sourceUrl":row[7],"license":row[8],"attribution":row[9],"role":row[10]}]},indent=2),encoding="utf-8")
     report=run_asset_intake(batch_dir,manifest_path,report_path)
     result=next((x for x in report.get("results",[]) if x.get("asset")==asset_path.name),None)
