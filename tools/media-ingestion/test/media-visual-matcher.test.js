@@ -115,5 +115,5 @@ test("manual picker and protected workflow remain present",()=>{
   assert.match(source,/function selectCatalogueProduct\(/);
   assert.match(source,/async function revalidate\(/);
   assert.match(source,/async function approveAsset\(/);
-  assert.match(source,/published=false/);
+  assert.match(source,/will not publish automatically/);
 });
