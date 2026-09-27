@@ -337,6 +337,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         actor_id=uuid.uuid4()
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as tmp:
             root=Path(tmp)
+            (root/"manifests").mkdir(parents=True)
             conn=MagicMock()
             conn.__enter__.return_value=conn
             conn.__exit__.return_value=False
