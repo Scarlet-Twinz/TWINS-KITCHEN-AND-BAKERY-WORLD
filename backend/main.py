@@ -488,6 +488,7 @@ def media_revalidate(asset_id:str,request:Request):
         if result is None:
             raise HTTPException(status_code=422,detail="Asset-intake completed without a result for the stored asset")
         status=result.get("state","REVIEW")
+        if status=="UNRESOLVED": status="REVIEW"
         if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
 
         stage="persist revalidation result"
