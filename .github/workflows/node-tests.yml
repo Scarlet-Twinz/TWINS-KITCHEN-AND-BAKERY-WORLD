@@ -20,6 +20,8 @@ jobs:
         run: node tools/media-ingestion/index.js reference-audit --output /tmp/twins-reference-index.json
       - name: Run Phase 6 public media audit
         run: node tools/media-ingestion/index.js public-media-audit
+      - name: Run Phase 7 benchmark manifest audit
+        run: node tools/media-ingestion/index.js benchmark-audit
 
   media-center-tests:
     runs-on: ubuntu-latest
