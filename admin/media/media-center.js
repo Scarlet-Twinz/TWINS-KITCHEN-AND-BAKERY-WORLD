@@ -4,7 +4,7 @@ function visualReferenceUrls(product){
   const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
   const override=overrides[String(product.id)]||overrides[product.id]||"";
   const values=[override,...(product.media&&Array.isArray(product.media.images)?product.media.images:[]),product.i||""];
-  return [...new Set(values.map(normalizeCatalogueMediaPath).filter(src=>/^\\/assets\\/media\\//.test(src)))];
+  return [...new Set(values.map(normalizeCatalogueMediaPath).filter(src=>/^\/assets\/media\//.test(src)))];
 }
 function visualReferenceUrl(product){
   return visualReferenceUrls(product)[0]||"";
@@ -93,7 +93,7 @@ async function enrichVisualSuggestions(){
       if(run===visualRun)render();
     }catch(e){
       asset.suggestions=[];
-      asset.suggestionSource="visual";
+      asset.suggestionSource="local visual similarity";
       asset.suggestionStatus="UNRESOLVED";
       asset.suggestionReason="visual matching could not inspect the uploaded image";
       if(run===visualRun)render();
