@@ -1,6 +1,6 @@
 # Twins Kitchen
 
-A commerce-focused web platform for **Twins Kitchen**, a Nigerian supplier of professional kitchen, bakery, catering, restaurant, and hospitality equipment.
+A commerce-focused storefront and operations platform for **Twins Kitchen**, a Nigerian supplier of professional kitchen, bakery, catering, restaurant, and hospitality equipment.
 
 ## Purpose
 
