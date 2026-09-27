@@ -466,6 +466,82 @@ def media_update(asset_id:str,request:Request,payload:dict):
         audit_media_action(conn,actor,"MEDIA_METADATA_UPDATED",asset_id,payload); conn.commit()
     return {"ok":True,"status":"REVIEW"}
 
+@app.post("/api/admin/media/{asset_id}/match-result")
+def media_match_result(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    state=str(payload.get("state") or "UNRESOLVED").upper()
+    if state not in {"HIGH","MEDIUM","UNRESOLVED"}: raise HTTPException(status_code=422,detail="Unsupported match result state")
+    candidates=payload.get("candidates") if isinstance(payload.get("candidates"),list) else []
+    candidate_ids=[str(x.get("productId")) for x in candidates if isinstance(x,dict) and x.get("productId") is not None]
+    top=candidates[0] if candidates and isinstance(candidates[0],dict) else {}
+    candidate_product_id=int(top["productId"]) if top.get("productId") is not None else None
+    confidence=payload.get("confidence",top.get("score"))
+    margin=payload.get("margin")
+    evidence=payload.get("evidence") if isinstance(payload.get("evidence"),dict) else {"reason":payload.get("reason","")}
+    with db() as conn:
+        row=conn.execute("select id from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+        conn.execute("""insert into media_match_results
+        (id,asset_id,candidate_product_id,confidence,margin,evidence,state)
+        values (%s,%s,%s,%s,%s,%s::jsonb,%s)""",
+        (uuid.uuid4(),asset_uuid,candidate_product_id,float(confidence) if confidence is not None else None,float(margin) if margin is not None else None,json.dumps(evidence),state))
+        conn.execute("""update media_assets set candidate_product_ids=%s::jsonb,confidence=%s,ai_state=%s,
+        status='REVIEW',review_state='REVIEW_REQUIRED',updated_at=now() where id=%s""",
+        (json.dumps(candidate_ids),float(confidence) if confidence is not None else None,state,asset_uuid))
+        audit_media_action(conn,actor,"MEDIA_MATCH_RECORDED",asset_id,{"state":state,"candidateProductIds":candidate_ids,"confidence":confidence,"margin":margin})
+        conn.commit()
+    return {"ok":True,"status":"REVIEW","state":state,"candidateProductIds":candidate_ids}
+
+@app.post("/api/admin/media/{asset_id}/match-decision")
+def media_match_decision(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    action=str(payload.get("action") or "").upper()
+    if action not in {"CONFIRM","CHANGE_PRODUCT","KEEP_UNRESOLVED","CREATE_NEW_PRODUCT"}:
+        raise HTTPException(status_code=422,detail="Unsupported match decision")
+    with db() as conn:
+        row=conn.execute("select id,product_legacy_id,filename,sha256 from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+        if action in {"CONFIRM","CHANGE_PRODUCT"}:
+            product_id=payload.get("productId")
+            if product_id in (None,""): raise HTTPException(status_code=422,detail="Product selection is required")
+            if not catalogue_product(product_id): raise HTTPException(status_code=422,detail="Product ID does not exist in canonical catalogue")
+            candidate_ids=payload.get("candidateProductIds") if isinstance(payload.get("candidateProductIds"),list) else [str(product_id)]
+            confidence=payload.get("confidence")
+            conn.execute("""update media_assets set product_legacy_id=%s,status='REVIEW',ai_state='VERIFIED',
+            review_state='CONFIRMED',candidate_product_ids=%s::jsonb,confidence=%s,updated_at=now() where id=%s""",
+            (int(product_id),json.dumps([str(x) for x in candidate_ids]),float(confidence) if confidence is not None else None,asset_uuid))
+            conn.execute("""insert into media_match_results
+            (id,asset_id,candidate_product_id,confidence,margin,evidence,state)
+            values (%s,%s,%s,%s,%s,%s::jsonb,'VERIFIED')""",
+            (uuid.uuid4(),asset_uuid,int(product_id),float(confidence) if confidence is not None else None,None,json.dumps({"decision":action,"filename":row[2]})))
+            audit_media_action(conn,actor,"MEDIA_MATCH_CONFIRMED",asset_id,{"productId":int(product_id),"decision":action})
+            conn.commit()
+            return {"ok":True,"status":"REVIEW","state":"VERIFIED","productId":int(product_id)}
+        if action=="KEEP_UNRESOLVED":
+            conn.execute("""update media_assets set product_legacy_id=case when product_legacy_id is null then null else product_legacy_id end,
+            status='REVIEW',ai_state='UNRESOLVED',review_state='UNRESOLVED',updated_at=now() where id=%s""",(asset_uuid,))
+            audit_media_action(conn,actor,"MEDIA_MATCH_KEPT_UNRESOLVED",asset_id,{"filename":row[2]})
+            conn.commit()
+            return {"ok":True,"status":"REVIEW","state":"UNRESOLVED","productId":row[1]}
+        suggested_name=str(payload.get("suggestedName") or "").strip()
+        category=str(payload.get("category") or "").strip()
+        source_asset_ids=payload.get("sourceAssetIds") if isinstance(payload.get("sourceAssetIds"),list) else [asset_id]
+        evidence=payload.get("evidence") if isinstance(payload.get("evidence"),dict) else {}
+        candidate_id=uuid.uuid4()
+        conn.execute("""insert into media_product_candidates
+        (id,asset_id,suggested_name,category,source_asset_ids,evidence,status)
+        values (%s,%s,%s,%s,%s::jsonb,%s::jsonb,'PENDING_OWNER')""",
+        (candidate_id,asset_uuid,suggested_name or None,category or None,json.dumps([str(x) for x in source_asset_ids]),json.dumps(evidence)))
+        conn.execute("""update media_assets set status='REVIEW',ai_state='UNRESOLVED',
+        review_state='REVIEW_REQUIRED',updated_at=now() where id=%s""",(asset_uuid,))
+        audit_media_action(conn,actor,"MEDIA_NEW_PRODUCT_CANDIDATE_CREATED",asset_id,{"candidateId":str(candidate_id),"suggestedName":suggested_name,"category":category})
+        conn.commit()
+    return {"ok":True,"status":"REVIEW","state":"NEW_PRODUCT_CANDIDATE","candidateId":str(candidate_id)}
+
 @app.post("/api/admin/media/{asset_id}/revalidate")
 def media_revalidate(asset_id:str,request:Request):
     actor=require_owner(request)
