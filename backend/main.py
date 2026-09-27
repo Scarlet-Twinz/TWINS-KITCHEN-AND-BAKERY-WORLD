@@ -161,14 +161,24 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
         message="Asset-intake validation failed"
         if details: message+=": "+details
         raise HTTPException(status_code=422,detail=message)
+    if result.stdout.strip():
+        try:
+            report=json.loads(result.stdout)
+            if isinstance(report,dict) and isinstance(report.get("results"),list):
+                return report
+        except json.JSONDecodeError:
+            pass
     if not report_path.is_file():
         details=(result.stderr or result.stdout or "").strip()
         message="Asset-intake completed without producing a report"
         if details: message+=f": {details}"
         raise HTTPException(status_code=500,detail=message)
     try:
-        return json.loads(report_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
+        report=json.loads(report_path.read_text(encoding="utf-8"))
+        if not isinstance(report,dict) or not isinstance(report.get("results"),list):
+            raise ValueError("report root must be an object containing results")
+        return report
+    except (json.JSONDecodeError,ValueError) as exc:
         raise HTTPException(status_code=500,detail=f"Asset-intake produced an invalid report: {exc}")
 def media_metadata_from_row(row):
     return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
