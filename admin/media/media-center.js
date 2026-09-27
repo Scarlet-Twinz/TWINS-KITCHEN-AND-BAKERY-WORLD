@@ -65,7 +65,10 @@ async function identifyAssetVisually(asset){
   const referenceResult=await getVisualReferenceIndex(products);
   const ranked=visualMatcher.rankByEmbedding(sourceResult.embedding,referenceResult.index);
   const localResult=visualMatcher.classifyVisualMatches(ranked);
-  return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length};
+  const top=Array.isArray(localResult.suggestions)&&localResult.suggestions[0]?localResult.suggestions[0]:null;
+  const second=Array.isArray(localResult.suggestions)&&localResult.suggestions[1]?localResult.suggestions[1]:null;
+  const margin=top&&second?Number(top.score)-Number(second.score):null;
+  return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length,margin};
 }
 async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
@@ -79,6 +82,15 @@ async function enrichVisualSuggestions(){
       asset.suggestionSource=result?.engine||"local visual similarity";
       asset.suggestionStatus=result?.status||"UNRESOLVED";
       asset.suggestionReason=result?.reason||"visual evidence unavailable";
+      try{
+        await api("/api/admin/media/"+encodeURIComponent(asset.id)+"/match-result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          state:asset.suggestionStatus,
+          candidates:asset.suggestions,
+          confidence:asset.suggestions[0]?.score??null,
+          margin:result?.margin??null,
+          evidence:{reason:asset.suggestionReason,engine:asset.suggestionSource,referenceCount:result?.referenceCount??0}
+        })});
+      }catch{}
       if(run===visualRun)render();
     }catch(e){
       asset.suggestions=[];
