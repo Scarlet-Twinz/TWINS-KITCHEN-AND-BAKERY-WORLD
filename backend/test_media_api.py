@@ -203,6 +203,10 @@ class MediaApiAuthorizationTests(unittest.TestCase):
         params=update_calls[0].args[1]
         self.assertEqual(params[0],existing_product_id)
         self.assertEqual(params[1],"REVIEW")
+        self.assertEqual(params[2],"UNRESOLVED")
+        self.assertEqual(params[3],"[]")
+        self.assertIsNone(params[4])
+        self.assertEqual(params[5],"UNRESOLVED")
         self.assertNotEqual(params[1],"UNRESOLVED")
 
     def test_revalidate_unexpected_failure_returns_structured_json_500_with_cors(self):
