@@ -48,6 +48,33 @@ set original_filename=coalesce(original_filename,filename),
 where original_filename is null;
 create index if not exists idx_media_assets_ai_state on media_assets(ai_state,created_at desc);
 create index if not exists idx_media_assets_review_state on media_assets(review_state,created_at desc);
+
+create table if not exists media_match_results (
+ id uuid primary key,
+ asset_id uuid not null references media_assets(id) on delete cascade,
+ candidate_product_id integer,
+ confidence numeric(7,6),
+ margin numeric(7,6),
+ evidence jsonb not null default '{}'::jsonb,
+ state text not null check (state in ('HIGH','MEDIUM','UNRESOLVED','VERIFIED','REJECTED')),
+ created_at timestamptz not null default now()
+);
+create index if not exists idx_media_match_results_asset on media_match_results(asset_id,created_at desc);
+create index if not exists idx_media_match_results_candidate on media_match_results(candidate_product_id,created_at desc);
+
+create table if not exists media_product_candidates (
+ id uuid primary key,
+ asset_id uuid not null references media_assets(id) on delete cascade,
+ suggested_name text,
+ category text,
+ source_asset_ids jsonb not null default '[]'::jsonb,
+ evidence jsonb not null default '{}'::jsonb,
+ status text not null default 'PENDING_OWNER' check (status in ('PENDING_OWNER','CREATED','MERGED','KEPT_UNRESOLVED','REJECTED')),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create index if not exists idx_media_product_candidates_asset on media_product_candidates(asset_id,created_at desc);
+create index if not exists idx_media_product_candidates_status on media_product_candidates(status,created_at desc);
 create table if not exists media_production_mappings (
  id uuid primary key, asset_id uuid not null unique references media_assets(id) on delete restrict,
  product_legacy_id integer not null, role text not null, published boolean not null default false,
