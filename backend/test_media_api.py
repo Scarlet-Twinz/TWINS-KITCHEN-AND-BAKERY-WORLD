@@ -107,6 +107,19 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
+    def test_revalidation_report_paths_are_unique_per_run(self):
+        import tempfile
+        from pathlib import Path
+        from main import revalidation_report_paths
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            first=revalidation_report_paths(root,"asset-123")
+            second=revalidation_report_paths(root,"asset-123")
+            self.assertNotEqual(first[0],second[0])
+            self.assertNotEqual(first[1],second[1])
+            self.assertTrue(first[0].name.startswith("asset-123.revalidate."))
+            self.assertTrue(first[1].name.endswith(".report.json"))
+
     def test_asset_intake_script_exists_in_repository(self):
         from pathlib import Path
         script=Path(__file__).resolve().parent.parent/"tools"/"media-ingestion"/"index.js"
