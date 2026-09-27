@@ -140,7 +140,7 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             conn=MagicMock()
             conn.__enter__.return_value=conn
             conn.__exit__.return_value=False
-            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","primary",batch_id)
+            conn.execute.return_value.fetchone.return_value=(asset_id,None,"uploaded.jpg",str(image),"owned","owned","local upload","","","", "primary",batch_id)
             token=sign_session(str(actor_id),"owner")
             with patch("main.media_root",return_value=root), patch("main.db",return_value=conn), patch("main.run_asset_intake",side_effect=RuntimeError("asset-intake exploded")):
                 r=self.client.post("/api/admin/media/"+str(asset_id)+"/revalidate",cookies={"twins_session":token},headers={"Origin":"http://localhost:5500"})
