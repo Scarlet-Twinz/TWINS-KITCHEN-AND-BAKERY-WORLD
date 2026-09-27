@@ -107,6 +107,23 @@ class MediaApiAuthorizationTests(unittest.TestCase):
             self.assertEqual(ctx.exception.status_code,422)
             self.assertIn("Product assignment is required for validation",str(ctx.exception.detail))
 
+    def test_asset_intake_prefers_clean_json_report_from_stdout(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import MagicMock, patch
+        from main import run_asset_intake
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            report=root/"report.json"
+            manifest=root/"manifest.json"
+            manifest.write_text('{"schemaVersion":1,"assets":[]}',encoding="utf-8")
+            completed=MagicMock(returncode=0,stderr="",stdout='{"results":[],"counts":{"VERIFIED":0}}\\n')
+            with patch("main.subprocess.run",return_value=completed):
+                result=run_asset_intake(root,manifest,report)
+            self.assertEqual(result["results"],[])
+            self.assertEqual(result["counts"]["VERIFIED"],0)
+
     def test_revalidation_report_paths_are_unique_per_run(self):
         import tempfile
         from pathlib import Path
