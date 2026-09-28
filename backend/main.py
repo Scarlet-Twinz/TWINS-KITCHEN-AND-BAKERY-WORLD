@@ -188,7 +188,7 @@ def suggest_candidate_name(assets):
     for asset in assets:
         filename=str(asset.get("filename","") or "")
         stem=os.path.splitext(os.path.basename(filename))[0]
-        if stem and not __import__("re").fullmatch(r"(?:img|dsc|pxl|screenshot)[ _-]?\\d{3,8}",stem.strip().lower()):
+        if stem and not __import__("re").fullmatch(r"(?:img|dsc|pxl|screenshot)[ _-]?\d{3,8}",stem.strip().lower()):
             meaningful.append(filename)
         evidence.extend([filename,asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
     if not meaningful and not any(str(asset.get(k,"")).strip() for asset in assets for k in ("provenance","sourceUrl","license","attribution")):
