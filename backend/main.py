@@ -184,8 +184,15 @@ def _candidate_tokens(value):
 
 def suggest_candidate_name(assets):
     evidence=[]
+    meaningful=[]
     for asset in assets:
-        evidence.extend([asset.get("filename",""),asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
+        filename=str(asset.get("filename","") or "")
+        stem=os.path.splitext(os.path.basename(filename))[0]
+        if stem and not __import__("re").fullmatch(r"(?:img|dsc|pxl|screenshot)[ _-]?\\d{3,8}",stem.strip().lower()):
+            meaningful.append(filename)
+        evidence.extend([filename,asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
+    if not meaningful and not any(str(asset.get(k,"")).strip() for asset in assets for k in ("provenance","sourceUrl","license","attribution")):
+        return "New Product — Review Required", None
     tokens=_candidate_tokens(" ".join(evidence))
     if not tokens:
         return "New Product — Review Required", None
@@ -208,22 +215,24 @@ def group_candidate_assets(asset_rows):
         asset={"id":str(row[0]),"filename":row[1],"sha256":row[2],"width":row[3],"height":row[4],"provenance":row[5],"sourceUrl":row[6],"license":row[7],"attribution":row[8],"role":row[9]}
         stem=os.path.splitext(asset["filename"])[0].lower()
         tokens=_candidate_tokens(stem)
+        view_tokens={"front","side","back","rear","control","controls","angle","left","right","top","bottom","detail","closeup","close"}
+        core_tokens=tokens-view_tokens
         best=None
         for group in groups:
-            overlap=tokens & group["tokens"]
+            overlap=core_tokens & group["tokens"]
             numeric_a={x for x in tokens if x.isdigit()}
             numeric_b={x for x in group["tokens"] if x.isdigit()}
             conflicting_numeric=bool(numeric_a and numeric_b and numeric_a.isdisjoint(numeric_b))
             if conflicting_numeric: continue
             same_shape=(asset["width"],asset["height"])==(group["width"],group["height"]) if asset["width"] and asset["height"] and group["width"] and group["height"] else False
-            score=(len(overlap)/max(1,len(tokens|group["tokens"]))) + (0.25 if same_shape else 0)
+            score=(len(overlap)/max(1,len(core_tokens|group["tokens"]))) + (0.25 if same_shape else 0)
             if score>=0.55 and (best is None or score>best[0]): best=(score,group)
         if best:
             score,group=best
-            group["assetIds"].append(asset["id"]); group["tokens"] |= tokens
+            group["assetIds"].append(asset["id"]); group["tokens"] |= core_tokens
             group["confidence"]=min(group["confidence"],round(score,3))
         else:
-            groups.append({"assetIds":[asset["id"]],"tokens":set(tokens),"width":asset["width"],"height":asset["height"],"confidence":0.55 if tokens else 0.30})
+            groups.append({"assetIds":[asset["id"]],"tokens":set(core_tokens),"width":asset["width"],"height":asset["height"],"confidence":0.55 if core_tokens else 0.30})
     return [{"assetIds":g["assetIds"],"confidence":round(g["confidence"],3),"reviewRequired":g["confidence"]<0.78 or len(g["assetIds"])==1} for g in groups]
 
 def media_metadata_from_row(row):
