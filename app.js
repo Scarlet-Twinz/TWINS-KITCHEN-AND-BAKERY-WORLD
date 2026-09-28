@@ -97,12 +97,19 @@ function finalMediaFor(p){
  if(!p)return {src:"",status:"pending",source:"product photo verification required"};
  return buildFinalMediaMap()[p.id]||{src:"",status:"pending",source:"product photo verification required"};
 }
-function productMedia(p){return finalMediaFor(p)}
+function isPublicMediaSrc(src){
+ return typeof src==="string"&&(src.indexOf("assets/media/")===0||src.indexOf("/assets/media/")===0);
+}
+function productMedia(p){
+ var media=finalMediaFor(p);
+ if(!isPublicMediaSrc(media.src))return {src:"",status:"pending",source:"public media requires legitimate local asset"};
+ return media;
+}
 function mediaPlaceholder(p){return "assets/media/twins-product-photo-pending.svg"}
 function mediaAudit(){
  var seen={},verified=0,pending=0,duplicates=0;
  P.forEach(function(p){
-   var m=finalMediaFor(p);
+   var m=productMedia(p);
    if(m.src){verified++;seen[m.src]=(seen[m.src]||0)+1}
    else pending++;
  });
@@ -205,7 +212,7 @@ return '<div class="top"><div class="wrap"><span>Professional kitchen, bakery & 
 function foot()
 {return '<footer class="footer"><div class="wrap footgrid"><div><b>'+SITE_CONFIG.name.toUpperCase()+'</b><p>Commercial equipment for kitchens, bakeries, restaurants, hotels, cafés and catering operations.</p><div class="whatsapptrust"><b>Official Twins WhatsApp</b><span>For enquiries, availability and quotes — not for unverified payment requests.</span><a class="whatsapp" href="'+whatsappUrl('Hello Twins Kitchen. I would like to enquire about a product. Please confirm the current price, availability, delivery options and official payment method.')+'" target="_blank" rel="noopener">Start a WhatsApp enquiry →</a></div><br><a href="'+emailUrl('Equipment enquiry','Hello Twins Kitchen,\n\nI would like to enquire about commercial equipment.')+'">Email Twins →</a></div><div><b>Shop</b><p><a href="products.html">All equipment</a><br><a href="categories.html">Categories</a><br><a href="equipment-finder.html">Equipment Finder</a><br><a href="project-planner.html">Project Planner</a><br><a href="media.html">Media</a><br><a href="marketplace.html">Marketplace</a><br><a href="sell-on-twins.html">Sell on Twins</a><br><a href="wishlist.html">Saved products</a><br><a href="compare.html">Compare</a></p></div><div><b>Business</b><p><a href="build-your-business.html">Business planner</a><br><a href="industries.html">Industries</a><br><a href="services.html">How we help</a><br><a href="quote.html">Request a quote</a><br><a href="faq.html">FAQ</a><br><a href="delivery.html">Delivery & collection</a><br><a href="returns.html">Returns & order issues</a></p></div><div><b>Visit</b><p>'+SITE_CONFIG.address+'<br>'+SITE_CONFIG.phoneDisplay+'<br>'+SITE_CONFIG.hours+'<br>'+SITE_CONFIG.email+'</p><a href="contact.html">Contact & directions →</a><br><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></div><a class="whatsapp-float" href="'+whatsappUrl('Hello Twins Kitchen. I would like to enquire about a product. Please confirm the current price, availability, delivery options and official payment method.')+'" target="_blank" rel="noopener" aria-label="Start an official Twins WhatsApp enquiry">Official WhatsApp · Enquire</a><div class="wrap copyright">© 2026 '+SITE_CONFIG.name+' · Built for real business buying.</div></footer>'}
 function cards(list){
-return list.map(function(p){
+return list.filter(function(p){return !!productMedia(p).src;}).map(function(p){
 var media=productMedia(p),src=media.src||mediaPlaceholder(p),statusLabel=media.status==="twins"?"TWINS MEDIA":(media.status==="pending"?"PHOTO PENDING":"REFERENCE IMAGE");
 return '<article class="prod"><div class="prodimg"><a href="product.html?id='+p.id+'"><img src="'+src+'" alt="'+p.n+' reference image" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'assets/media/twins-product-photo-pending.svg\'"></a><span class="badge">'+(p.tag||'Equipment')+'</span><span class="mediaflag">'+statusLabel+'</span><button class="icon save '+(saved().includes(p.id)?'active':'')+'" onclick="toggleSave('+p.id+');return false" aria-label="Save '+p.n+'">♡</button></div><div class="prodbody"><small class="muted">'+p.c+'</small><a href="product.html?id='+p.id+'"><h3>'+p.n+'</h3></a><p class="desc">'+p.desc+'</p><div class="price">'+SITE_CONFIG.priceLabel+'</div><small class="tiny muted price-note">Reference image · exact model, stock and current price confirmed with Twins.</small><div class="cardactions"><button class="btn red" onclick="add('+p.id+')">Build quote</button><button class="btn light mini" onclick="toggleCompare('+p.id+')" aria-label="Compare '+p.n+'">⇄</button></div><a class="cardwhatsapp" target="_blank" rel="noopener" href="'+whatsappUrl('Hello Twins Kitchen. I am interested in '+p.n+'. Please confirm the current price, availability, delivery options and official payment method.')+'">Ask on official WhatsApp →</a></div></article>'
 }).join('')
@@ -345,7 +352,7 @@ var products=list.length?cards(list):'<div class="empty"><h2>No demo items in th
 document.getElementById('category').innerHTML=head()+
 '<section class="page categoryhero"><div class="wrap"><div class="crumb">Store / Categories / '+name+'</div><span class="eyebrow darkey">EQUIPMENT AREA</span><h1>'+name+'</h1><p class="muted">'+desc+'</p><div class="categorystats"><span><b>'+list.length+'</b> catalogue items</span><span><b>Commercial</b> use focus</span><span><b>Quote</b> available</span></div></div></section>'+
 '<section class="section"><div class="wrap"><div class="categorylayout"><aside class="panel categoryaside"><span class="eyebrow darkey">SHOP THE CATALOGUE</span><h3>Equipment areas</h3>'+links+'</aside><div><div class="categoryintro"><div><span class="eyebrow darkey">BUYING FOCUS</span><h2>Choose by operation, then verify the exact unit.</h2><p class="muted">'+desc+' Use the catalogue as a starting point and confirm current price, stock, dimensions, utilities and installation requirements with Twins.</p></div><a class="btn red" href="quote.html">Request a quote →</a></div><div class="grid">'+products+'</div></div></div></div></section>'+
-'<section class="section soft"><div class="wrap"><div class="categorymediahead"><div><span class="eyebrow darkey">TWINS MEDIA · '+name.toUpperCase()+'</span><h2>See equipment from this area.</h2><p class="muted">Supplied Twins photos and videos linked to this equipment area.</p></div><a class="textlink" href="media.html">View all media →</a></div><div class="categorymediagrid">'+(typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY.filter(function(m){return m.category===name&&m.src;}).slice(0,6).map(function(m){return '<a class="categorymediacard" href="media.html"><div>'+(m.type==='video'?'<video muted autoplay loop playsinline poster="'+(m.poster||'')+'"><source src="'+m.src+'" type="video/mp4"></video>':'<img src="'+m.src+'" alt="'+m.alt+'">')+'</div><b>'+m.title+'</b><small>'+(m.type==='video'?'Video':'Photo')+'</small></a>';}).join(''):'')+'</div></div></section>'+
+'<section class="section soft"><div class="wrap"><div class="categorymediahead"><div><span class="eyebrow darkey">TWINS MEDIA · '+name.toUpperCase()+'</span><h2>See equipment from this area.</h2><p class="muted">Supplied Twins photos and videos linked to this equipment area.</p></div><a class="textlink" href="media.html">View all media →</a></div><div class="categorymediagrid">'+(typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY.filter(function(m){return m.category===name&&isPublicMediaSrc(m.src);}).slice(0,6).map(function(m){return '<a class="categorymediacard" href="media.html"><div>'+(m.type==='video'?'<video muted autoplay loop playsinline poster="'+(m.poster||'')+'"><source src="'+m.src+'" type="video/mp4"></video>':'<img src="'+m.src+'" alt="'+m.alt+'">')+'</div><b>'+m.title+'</b><small>'+(m.type==='video'?'Video':'Photo')+'</small></a>';}).join(''):'')+'</div></div></section>'+
 '<section class="section soft"><div class="wrap"><div class="panel enquiry"><div><span class="eyebrow darkey">NOT SURE WHAT FITS?</span><h2>Build a plan around your business.</h2><p class="muted">Connect this equipment area to a restaurant, bakery, hotel, catering, bar or café workflow.</p></div><a class="btn dark" href="build-your-business.html">Open business planner →</a></div></div></section></main>'+foot()+'<div id="toast"></div>';
 }
 function projectPlanner(){
@@ -376,7 +383,7 @@ toast('Project brief saved');
 setTimeout(function(){location.reload()},350);
 }
 function media(){
-var images=typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY:[];
+var images=typeof MEDIA_LIBRARY!=='undefined'?MEDIA_LIBRARY.filter(function(m){return isPublicMediaSrc(m.src);}):[];
 var cats=["All media"].concat(C.map(function(x){return x[0];}));
 var types=["All formats","Photos","Videos"];
 function mediaCards(list){return list.map(function(m){return '<article class="mediacard" data-media-category="'+m.category+'" data-media-type="'+m.type+'">'+(m.type==='video'?'<video controls preload="metadata" playsinline poster="'+(m.poster||'')+'"><source src="'+m.src+'" type="video/mp4">Your browser does not support video playback.</video>':'<img src="'+m.src+'" alt="'+m.alt+'" onerror="this.src=\'assets/media/twins-deck-oven-stack.jpg\'">')+'<div><span class="eyebrow darkey">'+m.category+(m.type==='video'?' · VIDEO':' · PHOTO')+'</span><h2>'+m.title+'</h2><a href="products.html?cat='+encodeURIComponent(m.category)+'">Explore this equipment area →</a></div></article>';}).join('');}
