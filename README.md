@@ -112,15 +112,9 @@ Alaba International Market, Nigeria
 **08033231712**  
 Open 24 hours
 
+
 ## License
 
-This repository is proprietary. See [LICENSE](LICENSE).
+MIT License.
 
-No open-source license is granted.
-
-## Project status
-
-The storefront and administrative frontend provide the current product and operations experience. The backend directory defines the planned server-side persistence and API boundary for production development.
-
-The project is intentionally documented around the implementation that exists rather than presenting planned backend capabilities as already deployed.
-
+See [LICENSE](LICENSE) for the full license text.
