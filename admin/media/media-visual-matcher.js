@@ -282,7 +282,7 @@
   }
 
   return{
-    MODEL_ID,MODEL_REVISION,DEFAULTS,cosineSimilarity,normalizeEmbedding,rankVisualMatches,classifyVisualMatches,
+    MODEL_ID,MODEL_REVISION,DEFAULTS,cosineSimilarity,normalizeEmbedding,rankVisualMatches,classifyVisualMatches,aggregateProductEvidence,evaluateVisualMatch,confirmedReferenceFromAsset,cacheKey,
     loadRuntime,embeddingForBlob,buildReferenceIndex,rankByEmbedding,getCachedEmbedding,putCachedEmbedding
   };
 });
