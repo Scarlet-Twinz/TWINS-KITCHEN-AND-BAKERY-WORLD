@@ -284,20 +284,25 @@ class QuotePayload(BaseModel):
     itemCount:int=Field(default=0,ge=0,le=10000)
 
 @app.post("/api/admin/media/upload",status_code=201)
-async def media_upload(request:Request, files:list[UploadFile]|None=File(None), metadata:str=Form("{}")):
+async def media_upload(request:Request, files:list[UploadFile]|None=File(None), metadata:str=Form("{}"), clientBatchId:str|None=Form(None), chunkIndex:int|None=Form(None), totalChunks:int|None=Form(None)):
     actor=require_owner(request)
     if not files or len(files)>100: raise HTTPException(status_code=422,detail="Upload between 1 and 100 files")
     try: meta=normalize_metadata(json.loads(metadata or "{}"))
     except Exception as exc: raise HTTPException(status_code=422,detail=str(exc))
     batch_id=uuid.uuid4(); root=media_root(); batch=root/"incoming"/str(batch_id); batch.mkdir(parents=True,exist_ok=True)
-    manifest=[]; uploaded=[]; duplicates=[]; documents=[]
+    manifest=[]; uploaded=[]; duplicates=[]; documents=[]; failed=[]
     with db() as conn:
         for upload in files:
-            original=upload.filename or "asset"; ext=Path(original).suffix.lower(); data=await upload.read()
+            original=upload.filename or "asset"; ext=Path(original).suffix.lower()
+            try: data=await upload.read()
+            except Exception as exc:
+                failed.append({"filename":original,"reason":"unable to read upload: "+str(exc)}); continue
             if ext==".zip":
-                if len(data)>MAX_ZIP_BYTES: raise HTTPException(status_code=422,detail=f"{original}: ZIP exceeds 250MB limit")
+                if len(data)>MAX_ZIP_BYTES:
+                    failed.append({"filename":original,"reason":"ZIP exceeds 250MB limit"}); continue
                 try: extracted=extract_zip(data,batch)
-                except Exception as exc: raise HTTPException(status_code=422,detail=f"{original}: {exc}")
+                except Exception as exc:
+                    failed.append({"filename":original,"reason":"ZIP extraction failed: "+str(exc)}); continue
                 for item in extracted:
                     path=Path(item["path"]); content=path.read_bytes(); item_ext=path.suffix.lower()
                     if item_ext in SUPPORTED_DOCUMENT_EXTENSIONS:
@@ -305,7 +310,8 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                         conn.execute("insert into media_supporting_documents (id,batch_id,filename,storage_path,uploaded_by) values (%s,%s,%s,%s,%s)",(doc_id,batch_id,item["filename"],rel,uuid.UUID(actor["sub"])))
                         documents.append({"id":str(doc_id),"filename":item["filename"]}); continue
                     inspection=inspect_image_bytes(content,item_ext)
-                    if not inspection.valid: path.unlink(missing_ok=True); continue
+                    if not inspection.valid:
+                        failed.append({"filename":item["filename"],"reason":inspection.reason}); path.unlink(missing_ok=True); continue
                     digest=hashlib.sha256(content).hexdigest()
                     existing=conn.execute("select id from media_assets where sha256=%s",(digest,)).fetchone()
                     if existing:
@@ -323,9 +329,11 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                 doc_id=uuid.uuid4(); rel=str(target.relative_to(Path.cwd())).replace("\\","/")
                 conn.execute("insert into media_supporting_documents (id,batch_id,filename,storage_path,uploaded_by) values (%s,%s,%s,%s,%s)",(doc_id,batch_id,original,rel,uuid.UUID(actor["sub"])))
                 documents.append({"id":str(doc_id),"filename":original}); continue
-            if ext not in SUPPORTED_IMAGE_EXTENSIONS: raise HTTPException(status_code=422,detail=f"{original}: unsupported file type")
+            if ext not in SUPPORTED_IMAGE_EXTENSIONS:
+                failed.append({"filename":original,"reason":"unsupported file type"}); continue
             inspection=inspect_image_bytes(data,ext)
-            if not inspection.valid: raise HTTPException(status_code=422,detail=f"{original}: {inspection.reason}")
+            if not inspection.valid:
+                failed.append({"filename":original,"reason":inspection.reason}); continue
             digest=hashlib.sha256(data).hexdigest()
             existing=conn.execute("select id from media_assets where sha256=%s",(digest,)).fetchone()
             if existing:
@@ -350,7 +358,7 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
             if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
             conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else None,status,uuid.UUID(item["id"])))
         conn.commit()
-    return {"batchId":str(batch_id),"uploaded":uploaded,"duplicates":duplicates,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
+    return {"batchId":str(batch_id),"clientBatchId":clientBatchId,"chunkIndex":chunkIndex,"totalChunks":totalChunks,"uploaded":uploaded,"duplicates":duplicates,"failed":failed,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
 
 @app.get("/api/admin/media/{asset_id}/file")
 def media_file(asset_id:str,request:Request):
