@@ -9,7 +9,7 @@ const ROOT=path.join(__dirname,"..","..","..");
 test("Phase 1 preserves the canonical 530-product catalogue and IDs",()=>{
   const data=loadCatalogue();
   assert.equal(data.P.length,530);
-  assert.deepEqual(data.P.map(p=>Number(p.id)),Array.from({length:530},(_,i)=>i+1));
+  assert.deepEqual(Array.from(data.P, p=>Number(p.id)),Array.from({length:530},(_,i)=>i+1));
 });
 
 test("public media gate rejects external URLs and allows only local assets",()=>{
