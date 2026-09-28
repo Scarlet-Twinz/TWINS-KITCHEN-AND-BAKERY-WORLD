@@ -58,6 +58,7 @@
       "required": [
         "referenceAssetId",
         "assetId",
+        "mediaAssetId",
         "productId",
         "mediaPath",
         "checksum",
@@ -74,6 +75,7 @@
       "properties": {
         "referenceAssetId": { "type": ["string", "null"] },
         "assetId": { "type": ["string", "null"] },
+        "mediaAssetId": { "type": ["string", "null"] },
         "productId": { "type": "string" },
         "mediaPath": { "type": "string" },
         "checksum": { "type": ["string", "null"] },
