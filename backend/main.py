@@ -484,6 +484,18 @@ def media_candidate_create(request:Request,payload:dict):
         rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
         from media_assets where id = any(%s) order by created_at""",(asset_uuids,)).fetchall()
         if len(rows)!=len(asset_uuids): raise HTTPException(status_code=404,detail="One or more media assets were not found")
+        # A single new-photo signal may represent several views of the same physical product.
+        # Expand only when deterministic local metadata gives a sufficiently strong group.
+        if len(rows)==1:
+            pool=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+              from media_assets where product_legacy_id is null and status in ('QUEUED','REVIEW','VERIFIED') order by created_at""").fetchall()
+            groups=group_candidate_assets(pool)
+            selected=str(asset_uuids[0])
+            group=next((g for g in groups if selected in g["assetIds"] and not g["reviewRequired"]),None)
+            if group and len(group["assetIds"])>1:
+                asset_uuids=[uuid.UUID(x) for x in group["assetIds"]]
+                rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+                  from media_assets where id = any(%s) order by created_at""",(asset_uuids,)).fetchall()
         if any(r[10] is not None for r in rows): raise HTTPException(status_code=409,detail="Candidate assets cannot already be assigned to a canonical product")
         if any(r[11] in ("APPROVED","REJECTED","DUPLICATE") for r in rows): raise HTTPException(status_code=409,detail="Candidate contains an ineligible media asset")
         existing=conn.execute("""select id from media_product_candidates
