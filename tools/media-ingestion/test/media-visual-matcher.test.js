@@ -92,7 +92,9 @@ test("Media Center uses ONNX vision embeddings, persistent indexing, background 
   assert.match(source,/embeddingForBlob/);
   assert.match(source,/evaluateVisualMatch/);
   assert.match(source,/void enrichVisualSuggestions\(\)/);
-  assert.match(source,/function selectCatalogueProduct\(/);\n  assert.match(source,/confirmSuggestedProduct/);\n  assert.match(source,/markNewProductCandidate/);
+  assert.match(source,/function selectCatalogueProduct\(/);
+  assert.match(source,/confirmSuggestedProduct/);
+  assert.match(source,/markNewProductCandidate/);
   assert.match(source,/ONNX vision \/ Transformers\.js/);
   assert.doesNotMatch(source,/signatureFromPixels/);
   assert.doesNotMatch(source,/visualSimilarity/);
@@ -138,7 +140,7 @@ test("MEDIUM returns multiple plausible products and never silently selects one"
   const result=matcher.evaluateVisualMatch([1,0],[
     {productId:"58",name:"20L Planetary Mixer",referenceAssetId:"r58",embedding:[0.8,0.6]},
     {productId:"59",name:"Planetary Mixer",referenceAssetId:"r59",embedding:[0.78,0.625]}
-  ],{highThreshold:0.99,mediumThreshold:0.60,mediumMargin:0.025});
+  ],{highThreshold:0.99,mediumThreshold:0.60,mediumMargin:0.015});
   assert.equal(result.status,"MEDIUM");
   assert.equal(result.suggestions.length,2);
   assert.ok(result.suggestions.every(x=>x.confidence==="MEDIUM"));
