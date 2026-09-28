@@ -307,7 +307,8 @@ async function confirmSuggestedProduct(assetId,productId){
   const asset=assets.find(x=>String(x.id)===String(assetId));
   if(!asset)return;
   asset.confirmedProductId=String(productId);
-  setActionStatus(assetId,"Candidate confirmed — owner approval still required","success");
+  const result=await updateAsset(assetId);
+  if(result) setActionStatus(assetId,"HIGH match confirmed — owner approval remains required","success");
 }
 function markNewProductCandidate(button){
   const card=button.closest(".asset-card");
