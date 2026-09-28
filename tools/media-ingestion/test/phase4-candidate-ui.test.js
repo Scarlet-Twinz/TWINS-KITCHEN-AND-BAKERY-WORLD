@@ -34,7 +34,8 @@ test("candidate approval requires owner session, authorized rights and validates
   assert.match(backend,/actor=require_owner\(request\)/);
   assert.match(backend,/Possible duplicate existing product/);
   assert.match(backend,/authorized provenance and rights/);
-  assert.match(backend,/status='APPROVED'/);\n  assert.match(backend,/media_production_mappings/);
+  assert.match(backend,/status='APPROVED'/);
+  assert.match(backend,/media_production_mappings/);
 });
 
 test("candidate persistence records approver and creation provenance in audit logs",()=>{
