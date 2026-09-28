@@ -90,9 +90,9 @@ test("Media Center uses ONNX vision embeddings, persistent indexing, background 
   const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
   assert.match(source,/buildReferenceIndex/);
   assert.match(source,/embeddingForBlob/);
-  assert.match(source,/rankByEmbedding/);
+  assert.match(source,/evaluateVisualMatch/);
   assert.match(source,/void enrichVisualSuggestions\(\)/);
-  assert.match(source,/function selectCatalogueProduct\(/);
+  assert.match(source,/function selectCatalogueProduct\(/);\n  assert.match(source,/confirmSuggestedProduct/);\n  assert.match(source,/markNewProductCandidate/);
   assert.match(source,/ONNX vision \/ Transformers\.js/);
   assert.doesNotMatch(source,/signatureFromPixels/);
   assert.doesNotMatch(source,/visualSimilarity/);
