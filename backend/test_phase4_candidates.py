@@ -56,6 +56,12 @@ class Phase4CandidateTests(unittest.TestCase):
         name,_=suggest_candidate_name([{"filename":"very-long-product-name-"*30+".jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
         self.assertLessEqual(len(name),160)
 
+    def test_approval_requires_authorized_rights_and_protected_mapping(self):
+        source=inspect.getsource(main.media_candidate_approve)
+        self.assertIn("authorized provenance and rights",source)
+        self.assertIn("status='APPROVED'",source)
+        self.assertIn("media_production_mappings",source)
+
     def test_backend_assigns_next_id_after_530(self):
         source=inspect.getsource(main.media_candidate_approve)
         self.assertIn("max(530",source)
