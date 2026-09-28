@@ -184,8 +184,15 @@ def _candidate_tokens(value):
 
 def suggest_candidate_name(assets):
     evidence=[]
+    meaningful=[]
     for asset in assets:
-        evidence.extend([asset.get("filename",""),asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
+        filename=str(asset.get("filename","") or "")
+        stem=os.path.splitext(os.path.basename(filename))[0]
+        if stem and not __import__("re").fullmatch(r"(?:img|dsc|pxl|screenshot)[ _-]?\d{3,8}",stem.strip().lower()):
+            meaningful.append(filename)
+        evidence.extend([filename,asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
+    if not meaningful and not any(str(asset.get(k,"")).strip() for asset in assets for k in ("provenance","sourceUrl","license","attribution")):
+        return "New Product — Review Required", None
     tokens=_candidate_tokens(" ".join(evidence))
     if not tokens:
         return "New Product — Review Required", None
@@ -208,22 +215,24 @@ def group_candidate_assets(asset_rows):
         asset={"id":str(row[0]),"filename":row[1],"sha256":row[2],"width":row[3],"height":row[4],"provenance":row[5],"sourceUrl":row[6],"license":row[7],"attribution":row[8],"role":row[9]}
         stem=os.path.splitext(asset["filename"])[0].lower()
         tokens=_candidate_tokens(stem)
+        view_tokens={"front","side","back","rear","control","controls","angle","left","right","top","bottom","detail","closeup","close"}
+        core_tokens=tokens-view_tokens
         best=None
         for group in groups:
-            overlap=tokens & group["tokens"]
+            overlap=core_tokens & group["tokens"]
             numeric_a={x for x in tokens if x.isdigit()}
             numeric_b={x for x in group["tokens"] if x.isdigit()}
             conflicting_numeric=bool(numeric_a and numeric_b and numeric_a.isdisjoint(numeric_b))
             if conflicting_numeric: continue
             same_shape=(asset["width"],asset["height"])==(group["width"],group["height"]) if asset["width"] and asset["height"] and group["width"] and group["height"] else False
-            score=(len(overlap)/max(1,len(tokens|group["tokens"]))) + (0.25 if same_shape else 0)
+            score=(len(overlap)/max(1,len(core_tokens|group["tokens"]))) + (0.25 if same_shape else 0)
             if score>=0.55 and (best is None or score>best[0]): best=(score,group)
         if best:
             score,group=best
-            group["assetIds"].append(asset["id"]); group["tokens"] |= tokens
+            group["assetIds"].append(asset["id"]); group["tokens"] |= core_tokens
             group["confidence"]=min(group["confidence"],round(score,3))
         else:
-            groups.append({"assetIds":[asset["id"]],"tokens":set(tokens),"width":asset["width"],"height":asset["height"],"confidence":0.55 if tokens else 0.30})
+            groups.append({"assetIds":[asset["id"]],"tokens":set(core_tokens),"width":asset["width"],"height":asset["height"],"confidence":0.55 if core_tokens else 0.30})
     return [{"assetIds":g["assetIds"],"confidence":round(g["confidence"],3),"reviewRequired":g["confidence"]<0.78 or len(g["assetIds"])==1} for g in groups]
 
 def media_metadata_from_row(row):
@@ -284,20 +293,25 @@ class QuotePayload(BaseModel):
     itemCount:int=Field(default=0,ge=0,le=10000)
 
 @app.post("/api/admin/media/upload",status_code=201)
-async def media_upload(request:Request, files:list[UploadFile]|None=File(None), metadata:str=Form("{}")):
+async def media_upload(request:Request, files:list[UploadFile]|None=File(None), metadata:str=Form("{}"), clientBatchId:str|None=Form(None), chunkIndex:int|None=Form(None), totalChunks:int|None=Form(None)):
     actor=require_owner(request)
     if not files or len(files)>100: raise HTTPException(status_code=422,detail="Upload between 1 and 100 files")
     try: meta=normalize_metadata(json.loads(metadata or "{}"))
     except Exception as exc: raise HTTPException(status_code=422,detail=str(exc))
     batch_id=uuid.uuid4(); root=media_root(); batch=root/"incoming"/str(batch_id); batch.mkdir(parents=True,exist_ok=True)
-    manifest=[]; uploaded=[]; duplicates=[]; documents=[]
+    manifest=[]; uploaded=[]; duplicates=[]; documents=[]; failed=[]
     with db() as conn:
         for upload in files:
-            original=upload.filename or "asset"; ext=Path(original).suffix.lower(); data=await upload.read()
+            original=upload.filename or "asset"; ext=Path(original).suffix.lower()
+            try: data=await upload.read()
+            except Exception as exc:
+                failed.append({"filename":original,"reason":"unable to read upload: "+str(exc)}); continue
             if ext==".zip":
-                if len(data)>MAX_ZIP_BYTES: raise HTTPException(status_code=422,detail=f"{original}: ZIP exceeds 250MB limit")
+                if len(data)>MAX_ZIP_BYTES:
+                    failed.append({"filename":original,"reason":"ZIP exceeds 250MB limit"}); continue
                 try: extracted=extract_zip(data,batch)
-                except Exception as exc: raise HTTPException(status_code=422,detail=f"{original}: {exc}")
+                except Exception as exc:
+                    failed.append({"filename":original,"reason":"ZIP extraction failed: "+str(exc)}); continue
                 for item in extracted:
                     path=Path(item["path"]); content=path.read_bytes(); item_ext=path.suffix.lower()
                     if item_ext in SUPPORTED_DOCUMENT_EXTENSIONS:
@@ -305,7 +319,8 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                         conn.execute("insert into media_supporting_documents (id,batch_id,filename,storage_path,uploaded_by) values (%s,%s,%s,%s,%s)",(doc_id,batch_id,item["filename"],rel,uuid.UUID(actor["sub"])))
                         documents.append({"id":str(doc_id),"filename":item["filename"]}); continue
                     inspection=inspect_image_bytes(content,item_ext)
-                    if not inspection.valid: path.unlink(missing_ok=True); continue
+                    if not inspection.valid:
+                        failed.append({"filename":item["filename"],"reason":inspection.reason}); path.unlink(missing_ok=True); continue
                     digest=hashlib.sha256(content).hexdigest()
                     existing=conn.execute("select id from media_assets where sha256=%s",(digest,)).fetchone()
                     if existing:
@@ -323,9 +338,11 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
                 doc_id=uuid.uuid4(); rel=str(target.relative_to(Path.cwd())).replace("\\","/")
                 conn.execute("insert into media_supporting_documents (id,batch_id,filename,storage_path,uploaded_by) values (%s,%s,%s,%s,%s)",(doc_id,batch_id,original,rel,uuid.UUID(actor["sub"])))
                 documents.append({"id":str(doc_id),"filename":original}); continue
-            if ext not in SUPPORTED_IMAGE_EXTENSIONS: raise HTTPException(status_code=422,detail=f"{original}: unsupported file type")
+            if ext not in SUPPORTED_IMAGE_EXTENSIONS:
+                failed.append({"filename":original,"reason":"unsupported file type"}); continue
             inspection=inspect_image_bytes(data,ext)
-            if not inspection.valid: raise HTTPException(status_code=422,detail=f"{original}: {inspection.reason}")
+            if not inspection.valid:
+                failed.append({"filename":original,"reason":inspection.reason}); continue
             digest=hashlib.sha256(data).hexdigest()
             existing=conn.execute("select id from media_assets where sha256=%s",(digest,)).fetchone()
             if existing:
@@ -350,7 +367,7 @@ async def media_upload(request:Request, files:list[UploadFile]|None=File(None), 
             if status=="REJECTED" and "product already has an existing media mapping" in str(result.get("reason","")): status="REVIEW"
             conn.execute("update media_assets set product_legacy_id=%s,status=%s,updated_at=now() where id=%s",(int(result["productId"]) if result.get("productId") else None,status,uuid.UUID(item["id"])))
         conn.commit()
-    return {"batchId":str(batch_id),"uploaded":uploaded,"duplicates":duplicates,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
+    return {"batchId":str(batch_id),"clientBatchId":clientBatchId,"chunkIndex":chunkIndex,"totalChunks":totalChunks,"uploaded":uploaded,"duplicates":duplicates,"failed":failed,"supportingDocuments":documents,"validation":report.get("counts",{}),"results":report.get("results",[])}
 
 @app.get("/api/admin/media/{asset_id}/file")
 def media_file(asset_id:str,request:Request):

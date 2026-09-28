@@ -1,3 +1,4 @@
+// Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.
 const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
 function visualReferenceUrls(product){
   if(!product)return [];
@@ -70,28 +71,47 @@ async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
   const run=++visualRun;
   const targets=assets.filter(a=>!a.productId);
-  for(const asset of targets){
-    if(run!==visualRun)return false;
-    try{
-      const result=await identifyAssetVisually(asset);
-      asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
-      asset.suggestionSource=result?.engine||"local visual similarity";
-      asset.suggestionStatus=result?.status||"UNRESOLVED";
-      asset.suggestionReason=result?.reason||"visual evidence unavailable";
-      asset.topScore=result?.topScore||0;
-      asset.secondScore=result?.secondScore||0;
-      asset.margin=result?.margin||0;
-      asset.referenceCount=result?.referenceCount||0;
-      asset.supportingReferences=result?.supportingReferences||[];
-      if(run===visualRun)render();
-    }catch(e){
-      asset.suggestions=[];
-      asset.suggestionSource="local visual similarity";
-      asset.suggestionStatus="UNRESOLVED";
-      asset.suggestionReason="visual matching could not inspect the uploaded image";
-      if(run===visualRun)render();
+  let cursor=0;
+  const progress=loadBatchProgress()||{clientBatchId:"current",total:targets.length,completed:0,summary:{}};
+  const worker=async()=>{
+    while(true){
+      const index=cursor++;
+      if(index>=targets.length)return;
+      if(run!==visualRun)return;
+      const asset=targets[index];
+      try{
+        const result=await identifyAssetVisually(asset);
+        asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
+        asset.suggestionSource=result?.engine||"local visual similarity";
+        asset.suggestionStatus=result?.status||"UNRESOLVED";
+        asset.suggestionReason=result?.reason||"visual evidence unavailable";
+        asset.topScore=result?.topScore||0;
+        asset.secondScore=result?.secondScore||0;
+        asset.margin=result?.margin||0;
+        asset.referenceCount=result?.referenceCount||0;
+        asset.supportingReferences=result?.supportingReferences||[];
+        if(run===visualRun)render();
+        progress.completed=(Number(progress.completed)||0)+1;
+        progress.summary=progress.summary||{};
+        if(asset.suggestionStatus==="HIGH")progress.summary.matched=(Number(progress.summary.matched)||0)+1;
+        else if(asset.suggestionStatus==="MEDIUM")progress.summary.review=(Number(progress.summary.review)||0)+1;
+        else progress.summary.unresolved=(Number(progress.summary.unresolved)||0)+1;
+        saveBatchProgress(progress);renderBatchProgress(progress);
+      }catch(e){
+        asset.suggestions=[];
+        asset.suggestionSource="local visual similarity";
+        asset.suggestionStatus="UNRESOLVED";
+        asset.suggestionReason="visual matching could not inspect the uploaded image";
+        progress.completed=(Number(progress.completed)||0)+1;
+        progress.summary=progress.summary||{};
+        progress.summary.failed=(Number(progress.summary.failed)||0)+1;
+        saveBatchProgress(progress);renderBatchProgress(progress);
+        if(run===visualRun)render();
+      }
     }
-  }
+  };
+  await Promise.all([worker(),worker()]);
+  if(run===visualRun){progress.status="PROCESSED";progress.finishedAt=new Date().toISOString();saveBatchProgress(progress);renderBatchProgress(progress);}
   return true;
 }
 async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
@@ -316,6 +336,8 @@ async function createNewProductCandidate(assetId){
   setActionStatus(assetId,"Creating candidate…","pending");
   try{
     const result=await api("/api/admin/media/candidates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assetIds:[assetId]})});
+    const progress=loadBatchProgress()||{clientBatchId:"current",total:assets.length,completed:0,summary:{}};
+    progress.summary=progress.summary||{};progress.summary.newCandidates=(Number(progress.summary.newCandidates)||0)+1;saveBatchProgress(progress);renderBatchProgress(progress);
     setActionStatus(assetId,"New Product Candidate created — awaiting owner approval","success");
     setQueueFeedback("New product candidate created. Review it below.","success");
     await loadCandidates();
@@ -449,27 +471,92 @@ $("dropzone").addEventListener("click",e=>{if(e.target!==$("files"))$("files").c
 $("dropzone").addEventListener("dragover",e=>{e.preventDefault();$("dropzone").classList.add("dragover")});
 $("dropzone").addEventListener("dragleave",()=>$("dropzone").classList.remove("dragover"));
 $("dropzone").addEventListener("drop",e=>{e.preventDefault();$("dropzone").classList.remove("dragover");setSelectedFiles(e.dataTransfer.files)});
-$("uploadBtn").addEventListener("click",()=>{
+const BATCH_PROGRESS_KEY="twins-media-center-batch-progress-v1";
+function loadBatchProgress(){
+  try{return JSON.parse(localStorage.getItem(BATCH_PROGRESS_KEY)||"null")}catch{return null}
+}
+function saveBatchProgress(progress){
+  try{localStorage.setItem(BATCH_PROGRESS_KEY,JSON.stringify(progress))}catch{}
+}
+function renderBatchProgress(progress){
+  if(!progress){$("progressText").textContent="Ready";return}
+  $("progressText").textContent="Processing "+Number(progress.completed||0)+" / "+Number(progress.total||0);
+  const summary=progress.summary||{};
+  $("summary").innerHTML='<div class="summary"><b>Batch '+escapeHtml(progress.clientBatchId||"current")+'</b> · '+Number(progress.completed||0)+' / '+Number(progress.total||0)+' processed · '+Number(summary.matched||0)+' matched · '+Number(summary.review||0)+' review · '+Number(summary.newCandidates||0)+' new candidates · '+Number(summary.duplicates||0)+' duplicates · '+Number(summary.rejected||0)+' rejected · '+Number(summary.unresolved||0)+' unresolved · '+Number(summary.failed||0)+' failed</div>';
+}
+async function uploadChunk(filesToUpload,clientBatchId,index,totalChunks,retries=1){
+  const fd=new FormData();
+  filesToUpload.forEach(f=>fd.append("files",f));
+  fd.append("metadata",metadata());
+  fd.append("clientBatchId",clientBatchId);
+  fd.append("chunkIndex",String(index));
+  fd.append("totalChunks",String(totalChunks));
+  let attempt=0;
+  while(true){
+    try{
+      return await new Promise((resolve,reject)=>{
+        const xhr=new XMLHttpRequest();xhr.open("POST",API+"/api/admin/media/upload");xhr.withCredentials=true;
+        xhr.upload.onprogress=e=>{if(e.lengthComputable){const percent=Math.round(e.loaded/e.total*100);$("progressText").textContent="Uploading chunk "+(index+1)+" / "+totalChunks+" · "+percent+"%";}};
+        xhr.onload=()=>{
+          if(xhr.status>=200&&xhr.status<300){try{resolve(JSON.parse(xhr.responseText))}catch(e){reject(new Error("Upload succeeded but response was invalid"))}}
+          else reject(new Error(xhrErrorMessage(xhr)));
+        };
+        xhr.onerror=()=>reject(new Error("Network request could not be completed"));
+        xhr.send(fd);
+      });
+    }catch(error){
+      if(attempt>=retries)throw error;
+      attempt++;
+      setUploadFeedback("Retrying chunk "+(index+1)+" ("+attempt+"/"+retries+")…","pending");
+    }
+  }
+}
+async function runBulkUpload(filesToUpload){
+  const chunkSize=100;
+  const totalChunks=Math.ceil(filesToUpload.length/chunkSize);
+  const clientBatchId=(crypto?.randomUUID?crypto.randomUUID():"batch-"+Date.now()+"-"+Math.random().toString(16).slice(2));
+  const progress={clientBatchId,total:filesToUpload.length,completed:0,uploaded:0,duplicates:0,failed:0,chunksCompleted:0,totalChunks,summary:{matched:0,review:0,newCandidates:0,duplicates:0,rejected:0,unresolved:0,failed:0}};
+  saveBatchProgress(progress);renderBatchProgress(progress);
+  const allResults=[];
+  for(let index=0;index<totalChunks;index++){
+    const chunk=filesToUpload.slice(index*chunkSize,(index+1)*chunkSize);
+    let response;
+    try{
+      response=await uploadChunk(chunk,clientBatchId,index,totalChunks);
+    }catch(error){
+      progress.failed+=chunk.length;progress.summary.failed+=chunk.length;progress.chunksCompleted=index;
+      progress.lastError=error.message;saveBatchProgress(progress);renderBatchProgress(progress);
+      setUploadFeedback("Chunk "+(index+1)+" failed. The remaining chunks were not discarded; retry the failed upload.","error");
+      throw error;
+    }
+    const uploadedCount=Array.isArray(response.uploaded)?response.uploaded.length:0;
+    const duplicateCount=Array.isArray(response.duplicates)?response.duplicates.length:0;
+    const failedCount=Array.isArray(response.failed)?response.failed.length:0;
+    progress.uploaded+=uploadedCount;progress.duplicates+=duplicateCount;progress.failed+=failedCount;progress.completed+=chunk.length;progress.chunksCompleted=index+1;
+    progress.summary.duplicates+=duplicateCount;progress.summary.failed+=failedCount;
+    allResults.push(response);
+    if(failedCount) progress.lastFailures=(response.failed||[]).slice(-20);
+    saveBatchProgress(progress);renderBatchProgress(progress);
+    try{await refresh(false)}catch{}
+  }
+  progress.status="UPLOADED";progress.finishedAt=new Date().toISOString();saveBatchProgress(progress);
+  renderBatchProgress(progress);
+  return {clientBatchId,parts:allResults,progress};
+}
+$("uploadBtn").addEventListener("click",async()=>{
   if(!selected.length)return;
   const filesToUpload=[...selected],button=$("uploadBtn");
-  button.disabled=true;button.textContent="Uploading…";setUploadFeedback("Uploading "+filesToUpload.length+" file(s)…","pending");$("progressText").textContent="Uploading…";
-  const fd=new FormData();filesToUpload.forEach(f=>fd.append("files",f));fd.append("metadata",metadata());
-  const xhr=new XMLHttpRequest();xhr.open("POST",API+"/api/admin/media/upload");xhr.withCredentials=true;
-  xhr.upload.onprogress=e=>{if(e.lengthComputable){const percent=Math.round(e.loaded/e.total*100);$("progressText").textContent=percent+"% uploading";}};
-  xhr.onload=async()=>{
-    if(xhr.status>=200&&xhr.status<300){
-      try{
-        const data=JSON.parse(xhr.responseText);
-        renderSummary(data);$("progressText").textContent="Upload complete";setUploadFeedback("Upload completed successfully.","success");clearSelectedFiles();
-        try{await refresh(false);setQueueFeedback("Upload completed and queue refreshed.","success")}catch(e){setQueueFeedback("Upload completed, but queue refresh failed: "+(e.message||e),"error")}
-      }catch(e){setUploadFeedback("Upload succeeded but the response could not be read: "+e.message,"error")}
-    }else{
-      const message=xhrErrorMessage(xhr);$("progressText").textContent="Upload failed";setUploadFeedback(message,"error");
-    }
+  button.disabled=true;button.textContent="Uploading batch…";setUploadFeedback("Uploading "+filesToUpload.length+" file(s) in bounded chunks of 100…","pending");
+  try{
+    const result=await runBulkUpload(filesToUpload);
+    setUploadFeedback("Batch upload completed. Validation and local visual processing continue without exposing unapproved media.","success");
+    clearSelectedFiles();
+    await refresh(false);
+  }catch(error){
+    setUploadFeedback("Batch upload stopped safely: "+error.message,"error");
+  }finally{
     button.textContent="Upload & validate";button.disabled=!selected.length;
-  };
-  xhr.onerror=()=>{const message="Upload failed: network request could not be completed.";$("progressText").textContent="Upload failed";setUploadFeedback(message,"error");button.textContent="Upload & validate";button.disabled=!selected.length};
-  xhr.send(fd);
+  }
 });
 $("search").addEventListener("input",render);$("deleteAllQueue").addEventListener("click",deleteAllQueue);
 $("status").addEventListener("change",async()=>{try{await refresh(false);setQueueFeedback($("status").value?"Filtered to "+$("status").value+".":"Showing all statuses.","success")}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}});
@@ -512,6 +599,7 @@ $("refresh").addEventListener("click",async()=>{
     const d=await api("/api/account/me");
     if(d.user.role!=="owner")throw new Error("Owner access required");
     $("identity").textContent=d.user.name+" · OWNER";
+    renderBatchProgress(loadBatchProgress());
     $("locked").classList.add("hidden");
     $("app").classList.remove("hidden");
     await refresh();

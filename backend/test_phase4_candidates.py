@@ -69,7 +69,7 @@ class Phase4CandidateTests(unittest.TestCase):
         self.assertIn("insert into products",source)
 
     def test_browser_does_not_choose_canonical_id(self):
-        source=Path(Path(__file__).resolve().parents[1].parent/"admin/media/media-center.js").read_text(encoding="utf-8")
+        source=Path(Path(__file__).resolve().parents[1]/"admin/media/media-center.js").read_text(encoding="utf-8")
         start=source.find("async function createNewProductCandidate")
         end=source.find("async function loadCandidates")
         self.assertGreaterEqual(start,0)
