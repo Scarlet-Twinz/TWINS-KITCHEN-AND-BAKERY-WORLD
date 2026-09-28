@@ -11,7 +11,9 @@ class MediaApiAuthorizationTests(unittest.TestCase):
     def test_health_endpoint_returns_ok(self):
         r=self.client.get("/api/health")
         self.assertEqual(r.status_code,200)
-        self.assertEqual(r.json().get("status"),"ok")
+        self.assertTrue(r.json().get("ok"))
+        self.assertIn("database",r.json())
+        self.assertIn("mode",r.json())
 
     def test_unauthenticated_media_endpoint_returns_401(self):
         r=self.client.get("/api/admin/media")
