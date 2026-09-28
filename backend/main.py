@@ -514,6 +514,21 @@ def media_candidate_create(request:Request,payload:dict):
         conn.commit()
     return {"candidate":{"id":str(candidate_id),"suggestedName":suggested,"assetIds":[str(x) for x in asset_uuids],"status":"PENDING_OWNER","evidence":evidence_payload}}
 
+@app.patch("/api/admin/media/candidates/{candidate_id}")
+def media_candidate_update(candidate_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    name=str(payload.get("name") or "").strip()
+    if not name or len(name)>160: raise HTTPException(status_code=422,detail="Candidate name must be 1–160 characters")
+    try: cid=uuid.UUID(candidate_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid candidate ID")
+    with db() as conn:
+        row=conn.execute("select id,status from media_product_candidates where id=%s for update",(cid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Product candidate not found")
+        if row[1]!="PENDING_OWNER": raise HTTPException(status_code=409,detail="Candidate is no longer editable")
+        conn.execute("update media_product_candidates set suggested_name=%s,updated_at=now() where id=%s",(name,cid))
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_UPDATED",str(cid),{"name":name}); conn.commit()
+    return {"ok":True,"status":"PENDING_OWNER","candidateId":candidate_id,"suggestedName":name}
+
 @app.post("/api/admin/media/candidates/{candidate_id}/approve")
 def media_candidate_approve(candidate_id:str,request:Request,payload:dict|None=None):
     actor=require_owner(request)
