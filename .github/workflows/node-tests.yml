@@ -16,6 +16,10 @@ jobs:
           node-version: 20
       - name: Run full Node test suite
         run: node --test tools/media-ingestion/test/*.test.js
+      - name: Check public storefront JavaScript
+        run: node --check app.js
+      - name: Run Phase 1 reference audit
+        run: node tools/media-ingestion/index.js reference-audit
 
   media-center-tests:
     runs-on: ubuntu-latest
