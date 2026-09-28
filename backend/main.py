@@ -179,7 +179,7 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
     return report
 def _candidate_tokens(value):
     import re
-    stop={"the","and","for","with","from","this","that","image","photo","commercial","machine","equipment","new","product"}
+    stop={"the","and","for","with","from","this","that","image","photo","commercial","machine","equipment","new","product","img","dsc","pxl","screenshot","whatsapp"}
     return {x for x in re.findall(r"[a-z0-9]+",str(value or "").lower()) if len(x)>=3 and x not in stop}
 
 def suggest_candidate_name(assets):
@@ -211,6 +211,10 @@ def group_candidate_assets(asset_rows):
         best=None
         for group in groups:
             overlap=tokens & group["tokens"]
+            numeric_a={x for x in tokens if x.isdigit()}
+            numeric_b={x for x in group["tokens"] if x.isdigit()}
+            conflicting_numeric=bool(numeric_a and numeric_b and numeric_a.isdisjoint(numeric_b))
+            if conflicting_numeric: continue
             same_shape=(asset["width"],asset["height"])==(group["width"],group["height"]) if asset["width"] and asset["height"] and group["width"] and group["height"] else False
             score=(len(overlap)/max(1,len(tokens|group["tokens"]))) + (0.25 if same_shape else 0)
             if score>=0.55 and (best is None or score>best[0]): best=(score,group)
