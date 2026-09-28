@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "twins-ai-reference-index-v1",
+  "title": "Twins AI Reference Index",
+  "type": "object",
+  "required": ["schemaVersion", "manifestType", "indexVersion", "model", "catalogue", "coverage", "references", "index"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "manifestType": { "const": "twins-ai-reference-index" },
+    "indexVersion": { "type": "integer", "minimum": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "model": {
+      "type": "object",
+      "required": ["id", "revision"],
+      "properties": {
+        "id": { "type": "string" },
+        "revision": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "catalogue": {
+      "type": "object",
+      "required": ["population", "canonical"],
+      "properties": {
+        "population": { "type": "integer", "minimum": 0 },
+        "canonical": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "productsWithZeroMedia",
+        "productsWithOneReference",
+        "productsWithMultipleReferences",
+        "verifiedMedia",
+        "invalidMedia",
+        "duplicateMedia",
+        "unreachableMedia",
+        "usableVisualReferences",
+        "productsWithNoUsableVisualReference",
+        "externalReferencesNotIndexed"
+      ],
+      "additionalProperties": false
+    },
+    "references": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reference" }
+    },
+    "index": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reference" }
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "required": [
+        "referenceAssetId",
+        "assetId",
+        "productId",
+        "mediaPath",
+        "checksum",
+        "model",
+        "modelRevision",
+        "indexVersion",
+        "source",
+        "rights",
+        "role",
+        "createdAt",
+        "updatedAt",
+        "status"
+      ],
+      "properties": {
+        "referenceAssetId": { "type": ["string", "null"] },
+        "assetId": { "type": ["string", "null"] },
+        "productId": { "type": "string" },
+        "mediaPath": { "type": "string" },
+        "checksum": { "type": ["string", "null"] },
+        "model": { "type": "string" },
+        "modelRevision": { "type": "string" },
+        "indexVersion": { "type": "integer", "minimum": 1 },
+        "source": { "type": "string" },
+        "rights": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "status": { "type": "string" },
+        "width": { "type": ["integer", "null"] },
+        "height": { "type": ["integer", "null"] },
+        "mimeType": { "type": ["string", "null"] },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

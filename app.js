@@ -1,47 +1,10 @@
 var page=location.pathname.split('/').pop()||'index.html';
 
-// Phase 6 final media guard: every catalogue card gets a relevant visual reference.
-var FINAL_MEDIA_RULES=[
-[/deep freezer|chest freezer|upright freezer|display chiller|refrigerator|freezer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026="],
-[/food warmer|bain marie|warming cabinet|display warmer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/12/4456814/1.jpg?5287="],
-[/meat slicer|meat cutter|food slicer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/61/7686914/1.jpg?1535="],
-[/extraction hood|extractor hood|exhaust hood|ventilation hood|range hood/i,"https://pictures-nigeria.jijistatic.net/201050015_NjIwLTQ2NS1hOWYxNTk4ZGUz.webp"],
-[/dstv|gotv|decoder|satellite/i,"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737"],
-[/single burner|one burner|1 burner/i,"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg"],
-[/two burner|2 burner/i,"https://image.made-in-china.com/2f0j00wKmYEMVkfPop/Commercial-Kitchen-Equipment-Table-Top-Gas-Stove.webp"],
-[/three burner|3 burner/i,"https://cdn.myikas.com/images/42158d38-d603-46cf-81ea-1639749e332d/0e45f817-b321-4f3e-9b86-5be1d127a60a/3840/cej25l.webp"],
-[/four burner|4 burner/i,"https://www.gastrodiscount.info/media/image/product/6212/lg/gasherd-serie-900-4-brenner-9999-36-kw-g20-900x900x850-mm-bxtxh.jpg"],
-[/six burner|6 burner|gas range|cooking range/i,"https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2"],
-[/spiral mixer|dough mixer/i,"https://www.hobartcorp.com/sites/default/files/styles/max_1300x1300/public/webdam-assets/Spiral%20Mixer%20HSL130%20f%20.png?itok=XAbWgPIq"],
-[/planetary mixer|cake mixer/i,"https://cdnimg.webstaurantstore.com/images/products/large/52221/833586.jpg"],
-[/convection oven|deck oven|bakery oven|commercial oven/i,"https://www.ekmekciler.gen.tr/Dosyalar/UrunResim/maksan-mkf-10-digi-konveksiyonlu-firin_3172.jpg"],
-[/food processor/i,"https://uploads.prod01.sydney.platformos.com/instances/647/assets/modules/homepage/webapp_uploads/blog/images/robotcoupe-r301ultrafoodprocessor21772766060899-1772766063538.png"],
-[/vegetable cutter|vegetable slicer/i,"https://www.italyline.rs/f/pics/Seckalice-za-povrce/seckalica-za-povrce-samic-CA301_b.jpg"],
-[/deep fryer|fryer/i,"https://static.wixstatic.com/media/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp/v1/fill/w_570%2Ch_570%2Cal_c%2Cq_80%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp"],
-[/juice extractor|juice machine|juicer/i,"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp"],
-[/coffee machine|espresso machine|coffee grinder/i,"https://coffeeya.net/data/editor/goods/1/2020/07/3996_a517ae935e170bfaf94ea2e0a803ef401335531.jpg"],
-[/storage rack|shelving|wall shelf|wall cabinet/i,"https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg"],
-[/three compartment sink|hand wash sink|sink station|stainless sink/i,"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg"],
-[/ice cream machine|frozen dessert/i,"https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-[/work table|prep table|stainless table/i,"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"],
-[/dining chair|restaurant chair|banquet table/i,"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-[/gas griddle|griddle|shawarma grill|pizza oven/i,"https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1200&q=85"]
-];
-var FINAL_CATEGORY_MEDIA={
-"Cooking Equipment":["https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2","https://image.made-in-china.com/2f0j00wKmYEMVkfPop/Commercial-Kitchen-Equipment-Table-Top-Gas-Stove.webp","https://static.wixstatic.com/media/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp/v1/fill/w_570%2Ch_570%2Cal_c%2Cq_80%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp"],
-"Bakery Equipment":["https://www.hobartcorp.com/sites/default/files/styles/max_1300x1300/public/webdam-assets/Spiral%20Mixer%20HSL130%20f%20.png?itok=XAbWgPIq","https://cdnimg.webstaurantstore.com/images/products/large/52221/833586.jpg","https://www.ekmekciler.gen.tr/Dosyalar/UrunResim/maksan-mkf-10-digi-konveksiyonlu-firin_3172.jpg"],
-"Food Preparation":["https://uploads.prod01.sydney.platformos.com/instances/647/assets/modules/homepage/webapp_uploads/blog/images/robotcoupe-r301ultrafoodprocessor21772766060899-1772766063538.png","https://www.italyline.rs/f/pics/Seckalice-za-povrce/seckalica-za-povrce-samic-CA301_b.jpg","https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/61/7686914/1.jpg?1535="],
-"Cold Storage":["https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-"Bar & Beverage":["https://coffeeya.net/data/editor/goods/1/2020/07/3996_a517ae935e170bfaf94ea2e0a803ef401335531.jpg","https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp","https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-"Storage":["https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"],
-"Ventilation":["https://pictures-nigeria.jijistatic.net/201050015_NjIwLTQ2NS1hOWYxNTk4ZGUz.webp"],
-"Serving Equipment":["https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/12/4456814/1.jpg?5287=","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-"Restaurant & Hotel":["https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85"],
-"Catering Supplies":["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-"Kitchen Equipment":["https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"]
-};
-/* Phase Six strict media gate: these supplied/local mappings were audited as visually mismatched to their product titles.
-   They must remain pending until an exact product photo is sourced; never silently reuse a nearby product image. */
+// Phase 1 public-media gate: only local Twins media is publishable.
+function isPublicMediaSrc(src){
+ var value=String(src||"").trim().replace(/\\/g,"/");
+ return value.indexOf("assets/media/")===0||value.indexOf("/assets/media/")===0;
+}
 var PHASE_SIX_MEDIA_BLOCKLIST={54:"One-Bag Bakery Oven is not represented by the supplied deck-oven stack image.",76:"Commercial Chest Freezer - Large is not represented by the supplied ice-cream-machine image.",77:"Commercial Undercounter Refrigerator is not represented by the supplied refrigerated-display-case image.",86:"Stainless Wall Shelf - 4ft is not represented by the supplied retail-shelf image.",88:"Heavy-Duty 4-Tier Storage Rack is not represented by the supplied retail-shelf image."};
 var __twinsOverrideById=null;
 function buildOverrideMap(){
@@ -205,7 +168,7 @@ return '<div class="top"><div class="wrap"><span>Professional kitchen, bakery & 
 function foot()
 {return '<footer class="footer"><div class="wrap footgrid"><div><b>'+SITE_CONFIG.name.toUpperCase()+'</b><p>Commercial equipment for kitchens, bakeries, restaurants, hotels, cafés and catering operations.</p><div class="whatsapptrust"><b>Official Twins WhatsApp</b><span>For enquiries, availability and quotes — not for unverified payment requests.</span><a class="whatsapp" href="'+whatsappUrl('Hello Twins Kitchen. I would like to enquire about a product. Please confirm the current price, availability, delivery options and official payment method.')+'" target="_blank" rel="noopener">Start a WhatsApp enquiry →</a></div><br><a href="'+emailUrl('Equipment enquiry','Hello Twins Kitchen,\n\nI would like to enquire about commercial equipment.')+'">Email Twins →</a></div><div><b>Shop</b><p><a href="products.html">All equipment</a><br><a href="categories.html">Categories</a><br><a href="equipment-finder.html">Equipment Finder</a><br><a href="project-planner.html">Project Planner</a><br><a href="media.html">Media</a><br><a href="marketplace.html">Marketplace</a><br><a href="sell-on-twins.html">Sell on Twins</a><br><a href="wishlist.html">Saved products</a><br><a href="compare.html">Compare</a></p></div><div><b>Business</b><p><a href="build-your-business.html">Business planner</a><br><a href="industries.html">Industries</a><br><a href="services.html">How we help</a><br><a href="quote.html">Request a quote</a><br><a href="faq.html">FAQ</a><br><a href="delivery.html">Delivery & collection</a><br><a href="returns.html">Returns & order issues</a></p></div><div><b>Visit</b><p>'+SITE_CONFIG.address+'<br>'+SITE_CONFIG.phoneDisplay+'<br>'+SITE_CONFIG.hours+'<br>'+SITE_CONFIG.email+'</p><a href="contact.html">Contact & directions →</a><br><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></div><a class="whatsapp-float" href="'+whatsappUrl('Hello Twins Kitchen. I would like to enquire about a product. Please confirm the current price, availability, delivery options and official payment method.')+'" target="_blank" rel="noopener" aria-label="Start an official Twins WhatsApp enquiry">Official WhatsApp · Enquire</a><div class="wrap copyright">© 2026 '+SITE_CONFIG.name+' · Built for real business buying.</div></footer>'}
 function cards(list){
-return list.map(function(p){
+return list.filter(function(p){return !!productMedia(p).src;}).map(function(p){
 var media=productMedia(p),src=media.src||mediaPlaceholder(p),statusLabel=media.status==="twins"?"TWINS MEDIA":(media.status==="pending"?"PHOTO PENDING":"REFERENCE IMAGE");
 return '<article class="prod"><div class="prodimg"><a href="product.html?id='+p.id+'"><img src="'+src+'" alt="'+p.n+' reference image" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'assets/media/twins-product-photo-pending.svg\'"></a><span class="badge">'+(p.tag||'Equipment')+'</span><span class="mediaflag">'+statusLabel+'</span><button class="icon save '+(saved().includes(p.id)?'active':'')+'" onclick="toggleSave('+p.id+');return false" aria-label="Save '+p.n+'">♡</button></div><div class="prodbody"><small class="muted">'+p.c+'</small><a href="product.html?id='+p.id+'"><h3>'+p.n+'</h3></a><p class="desc">'+p.desc+'</p><div class="price">'+SITE_CONFIG.priceLabel+'</div><small class="tiny muted price-note">Reference image · exact model, stock and current price confirmed with Twins.</small><div class="cardactions"><button class="btn red" onclick="add('+p.id+')">Build quote</button><button class="btn light mini" onclick="toggleCompare('+p.id+')" aria-label="Compare '+p.n+'">⇄</button></div><a class="cardwhatsapp" target="_blank" rel="noopener" href="'+whatsappUrl('Hello Twins Kitchen. I am interested in '+p.n+'. Please confirm the current price, availability, delivery options and official payment method.')+'">Ask on official WhatsApp →</a></div></article>'
 }).join('')
