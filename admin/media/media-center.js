@@ -488,23 +488,32 @@ function renderBatchProgress(progress){
   const summary=progress.summary||{};
   $("summary").innerHTML='<div class="summary"><b>Batch '+escapeHtml(progress.clientBatchId||"current")+'</b> · '+Number(progress.completed||0)+' / '+Number(progress.total||0)+' processed · '+Number(summary.matched||0)+' matched · '+Number(summary.review||0)+' review · '+Number(summary.newCandidates||0)+' new candidates · '+Number(summary.duplicates||0)+' duplicates · '+Number(summary.rejected||0)+' rejected · '+Number(summary.unresolved||0)+' unresolved · '+Number(summary.failed||0)+' failed</div>';
 }
-async function uploadChunk(filesToUpload,clientBatchId,index,totalChunks){
+async function uploadChunk(filesToUpload,clientBatchId,index,totalChunks,retries=1){
   const fd=new FormData();
   filesToUpload.forEach(f=>fd.append("files",f));
   fd.append("metadata",metadata());
   fd.append("clientBatchId",clientBatchId);
   fd.append("chunkIndex",String(index));
   fd.append("totalChunks",String(totalChunks));
-  return await new Promise((resolve,reject)=>{
-    const xhr=new XMLHttpRequest();xhr.open("POST",API+"/api/admin/media/upload");xhr.withCredentials=true;
-    xhr.upload.onprogress=e=>{if(e.lengthComputable){const percent=Math.round(e.loaded/e.total*100);$("progressText").textContent="Uploading chunk "+(index+1)+" / "+totalChunks+" · "+percent+"%";}};
-    xhr.onload=()=>{
-      if(xhr.status>=200&&xhr.status<300){try{resolve(JSON.parse(xhr.responseText))}catch(e){reject(new Error("Upload succeeded but response was invalid"))}}
-      else reject(new Error(xhrErrorMessage(xhr)));
-    };
-    xhr.onerror=()=>reject(new Error("Network request could not be completed"));
-    xhr.send(fd);
-  });
+  let attempt=0;
+  while(true){
+    try{
+      return await new Promise((resolve,reject)=>{
+        const xhr=new XMLHttpRequest();xhr.open("POST",API+"/api/admin/media/upload");xhr.withCredentials=true;
+        xhr.upload.onprogress=e=>{if(e.lengthComputable){const percent=Math.round(e.loaded/e.total*100);$("progressText").textContent="Uploading chunk "+(index+1)+" / "+totalChunks+" · "+percent+"%";}};
+        xhr.onload=()=>{
+          if(xhr.status>=200&&xhr.status<300){try{resolve(JSON.parse(xhr.responseText))}catch(e){reject(new Error("Upload succeeded but response was invalid"))}}
+          else reject(new Error(xhrErrorMessage(xhr)));
+        };
+        xhr.onerror=()=>reject(new Error("Network request could not be completed"));
+        xhr.send(fd);
+      });
+    }catch(error){
+      if(attempt>=retries)throw error;
+      attempt++;
+      setUploadFeedback("Retrying chunk "+(index+1)+" ("+attempt+"/"+retries+")…","pending");
+    }
+  }
 }
 async function runBulkUpload(filesToUpload){
   const chunkSize=100;
@@ -526,9 +535,11 @@ async function runBulkUpload(filesToUpload){
     }
     const uploadedCount=Array.isArray(response.uploaded)?response.uploaded.length:0;
     const duplicateCount=Array.isArray(response.duplicates)?response.duplicates.length:0;
-    progress.uploaded+=uploadedCount;progress.duplicates+=duplicateCount;progress.completed+=chunk.length;progress.chunksCompleted=index+1;
-    progress.summary.duplicates+=duplicateCount;
+    const failedCount=Array.isArray(response.failed)?response.failed.length:0;
+    progress.uploaded+=uploadedCount;progress.duplicates+=duplicateCount;progress.failed+=failedCount;progress.completed+=chunk.length;progress.chunksCompleted=index+1;
+    progress.summary.duplicates+=duplicateCount;progress.summary.failed+=failedCount;
     allResults.push(response);
+    if(failedCount) progress.lastFailures=(response.failed||[]).slice(-20);
     saveBatchProgress(progress);renderBatchProgress(progress);
     try{await refresh(false)}catch{}
   }
