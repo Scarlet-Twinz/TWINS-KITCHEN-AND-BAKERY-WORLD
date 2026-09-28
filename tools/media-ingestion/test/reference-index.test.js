@@ -81,6 +81,7 @@ test("reference index contains only explicit identity-bearing usable references"
   assert.equal(manifest.index.length, 1);
   assert.equal(manifest.index[0].productId, "9");
   assert.ok(manifest.index[0].assetId);
+  assert.equal(manifest.index[0].mediaAssetId, null);
   assert.ok(manifest.index[0].referenceAssetId);
   assert.ok(manifest.index[0].checksum);
   assert.equal(manifest.index[0].indexVersion, 1);
