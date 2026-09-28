@@ -7,8 +7,8 @@ const os = require("node:os");
 const referenceIndex = require("../reference-index");
 
 test("reference index schema is versioned and preserves explicit asset/product identity", () => {
-  assert.equal(referenceIndex.REFERENCE_SCHEMA_VERSION, 1);
-  assert.equal(referenceIndex.REFERENCE_INDEX_VERSION, 1);
+  assert.equal(referenceIndex.REFERENCE_SCHEMA_VERSION, 2);
+  assert.equal(referenceIndex.REFERENCE_INDEX_VERSION, 2);
   assert.equal(referenceIndex.MODEL, "Xenova/mobileclip_s0");
   assert.equal(referenceIndex.MODEL_REVISION, "main");
   assert.match(referenceIndex.legacyAssetId("abc"), /^legacy_asset_/);
@@ -83,5 +83,7 @@ test("reference index contains only explicit identity-bearing usable references"
   assert.ok(manifest.index[0].assetId);
   assert.ok(manifest.index[0].referenceAssetId);
   assert.ok(manifest.index[0].checksum);
-  assert.equal(manifest.index[0].indexVersion, 1);
+  assert.equal(manifest.index[0].indexVersion, 2);
+  assert.equal(manifest.index[0].embeddingVersion, 1);
+  assert.equal(manifest.index[0].mediaAssetId, manifest.index[0].assetId);
 });

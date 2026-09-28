@@ -10,8 +10,8 @@ const {
 } = require("./validator");
 const { inspectImage, fileSha256 } = require("./asset-intake");
 
-const REFERENCE_SCHEMA_VERSION = 1;
-const REFERENCE_INDEX_VERSION = 1;
+const REFERENCE_SCHEMA_VERSION = 2;
+const REFERENCE_INDEX_VERSION = 2;
 const MODEL = "Xenova/mobileclip_s0";
 const MODEL_REVISION = "main";
 const LOCAL_MEDIA_PREFIX = "assets/media/";
@@ -107,11 +107,13 @@ function buildReferenceManifest(options = {}) {
     const base = {
       referenceAssetId: null,
       assetId: null,
+      mediaAssetId: null,
       productId: candidate.productId,
       mediaPath: candidate.mediaPath,
       checksum: null,
       model: MODEL,
       modelRevision: MODEL_REVISION,
+      embeddingVersion: 1,
       indexVersion: REFERENCE_INDEX_VERSION,
       source: "legacy-catalogue-local",
       rights: "unverified",
@@ -160,6 +162,7 @@ function buildReferenceManifest(options = {}) {
       ...base,
       referenceAssetId: referenceAssetId(checksum, candidate.productId),
       assetId: legacyAssetId(checksum),
+      mediaAssetId: legacyAssetId(checksum),
       checksum,
       width: validation.width,
       height: validation.height,
@@ -232,11 +235,13 @@ function buildReferenceManifest(options = {}) {
     index: usable.map(entry => ({
       referenceAssetId: entry.referenceAssetId,
       assetId: entry.assetId,
+      mediaAssetId: entry.mediaAssetId,
       productId: entry.productId,
       mediaPath: entry.mediaPath,
       checksum: entry.checksum,
       model: entry.model,
       modelRevision: entry.modelRevision,
+      embeddingVersion: entry.embeddingVersion,
       indexVersion: entry.indexVersion,
       source: entry.source,
       rights: entry.rights,

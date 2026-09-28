@@ -6,7 +6,7 @@
   const MODEL_REVISION="main";
   const TRANSFORMERS_MODULE="https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
   const DB_NAME="twins-media-vision";
-  const DB_VERSION=1;
+  const DB_VERSION=2;
   const STORE_NAME="embeddings";
   const DEFAULTS={highThreshold:0.78,mediumThreshold:0.62,highMargin:0.07,mediumMargin:0.025,maxSuggestions:5};
   const memoryCache=new Map();
@@ -93,8 +93,8 @@
     });
   }
 
-  function cacheKey(kind,identity){
-    return [MODEL_ID,MODEL_REVISION,kind,String(identity)].join("|");
+  function cacheKey(kind,identity,metadata={}){
+    return [MODEL_ID,MODEL_REVISION,metadata.indexVersion||1,metadata.embeddingVersion||1,metadata.checksum||"",kind,String(identity)].join("|");
   }
 
   function setStatus(callback,message,state="loading"){
@@ -159,8 +159,8 @@
     return normalizeEmbedding(embedding);
   }
 
-  async function embeddingForBlob(blob,identity,onStatus){
-    const key=cacheKey("asset",identity);
+  async function embeddingForBlob(blob,identity,onStatus,metadata={}){
+    const key=cacheKey("asset",identity,metadata);
     const cached=await getCachedEmbedding(key);
     if(cached)return{embedding:cached,cached:true};
     const embedding=await embedBlob(blob,onStatus);
@@ -168,8 +168,8 @@
     return{embedding,cached:false};
   }
 
-  async function embeddingForReference(url,onStatus){
-    const key=cacheKey("reference",url);
+  async function embeddingForReference(url,onStatus,metadata={}){
+    const key=cacheKey("reference",metadata.referenceAssetId||url,metadata);
     const cached=await getCachedEmbedding(key);
     if(cached)return{embedding:cached,cached:true,referenceUnavailable:false};
     try{
@@ -177,7 +177,7 @@
       if(!response.ok)throw new Error("HTTP "+response.status);
       const blob=await response.blob();
       const embedding=await embedBlob(blob,onStatus);
-      await putCachedEmbedding(key,embedding,{kind:"reference",url});
+      await putCachedEmbedding(key,embedding,{kind:"reference",url,referenceAssetId:metadata.referenceAssetId||url,checksum:metadata.checksum||"",model:MODEL_ID,modelRevision:MODEL_REVISION,embeddingVersion:metadata.embeddingVersion||1,indexVersion:metadata.indexVersion||1});
       return{embedding,cached:false,referenceUnavailable:false};
     }catch(error){
       return{embedding:null,cached:false,referenceUnavailable:true,status:"REFERENCE_UNAVAILABLE",error:String(error?.message||error)};
@@ -191,21 +191,84 @@
     const candidates=(Array.isArray(products)?products:[]).filter(product=>product&&product.id!=null&&product.n);
     let usable=0,unavailable=0,completed=0;
     for(const product of candidates){
-      const urls=Array.isArray(referenceResolver(product))?referenceResolver(product):[];
-      if(!urls.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
-      let added=false;
-      for(const url of urls){
-        const result=await embedReference(url,onStatus);
+      const rawReferences=referenceResolver(product);
+      const references=Array.isArray(rawReferences)?rawReferences:[]; 
+      if(!references.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
+      let added=0;
+      for(const raw of references){
+        const metadata=typeof raw==="string"?{url:raw}:raw||{};
+        const url=metadata.url||metadata.referenceUrl||metadata.mediaPath;
+        if(!url)continue;
+        const result=await embedReference(url,onStatus,metadata);
         if(!result.embedding){unavailable++;unavailableReferences.push({url,status:"REFERENCE_UNAVAILABLE",error:result.error||""});continue;}
-        index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceUrl:url,embedding:result.embedding});
-        usable++;added=true;break;
+        index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceAssetId:metadata.referenceAssetId||null,checksum:metadata.checksum||null,model:MODEL_ID,modelRevision:MODEL_REVISION,embeddingVersion:metadata.embeddingVersion||1,indexVersion:metadata.indexVersion||1,referenceUrl:url,embedding:result.embedding});
+        usable++;added++;
       }
-      if(!added&&urls.length)unavailable++;
+      if(!added&&references.length)unavailable++;
       completed++;
       if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});
       await new Promise(resolve=>setTimeout(resolve,0));
     }
     return{index,usable,unavailable,unavailableReferences,totalProducts:candidates.length};
+  }
+
+  function aggregateProductEvidence(sourceEmbedding,index){
+    const groups=new Map();
+    for(const item of Array.isArray(index)?index:[]){
+      if(!item||item.productId==null)continue;
+      const score=cosineSimilarity(sourceEmbedding,item.embedding);
+      const id=String(item.productId);
+      if(!groups.has(id))groups.set(id,{productId:id,name:item.name,category:item.category||"",score:-Infinity,supportingReferences:[],referenceCount:0});
+      const group=groups.get(id);
+      group.referenceCount++;
+      group.supportingReferences.push({referenceAssetId:item.referenceAssetId||null,referenceUrl:item.referenceUrl||null,checksum:item.checksum||null,score});
+      if(score>group.score)group.score=score;
+    }
+    return [...groups.values()].map(item=>({...item,supportingReferences:item.supportingReferences.sort((a,b)=>b.score-a.score)}))
+      .sort((a,b)=>Number(b.score)-Number(a.score)||String(a.productId).localeCompare(String(b.productId),undefined,{numeric:true}));
+  }
+
+  function evaluateVisualMatch(sourceEmbedding,index,options={}){
+    const ranked=aggregateProductEvidence(sourceEmbedding,index);
+    const classified=classifyVisualMatches(ranked,options);
+    const top=ranked[0]||null;
+    const second=ranked[1]||null;
+    const margin=top?(second?Number(top.score)-Number(second.score):Number(top.score)):0;
+    const evidenceCount=ranked.reduce((sum,item)=>sum+Number(item.referenceCount||0),0);
+    return {
+      ...classified,
+      topCandidate:top,
+      secondCandidate:second,
+      topScore:top?Number(top.score):0,
+      secondScore:second?Number(second.score):0,
+      margin,
+      evidenceCount,
+      supportingReferences:top?.supportingReferences||[],
+      model:MODEL_ID,
+      modelRevision:MODEL_REVISION,
+      decisionVersion:1
+    };
+  }
+
+  function confirmedReferenceFromAsset(asset,productId,now=new Date().toISOString()){
+    if(!asset||!productId)throw new Error("Confirmed reference requires an explicit productId");
+    const allowed=["owned","supplier-authorized","licensed","public-domain","cc0"];
+    if(!allowed.includes(asset.sourceType)||!allowed.includes(asset.rightsStatus))throw new Error("Reference requires authorized provenance and rights");
+    return {
+      referenceAssetId:String(asset.id||asset.sha256),
+      mediaAssetId:String(asset.id||""),
+      productId:String(productId),
+      checksum:String(asset.sha256||""),
+      model:MODEL_ID,
+      modelRevision:MODEL_REVISION,
+      embeddingVersion:1,
+      source:String(asset.sourceType),
+      rights:String(asset.rightsStatus),
+      role:String(asset.role||"primary"),
+      createdAt:now,
+      updatedAt:now,
+      status:"ACTIVE"
+    };
   }
 
   function rankByEmbedding(sourceEmbedding,index){
@@ -219,7 +282,7 @@
   }
 
   return{
-    MODEL_ID,MODEL_REVISION,DEFAULTS,cosineSimilarity,normalizeEmbedding,rankVisualMatches,classifyVisualMatches,
+    MODEL_ID,MODEL_REVISION,DEFAULTS,cosineSimilarity,normalizeEmbedding,rankVisualMatches,classifyVisualMatches,aggregateProductEvidence,evaluateVisualMatch,confirmedReferenceFromAsset,cacheKey,
     loadRuntime,embeddingForBlob,buildReferenceIndex,rankByEmbedding,getCachedEmbedding,putCachedEmbedding
   };
 });

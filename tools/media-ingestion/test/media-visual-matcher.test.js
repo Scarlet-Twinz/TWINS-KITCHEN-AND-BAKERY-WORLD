@@ -90,9 +90,11 @@ test("Media Center uses ONNX vision embeddings, persistent indexing, background 
   const source=fs.readFileSync(path.join(__dirname,"../../../admin/media/media-center.js"),"utf8");
   assert.match(source,/buildReferenceIndex/);
   assert.match(source,/embeddingForBlob/);
-  assert.match(source,/rankByEmbedding/);
+  assert.match(source,/evaluateVisualMatch/);
   assert.match(source,/void enrichVisualSuggestions\(\)/);
   assert.match(source,/function selectCatalogueProduct\(/);
+  assert.match(source,/confirmSuggestedProduct/);
+  assert.match(source,/markNewProductCandidate/);
   assert.match(source,/ONNX vision \/ Transformers\.js/);
   assert.doesNotMatch(source,/signatureFromPixels/);
   assert.doesNotMatch(source,/visualSimilarity/);
@@ -116,4 +118,59 @@ test("manual picker and protected workflow remain present",()=>{
   assert.match(source,/async function revalidate\(/);
   assert.match(source,/async function approveAsset\(/);
   assert.match(source,/will not publish automatically/);
+});
+
+test("product-level visual evidence aggregates multiple references and reports margin",()=>{
+  const result=matcher.evaluateVisualMatch([1,0],[
+    {productId:"58",name:"20L Planetary Mixer",referenceAssetId:"r58a",referenceUrl:"/a.jpg",checksum:"a",embedding:[1,0]},
+    {productId:"58",name:"20L Planetary Mixer",referenceAssetId:"r58b",referenceUrl:"/b.jpg",checksum:"b",embedding:[0.8,0.6]},
+    {productId:"33",name:"Commercial Dishwasher",referenceAssetId:"r33",referenceUrl:"/c.jpg",checksum:"c",embedding:[0.75,0.66]}
+  ]);
+  assert.equal(result.status,"HIGH");
+  assert.equal(result.topCandidate.productId,"58");
+  assert.equal(result.topCandidate.referenceCount,2);
+  assert.equal(result.supportingReferences.length,2);
+  assert.equal(result.secondCandidate.productId,"33");
+  assert.ok(result.margin>0);
+  assert.equal(result.model,"Xenova/mobileclip_s0");
+  assert.equal(result.modelRevision,"main");
+});
+
+test("MEDIUM returns multiple plausible products and never silently selects one",()=>{
+  const result=matcher.evaluateVisualMatch([1,0],[
+    {productId:"58",name:"20L Planetary Mixer",referenceAssetId:"r58",embedding:[0.8,0.6]},
+    {productId:"59",name:"Planetary Mixer",referenceAssetId:"r59",embedding:[0.78,0.625]}
+  ],{highThreshold:0.99,mediumThreshold:0.60,mediumMargin:0.015});
+  assert.equal(result.status,"MEDIUM");
+  assert.equal(result.suggestions.length,2);
+  assert.ok(result.suggestions.every(x=>x.confidence==="MEDIUM"));
+  assert.equal(result.suggestions.some(x=>x.confirmed),false);
+});
+
+test("UNRESOLVED is returned when local catalogue evidence is insufficient",()=>{
+  const result=matcher.evaluateVisualMatch([1,0],[
+    {productId:"58",name:"20L Planetary Mixer",referenceAssetId:"r58",embedding:[0.4,0.9165]}
+  ]);
+  assert.equal(result.status,"UNRESOLVED");
+  assert.equal(result.suggestions.length,0);
+});
+
+test("confirmed eligible asset becomes a reference record without choosing or publishing a catalogue ID",()=>{
+  const record=matcher.confirmedReferenceFromAsset({
+    id:"asset-1",sha256:"sha-1",sourceType:"owned",rightsStatus:"owned",role:"detail"
+  },"58","2026-09-28T00:00:00.000Z");
+  assert.equal(record.productId,"58");
+  assert.equal(record.referenceAssetId,"asset-1");
+  assert.equal(record.mediaAssetId,"asset-1");
+  assert.equal(record.rights,"owned");
+  assert.equal(record.status,"ACTIVE");
+  assert.throws(()=>matcher.confirmedReferenceFromAsset({id:"asset-2",sha256:"sha-2",sourceType:"review",rightsStatus:"review"},"58"),/authorized provenance/);
+});
+
+test("AI matcher never creates a product ID",()=>{
+  const result=matcher.evaluateVisualMatch([1,0],[]);
+  assert.equal(result.status,"UNRESOLVED");
+  assert.equal(result.productId,undefined);
+  assert.equal(result.topCandidate,null);
+  assert.equal(result.secondCandidate,null);
 });

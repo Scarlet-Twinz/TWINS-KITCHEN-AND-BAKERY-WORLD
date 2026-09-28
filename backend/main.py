@@ -177,6 +177,51 @@ def run_asset_intake(batch_dir,manifest_path,report_path):
     if not isinstance(report.get("results"),list):
         raise HTTPException(status_code=500,detail="Asset-intake produced an invalid report: report root must contain a results array")
     return report
+def _candidate_tokens(value):
+    import re
+    stop={"the","and","for","with","from","this","that","image","photo","commercial","machine","equipment","new","product"}
+    return {x for x in re.findall(r"[a-z0-9]+",str(value or "").lower()) if len(x)>=3 and x not in stop}
+
+def suggest_candidate_name(assets):
+    evidence=[]
+    for asset in assets:
+        evidence.extend([asset.get("filename",""),asset.get("provenance",""),asset.get("sourceUrl",""),asset.get("license",""),asset.get("attribution","")])
+    tokens=_candidate_tokens(" ".join(evidence))
+    if not tokens:
+        return "New Product — Review Required", None
+    ordered=[]
+    for value in evidence:
+        for token in _candidate_tokens(value):
+            if token not in ordered: ordered.append(token)
+    if not ordered:
+        return "New Product — Review Required", None
+    # Only promote evidence already present in the supplied metadata/filename; never invent specs.
+    words=[x.replace("-"," ").strip() for x in ordered[:6]]
+    name=" ".join(words).strip()
+    if len(name)<4:
+        return "New Product — Review Required", None
+    return name[:160], {"tokens":ordered[:6],"basis":"uploaded filename/provenance/license metadata"}
+
+def group_candidate_assets(asset_rows):
+    groups=[]
+    for row in asset_rows:
+        asset={"id":str(row[0]),"filename":row[1],"sha256":row[2],"width":row[3],"height":row[4],"provenance":row[5],"sourceUrl":row[6],"license":row[7],"attribution":row[8],"role":row[9]}
+        stem=os.path.splitext(asset["filename"])[0].lower()
+        tokens=_candidate_tokens(stem)
+        best=None
+        for group in groups:
+            overlap=tokens & group["tokens"]
+            same_shape=(asset["width"],asset["height"])==(group["width"],group["height"]) if asset["width"] and asset["height"] and group["width"] and group["height"] else False
+            score=(len(overlap)/max(1,len(tokens|group["tokens"]))) + (0.25 if same_shape else 0)
+            if score>=0.55 and (best is None or score>best[0]): best=(score,group)
+        if best:
+            score,group=best
+            group["assetIds"].append(asset["id"]); group["tokens"] |= tokens
+            group["confidence"]=min(group["confidence"],round(score,3))
+        else:
+            groups.append({"assetIds":[asset["id"]],"tokens":set(tokens),"width":asset["width"],"height":asset["height"],"confidence":0.55 if tokens else 0.30})
+    return [{"assetIds":g["assetIds"],"confidence":round(g["confidence"],3),"reviewRequired":g["confidence"]<0.78 or len(g["assetIds"])==1} for g in groups]
+
 def media_metadata_from_row(row):
     return {"id":str(row[0]),"productId":row[1],"filename":row[2],"storagePath":row[3],"sha256":row[4],"mimeType":row[5],"width":row[6],"height":row[7],"sourceType":row[8],"rightsStatus":row[9],"provenance":row[10],"sourceUrl":row[11],"license":row[12],"attribution":row[13],"role":row[14],"status":row[15],"batchId":str(row[16]),"createdAt":row[17].isoformat(),"verifiedAt":row[18].isoformat() if row[18] else None}
 
@@ -418,6 +463,113 @@ def media_delete(asset_id:str,request:Request):
             raise
     trash.unlink(missing_ok=True)
     return {"ok":True,"status":"DELETED","assetId":asset_id}
+
+@app.get("/api/admin/media/candidates")
+def media_candidate_list(request:Request,status:str|None=None):
+    require_owner(request)
+    with db() as conn:
+        rows=conn.execute("""select id,suggested_name,category,source_asset_ids,evidence,status,created_at,updated_at
+        from media_product_candidates where (%s is null or status=%s) order by created_at desc limit 200""",(status,status)).fetchall()
+    return {"candidates":[{"id":str(r[0]),"suggestedName":r[1],"category":r[2],"assetIds":r[3],"evidence":r[4],"status":r[5],"createdAt":r[6].isoformat(),"updatedAt":r[7].isoformat()} for r in rows]}
+
+@app.post("/api/admin/media/candidates",status_code=201)
+def media_candidate_create(request:Request,payload:dict):
+    actor=require_owner(request)
+    asset_ids=payload.get("assetIds") or []
+    if not isinstance(asset_ids,list) or not asset_ids:
+        raise HTTPException(status_code=422,detail="At least one media asset is required")
+    try: asset_uuids=[uuid.UUID(str(x)) for x in asset_ids]
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    with db() as conn:
+        rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+        from media_assets where id = any(%s) order by created_at""",(asset_uuids,)).fetchall()
+        if len(rows)!=len(asset_uuids): raise HTTPException(status_code=404,detail="One or more media assets were not found")
+        if any(r[10] is not None for r in rows): raise HTTPException(status_code=409,detail="Candidate assets cannot already be assigned to a canonical product")
+        if any(r[11] in ("APPROVED","REJECTED","DUPLICATE") for r in rows): raise HTTPException(status_code=409,detail="Candidate contains an ineligible media asset")
+        existing=conn.execute("""select id from media_product_candidates
+          where status in ('PENDING_OWNER','CREATED') and source_asset_ids ?| %s limit 1""",([str(x) for x in asset_uuids],)).fetchone()
+        if existing: raise HTTPException(status_code=409,detail="One or more assets already belong to an active product candidate")
+        assets=[{"filename":r[1],"provenance":r[5],"sourceUrl":r[6],"license":r[7],"attribution":r[8]} for r in rows]
+        suggested,evidence=suggest_candidate_name(assets)
+        candidate_id=uuid.uuid4()
+        evidence_payload=evidence or {"basis":"insufficient evidence"}
+        evidence_payload["assetCount"]=len(rows)
+        evidence_payload["grouping"]="owner-review" if len(rows)>1 else "single-asset"
+        conn.execute("""insert into media_product_candidates
+          (id,suggested_name,category,source_asset_ids,evidence,status) values (%s,%s,%s,%s,%s,'PENDING_OWNER')""",
+          (candidate_id,suggested_name:=suggested,None,json.dumps([str(x) for x in asset_uuids]),json.dumps(evidence_payload)))
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_CREATED",str(candidate_id),{"assetIds":[str(x) for x in asset_uuids],"suggestedName":suggested})
+        conn.commit()
+    return {"candidate":{"id":str(candidate_id),"suggestedName":suggested,"assetIds":[str(x) for x in asset_uuids],"status":"PENDING_OWNER","evidence":evidence_payload}}
+
+@app.post("/api/admin/media/candidates/{candidate_id}/approve")
+def media_candidate_approve(candidate_id:str,request:Request,payload:dict|None=None):
+    actor=require_owner(request)
+    name=str((payload or {}).get("name") or "").strip()
+    try: cid=uuid.UUID(candidate_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid candidate ID")
+    with db() as conn:
+        row=conn.execute("""select id,suggested_name,source_asset_ids,evidence,status from media_product_candidates where id=%s for update""",(cid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Product candidate not found")
+        if row[4]!="PENDING_OWNER": raise HTTPException(status_code=409,detail="Candidate is no longer awaiting owner approval")
+        final_name=name or str(row[1] or "").strip()
+        if not final_name or final_name=="New Product — Review Required":
+            raise HTTPException(status_code=422,detail="A product name is required when evidence is insufficient")
+        asset_ids=row[2] if isinstance(row[2],list) else []
+        try: asset_uuids=[uuid.UUID(str(x)) for x in asset_ids]
+        except ValueError: raise HTTPException(status_code=422,detail="Candidate contains invalid asset IDs")
+        assets=conn.execute("""select id,sha256,product_legacy_id,status,role,source_type,rights_status from media_assets
+          where id = any(%s) for update""",(asset_uuids,)).fetchall()
+        if len(assets)!=len(asset_uuids): raise HTTPException(status_code=409,detail="Candidate media is incomplete")
+        if any(a[2] is not None for a in assets): raise HTTPException(status_code=409,detail="Candidate now corresponds to an existing product; review required")
+        if any(a[3] in ("APPROVED","REJECTED","DUPLICATE") for a in assets): raise HTTPException(status_code=409,detail="Candidate contains media that cannot be approved")
+        duplicate=conn.execute("""select p.legacy_catalogue_id,p.name from products p
+          where lower(p.name)=lower(%s) and p.active=true limit 1""",(final_name,)).fetchone()
+        if duplicate: raise HTTPException(status_code=409,detail=f"Possible duplicate existing product: {duplicate[0]} · {duplicate[1]}")
+        max_row=conn.execute("select coalesce(max(legacy_catalogue_id),0) from products").fetchone()
+        next_id=max(530,int(max_row[0] or 0))+1
+        slug_base="".join(ch.lower() if ch.isalnum() else "-" for ch in final_name).strip("-") or f"product-{next_id}"
+        slug=slug_base
+        suffix=1
+        while conn.execute("select 1 from products where slug=%s",(slug,)).fetchone():
+            suffix+=1; slug=f"{slug_base}-{suffix}"
+        product_id=uuid.uuid4()
+        description=(row[3] or {}).get("description") if isinstance(row[3],dict) else None
+        conn.execute("""insert into products
+          (id,legacy_catalogue_id,name,slug,description,tag,price_mode,active)
+          values (%s,%s,%s,%s,%s,%s,'quote',true)""",(product_id,next_id,final_name,slug,description,None))
+        for asset in assets:
+            conn.execute("""update media_assets set product_legacy_id=%s,status='VERIFIED',verified_at=now(),verified_by=%s,updated_at=now()
+              where id=%s""",(next_id,uuid.UUID(actor["sub"]),asset[0]))
+        conn.execute("update media_product_candidates set suggested_name=%s,status='CREATED',updated_at=now() where id=%s",(final_name,cid))
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CREATED",str(cid),{"productId":next_id,"candidateId":str(cid),"assetIds":[str(x) for x in asset_uuids],"name":final_name})
+        conn.commit()
+    return {"ok":True,"status":"CREATED","product":{"id":next_id,"name":final_name},"candidateId":candidate_id}
+
+@app.post("/api/admin/media/candidates/{candidate_id}/reject")
+def media_candidate_reject(candidate_id:str,request:Request):
+    actor=require_owner(request)
+    try: cid=uuid.UUID(candidate_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid candidate ID")
+    with db() as conn:
+        row=conn.execute("select id,status from media_product_candidates where id=%s for update",(cid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Product candidate not found")
+        if row[1]!="PENDING_OWNER": raise HTTPException(status_code=409,detail="Candidate is no longer pending")
+        conn.execute("update media_product_candidates set status='REJECTED',updated_at=now() where id=%s",(cid,))
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_REJECTED",str(cid)); conn.commit()
+    return {"ok":True,"status":"REJECTED","candidateId":candidate_id}
+
+@app.post("/api/admin/media/candidates/{candidate_id}/keep-pending")
+def media_candidate_keep_pending(candidate_id:str,request:Request):
+    actor=require_owner(request)
+    try: cid=uuid.UUID(candidate_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid candidate ID")
+    with db() as conn:
+        row=conn.execute("select id,status from media_product_candidates where id=%s",(cid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Product candidate not found")
+        if row[1]!="PENDING_OWNER": raise HTTPException(status_code=409,detail="Candidate is no longer pending")
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_KEPT_PENDING",str(cid)); conn.commit()
+    return {"ok":True,"status":"PENDING_OWNER","candidateId":candidate_id}
 
 @app.get("/api/admin/media")
 def media_list(request:Request,status:str|None=None,q:str|None=None):
