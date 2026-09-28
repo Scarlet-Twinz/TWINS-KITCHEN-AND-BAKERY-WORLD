@@ -389,16 +389,6 @@ async function rejectNewProductCandidate(id){
   catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
 }
 
-  const card=button.closest(".asset-card");
-  const assetId=card?.querySelector("[data-id]")?.getAttribute("data-id");
-  const asset=assets.find(x=>String(x.id)===String(assetId));
-  if(!asset)return;
-  asset.suggestionStatus="NEW_PRODUCT_CANDIDATE";
-  asset.suggestionReason="Existing catalogue evidence is insufficient; owner review is required before creating a canonical product.";
-  button.textContent="New Product Candidate — Review Required";
-  button.disabled=true;
-  render();
-}
 function keepUnresolved(button){button.textContent="Kept Unresolved";button.disabled=true;}
 async function updateAsset(id){
   const p=document.querySelector('[data-id="'+id+'"][data-field="productId"]'),r=document.querySelector('[data-id="'+id+'"][data-field="role"]');
