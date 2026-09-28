@@ -1,4 +1,5 @@
-// Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.\nconst API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
+// Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.
+const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
 function visualReferenceUrls(product){
   if(!product)return [];
   const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
