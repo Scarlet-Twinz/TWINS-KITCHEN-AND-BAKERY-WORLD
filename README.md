@@ -111,10 +111,3 @@ When confirmed catalogue prices and inventory are available, customer checkout c
 Alaba International Market, Nigeria  
 **08033231712**  
 Open 24 hours
-
-
-## License
-
-MIT License.
-
-See [LICENSE](LICENSE) for the full license text.
