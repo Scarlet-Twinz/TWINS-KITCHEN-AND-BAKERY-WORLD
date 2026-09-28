@@ -16,6 +16,8 @@ jobs:
           node-version: 20
       - name: Run full Node test suite
         run: node --test tools/media-ingestion/test/*.test.js
+      - name: Run Phase 1 reference audit
+        run: node tools/media-ingestion/index.js reference-audit
 
   media-center-tests:
     runs-on: ubuntu-latest
@@ -39,3 +41,8 @@ jobs:
         run: node --check admin/media/media-center.js
       - name: Check Media Center vision matcher JavaScript
         run: node --check admin/media/media-visual-matcher.js
+      - name: Check Phase 1 JavaScript
+        run: |
+          node --check app.js
+          node --check tools/media-ingestion/index.js
+          node --check tools/media-ingestion/reference-index.js
