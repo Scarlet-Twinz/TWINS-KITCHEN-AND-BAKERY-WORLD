@@ -38,6 +38,11 @@ class Phase4CandidateTests(unittest.TestCase):
         self.assertIn("table",name.lower())
         self.assertNotIn("watt",name.lower())
 
+    def test_camera_filename_alone_is_not_a_product_name(self):
+        name,evidence=suggest_candidate_name([{"filename":"IMG_0001.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
+        self.assertEqual(name,"New Product — Review Required")
+        self.assertIsNone(evidence)
+
     def test_no_hallucinated_specifications(self):
         name,_=suggest_candidate_name([{"filename":"work-table.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
         self.assertNotIn("watt",name.lower())
