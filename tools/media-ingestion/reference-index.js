@@ -107,6 +107,7 @@ function buildReferenceManifest(options = {}) {
     const base = {
       referenceAssetId: null,
       assetId: null,
+      mediaAssetId: null,
       productId: candidate.productId,
       mediaPath: candidate.mediaPath,
       checksum: null,
@@ -160,6 +161,7 @@ function buildReferenceManifest(options = {}) {
       ...base,
       referenceAssetId: referenceAssetId(checksum, candidate.productId),
       assetId: legacyAssetId(checksum),
+      mediaAssetId: null,
       checksum,
       width: validation.width,
       height: validation.height,
@@ -232,6 +234,7 @@ function buildReferenceManifest(options = {}) {
     index: usable.map(entry => ({
       referenceAssetId: entry.referenceAssetId,
       assetId: entry.assetId,
+      mediaAssetId: entry.mediaAssetId || null,
       productId: entry.productId,
       mediaPath: entry.mediaPath,
       checksum: entry.checksum,
