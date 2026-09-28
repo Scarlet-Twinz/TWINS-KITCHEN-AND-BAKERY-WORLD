@@ -326,6 +326,7 @@ async function processBatchAssets(items, worker, options = {}) {
   const concurrency = Math.max(1, Math.min(Number(options.concurrency || 4), 8));
   const retryLimit = Math.max(0, Math.min(Number(options.retries || 1), 3));
   const cache = options.cache instanceof Map ? options.cache : new Map();
+  const inFlight = new Map();
   const results = new Array(items.length);
   let cursor = 0;
   let completed = 0;
@@ -340,16 +341,28 @@ async function processBatchAssets(items, worker, options = {}) {
       options.onProgress?.({ completed, total: items.length, result: results[index] });
       return;
     }
+    if (checksum && inFlight.has(checksum)) {
+      const shared = await inFlight.get(checksum);
+      results[index] = { ...shared, asset: item.asset, cached: true };
+      completed += 1;
+      options.onProgress?.({ completed, total: items.length, result: results[index] });
+      return;
+    }
     let lastError = null;
     for (let attempt = 0; attempt <= retryLimit; attempt += 1) {
       try {
-        const value = await worker(item, { attempt, checksum });
+        const execute = async () => worker(item, { attempt, checksum });
+        const pending = checksum && !inFlight.has(checksum) ? execute() : null;
+        if (pending) inFlight.set(checksum, pending);
+        const value = pending ? await pending : await worker(item, { attempt, checksum });
+        if (pending) inFlight.delete(checksum);
         results[index] = { ...value, asset: item.asset, attempts: attempt + 1 };
         if (checksum) cache.set(checksum, results[index]);
         completed += 1;
         options.onProgress?.({ completed, total: items.length, result: results[index] });
         return;
       } catch (error) {
+        if (checksum) inFlight.delete(checksum);
         lastError = error;
         if (attempt < retryLimit) continue;
       }
