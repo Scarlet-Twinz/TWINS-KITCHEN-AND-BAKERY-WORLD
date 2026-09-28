@@ -310,7 +310,85 @@ async function confirmSuggestedProduct(assetId,productId){
   const result=await updateAsset(assetId);
   if(result) setActionStatus(assetId,"HIGH match confirmed — owner approval remains required","success");
 }
-function markNewProductCandidate(button){
+async function createNewProductCandidate(assetId){
+  const asset=assets.find(x=>String(x.id)===String(assetId));
+  if(!asset)return null;
+  setActionStatus(assetId,"Creating candidate…","pending");
+  try{
+    const result=await api("/api/admin/media/candidates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assetIds:[assetId]})});
+    setActionStatus(assetId,"New Product Candidate created — awaiting owner approval","success");
+    setQueueFeedback("New product candidate created. Review it below.","success");
+    await loadCandidates();
+    return result;
+  }catch(e){
+    const message=(e.status?"HTTP "+e.status+": ":"")+e.message;
+    setActionStatus(assetId,message,"error");
+    setQueueFeedback(message,"error");
+    return null;
+  }
+}
+async function markNewProductCandidate(button){
+  const card=button.closest(".asset-card");
+  const assetId=card?.querySelector("[data-id]")?.getAttribute("data-id");
+  if(assetId) await createNewProductCandidate(assetId);
+}
+async function loadCandidates(){
+  const box=document.getElementById("candidates");
+  if(!box)return;
+  try{
+    const d=await api("/api/admin/media/candidates?status=PENDING_OWNER");
+    const candidates=d.candidates||[];
+    box.innerHTML=candidates.length?candidates.map(candidate=>{
+      const evidence=candidate.evidence||{};
+      const photos=(candidate.assetIds||[]).map(id=>assets.find(a=>String(a.id)===String(id))).filter(Boolean);
+      const photoHtml=photos.map(a=>'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">').join("");
+      const evidenceHtml=Array.isArray(evidence.tokens)&&evidence.tokens.length?'<small>Evidence: '+escapeHtml(evidence.tokens.join(", "))+'</small>':'<small>Evidence: insufficient — owner must provide the product name.</small>';
+      return '<article class="candidate-card"><div class="candidate-photos">'+(photoHtml||'<div class="candidate-photo-empty">No preview available</div>')+'</div><div class="candidate-meta"><span class="badge">NEW PRODUCT CANDIDATE</span><h3>'+escapeHtml(candidate.suggestedName||"New Product — Review Required")+'</h3><small>'+photos.length+' photo(s) · Awaiting Owner Approval</small>'+evidenceHtml+'<div class="candidate-actions"><button class="btn red" data-candidate-action="approve" data-candidate-id="'+escapeHtml(candidate.id)+'">Approve &amp; Create Product</button><button class="btn light" data-candidate-action="edit" data-candidate-id="'+escapeHtml(candidate.id)+'">Edit Name</button><button class="btn light" data-candidate-action="pending" data-candidate-id="'+escapeHtml(candidate.id)+'">Keep Pending</button><button class="btn light danger-outline" data-candidate-action="reject" data-candidate-id="'+escapeHtml(candidate.id)+'">Reject Candidate</button></div></div></article>';
+    }).join(""):'<div class="panel"><p class="muted">No new product candidates are awaiting approval.</p></div>';
+  }catch(e){
+    box.innerHTML='<div class="panel"><p class="muted">Candidate queue unavailable: '+escapeHtml(e.message)+'</p></div>';
+  }
+}
+async function candidateData(id){
+  const d=await api("/api/admin/media/candidates?status=PENDING_OWNER");
+  return (d.candidates||[]).find(x=>String(x.id)===String(id))||null;
+}
+async function approveNewProductCandidate(id){
+  const candidate=await candidateData(id);
+  if(!candidate)return;
+  let name=candidate.suggestedName||"";
+  if(name==="New Product — Review Required"){
+    name=prompt("Evidence is insufficient. Enter the product name to approve this candidate:","");
+    if(!name||!name.trim())return;
+  }
+  if(!confirm("Approve this candidate and let the backend assign the next canonical Product ID?"))return;
+  try{
+    const result=await api("/api/admin/media/candidates/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim()})});
+    setQueueFeedback("Product created by backend: "+result.product.id+" · "+result.product.name,"success");
+    await refresh(false); await loadCandidates();
+  }catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
+}
+async function editNewProductCandidate(id){
+  const candidate=await candidateData(id);
+  if(!candidate)return;
+  const name=prompt("Correct the suggested product name if necessary:",candidate.suggestedName||"");
+  if(!name||!name.trim())return;
+  try{
+    const result=await api("/api/admin/media/candidates/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim()})});
+    setQueueFeedback("Product created by backend: "+result.product.id+" · "+result.product.name,"success");
+    await refresh(false); await loadCandidates();
+  }catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
+}
+async function keepCandidatePending(id){
+  try{await api("/api/admin/media/candidates/"+encodeURIComponent(id)+"/keep-pending",{method:"POST"});setQueueFeedback("Candidate kept pending.","success");await loadCandidates();}
+  catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
+}
+async function rejectNewProductCandidate(id){
+  if(!confirm("Reject this new product candidate?"))return;
+  try{await api("/api/admin/media/candidates/"+encodeURIComponent(id)+"/reject",{method:"POST"});setQueueFeedback("Candidate rejected.","success");await loadCandidates();}
+  catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
+}
+
   const card=button.closest(".asset-card");
   const assetId=card?.querySelector("[data-id]")?.getAttribute("data-id");
   const asset=assets.find(x=>String(x.id)===String(assetId));
@@ -447,8 +525,11 @@ $("refresh").addEventListener("click",async()=>{
     $("locked").classList.add("hidden");
     $("app").classList.remove("hidden");
     await refresh();
+    await loadCandidates();
   }catch(e){
     $("app").classList.add("hidden");
     $("locked").classList.remove("hidden");
   }
 })();
+document.getElementById("refreshCandidates")?.addEventListener("click",loadCandidates);
+document.getElementById("candidates")?.addEventListener("click",event=>{const b=event.target.closest("[data-candidate-action]");if(!b)return;const id=b.getAttribute("data-candidate-id");const action=b.getAttribute("data-candidate-action");if(action==="approve")approveNewProductCandidate(id);else if(action==="edit")editNewProductCandidate(id);else if(action==="pending")keepCandidatePending(id);else if(action==="reject")rejectNewProductCandidate(id);});
