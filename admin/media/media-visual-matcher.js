@@ -93,8 +93,8 @@
     });
   }
 
-  function cacheKey(kind,identity){
-    return [MODEL_ID,MODEL_REVISION,kind,String(identity)].join("|");
+  function cacheKey(kind,identity,metadata={}){
+    return [MODEL_ID,MODEL_REVISION,metadata.indexVersion||1,metadata.embeddingVersion||1,metadata.checksum||"",kind,String(identity)].join("|");
   }
 
   function setStatus(callback,message,state="loading"){
@@ -159,8 +159,8 @@
     return normalizeEmbedding(embedding);
   }
 
-  async function embeddingForBlob(blob,identity,onStatus){
-    const key=cacheKey("asset",identity);
+  async function embeddingForBlob(blob,identity,onStatus,metadata={}){
+    const key=cacheKey("asset",identity,metadata);
     const cached=await getCachedEmbedding(key);
     if(cached)return{embedding:cached,cached:true};
     const embedding=await embedBlob(blob,onStatus);
@@ -168,8 +168,8 @@
     return{embedding,cached:false};
   }
 
-  async function embeddingForReference(url,onStatus){
-    const key=cacheKey("reference",url);
+  async function embeddingForReference(url,onStatus,metadata={}){
+    const key=cacheKey("reference",metadata.referenceAssetId||url,metadata);
     const cached=await getCachedEmbedding(key);
     if(cached)return{embedding:cached,cached:true,referenceUnavailable:false};
     try{
@@ -210,6 +210,65 @@
       await new Promise(resolve=>setTimeout(resolve,0));
     }
     return{index,usable,unavailable,unavailableReferences,totalProducts:candidates.length};
+  }
+
+  function aggregateProductEvidence(sourceEmbedding,index){
+    const groups=new Map();
+    for(const item of Array.isArray(index)?index:[]){
+      if(!item||item.productId==null)continue;
+      const score=cosineSimilarity(sourceEmbedding,item.embedding);
+      const id=String(item.productId);
+      if(!groups.has(id))groups.set(id,{productId:id,name:item.name,category:item.category||"",score:-Infinity,supportingReferences:[],referenceCount:0});
+      const group=groups.get(id);
+      group.referenceCount++;
+      group.supportingReferences.push({referenceAssetId:item.referenceAssetId||null,referenceUrl:item.referenceUrl||null,checksum:item.checksum||null,score});
+      if(score>group.score)group.score=score;
+    }
+    return [...groups.values()].map(item=>({...item,supportingReferences:item.supportingReferences.sort((a,b)=>b.score-a.score)}))
+      .sort((a,b)=>Number(b.score)-Number(a.score)||String(a.productId).localeCompare(String(b.productId),undefined,{numeric:true}));
+  }
+
+  function evaluateVisualMatch(sourceEmbedding,index,options={}){
+    const ranked=aggregateProductEvidence(sourceEmbedding,index);
+    const classified=classifyVisualMatches(ranked,options);
+    const top=ranked[0]||null;
+    const second=ranked[1]||null;
+    const margin=top?(second?Number(top.score)-Number(second.score):Number(top.score)):0;
+    const evidenceCount=ranked.reduce((sum,item)=>sum+Number(item.referenceCount||0),0);
+    return {
+      ...classified,
+      topCandidate:top,
+      secondCandidate:second,
+      topScore:top?Number(top.score):0,
+      secondScore:second?Number(second.score):0,
+      margin,
+      evidenceCount,
+      supportingReferences:top?.supportingReferences||[],
+      model:MODEL_ID,
+      modelRevision:MODEL_REVISION,
+      decisionVersion:1
+    };
+  }
+
+  function confirmedReferenceFromAsset(asset,productId,now=new Date().toISOString()){
+    if(!asset||!productId)throw new Error("Confirmed reference requires an explicit productId");
+    const allowed=["owned","supplier-authorized","licensed","public-domain","cc0"];
+    if(!allowed.includes(asset.sourceType)||!allowed.includes(asset.rightsStatus))throw new Error("Reference requires authorized provenance and rights");
+    return {
+      referenceAssetId:String(asset.id||asset.sha256),
+      mediaAssetId:String(asset.id||""),
+      productId:String(productId),
+      checksum:String(asset.sha256||""),
+      model:MODEL_ID,
+      modelRevision:MODEL_REVISION,
+      embeddingVersion:1,
+      source:String(asset.sourceType),
+      rights:String(asset.rightsStatus),
+      role:String(asset.role||"primary"),
+      createdAt:now,
+      updatedAt:now,
+      status:"ACTIVE"
+    };
   }
 
   function rankByEmbedding(sourceEmbedding,index){
