@@ -554,6 +554,8 @@ def media_candidate_approve(candidate_id:str,request:Request,payload:dict|None=N
         if len(assets)!=len(asset_uuids): raise HTTPException(status_code=409,detail="Candidate media is incomplete")
         if any(a[2] is not None for a in assets): raise HTTPException(status_code=409,detail="Candidate now corresponds to an existing product; review required")
         if any(a[3] in ("APPROVED","REJECTED","DUPLICATE") for a in assets): raise HTTPException(status_code=409,detail="Candidate contains media that cannot be approved")
+        allowed_rights={"owned","supplier-authorized","licensed","public-domain","cc0"}
+        if any(a[5] not in allowed_rights or a[6] not in allowed_rights for a in assets): raise HTTPException(status_code=422,detail="All candidate media must have authorized provenance and rights before approval")
         duplicate=conn.execute("""select p.legacy_catalogue_id,p.name from products p
           where lower(p.name)=lower(%s) and p.active=true limit 1""",(final_name,)).fetchone()
         if duplicate: raise HTTPException(status_code=409,detail=f"Possible duplicate existing product: {duplicate[0]} · {duplicate[1]}")
@@ -570,8 +572,10 @@ def media_candidate_approve(candidate_id:str,request:Request,payload:dict|None=N
           (id,legacy_catalogue_id,name,slug,description,tag,price_mode,active)
           values (%s,%s,%s,%s,%s,%s,'quote',true)""",(product_id,next_id,final_name,slug,description,None))
         for asset in assets:
-            conn.execute("""update media_assets set product_legacy_id=%s,status='VERIFIED',verified_at=now(),verified_by=%s,updated_at=now()
-              where id=%s""",(next_id,uuid.UUID(actor["sub"]),asset[0]))
+            mapping_id=uuid.uuid4()
+            conn.execute("""update media_assets set product_legacy_id=%s,status='APPROVED',verified_at=coalesce(verified_at,now()),verified_by=coalesce(verified_by,%s),approved_at=now(),approved_by=%s,updated_at=now()
+              where id=%s""",(next_id,uuid.UUID(actor["sub"]),uuid.UUID(actor["sub"]),asset[0]))
+            conn.execute("""insert into media_production_mappings (id,asset_id,product_legacy_id,role,published,created_by) values (%s,%s,%s,%s,false,%s)""",(mapping_id,asset[0],next_id,asset[4],uuid.UUID(actor["sub"])))
         conn.execute("update media_product_candidates set suggested_name=%s,status='CREATED',updated_at=now() where id=%s",(final_name,cid))
         audit_media_action(conn,actor,"MEDIA_PRODUCT_CREATED",str(cid),{"productId":next_id,"candidateId":str(cid),"assetIds":[str(x) for x in asset_uuids],"name":final_name})
         conn.commit()
