@@ -234,3 +234,37 @@ create table if not exists media_supporting_documents (
 );
 create index if not exists idx_media_supporting_documents_batch on media_supporting_documents(batch_id,created_at);
 
+
+
+-- Phase 1 media/reference foundation.
+-- Candidate products are deliberately separate from canonical product records.
+create table if not exists media_product_candidates (
+ id uuid primary key,
+ suggested_name text,
+ category text,
+ source_asset_ids jsonb not null default '[]'::jsonb,
+ evidence jsonb not null default '{}'::jsonb,
+ status text not null default 'PENDING_OWNER' check (status in ('PENDING_OWNER','CREATED','MERGED','KEPT_UNRESOLVED','REJECTED')),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create index if not exists idx_media_product_candidates_status on media_product_candidates(status,created_at desc);
+
+-- Visual references explicitly bind an identity-bearing reference to a canonical product.
+-- media_asset_id is nullable so legacy local catalogue references can be indexed before
+-- every legacy image has a corresponding Media Center upload row.
+create table if not exists media_visual_references (
+ reference_asset_id text primary key,
+ product_legacy_id integer not null,
+ media_asset_id uuid references media_assets(id) on delete set null,
+ checksum text,
+ model text not null,
+ model_revision text not null,
+ source text,
+ rights text,
+ role text not null default 'primary',
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create index if not exists idx_media_visual_references_product on media_visual_references(product_legacy_id);
+create index if not exists idx_media_visual_references_checksum on media_visual_references(checksum);
