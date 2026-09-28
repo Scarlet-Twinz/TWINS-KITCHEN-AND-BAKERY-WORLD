@@ -3,6 +3,7 @@ const path = require('node:path');
 const { DATA_PATH, loadCatalogue, readExistingRules, computeMediaState, validateManifest, applyMappings, buildAudit } = require('./validator');
 const { writePendingManifest } = require('./collector');
 const { discover } = require('./discovery');
+const { writeReferenceManifest } = require('./reference-index');
 const { buildPendingAssetManifest, writePendingAssetManifest, loadAssetManifest, processAssets, buildAppliedManifest, DEFAULT_ASSET_ROOT, DEFAULT_PENDING_OUTPUT, DEFAULT_REPORT_OUTPUT, DEFAULT_APPLIED_OUTPUT } = require('./asset-intake');
 
 function arg(name, fallback = null) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : fallback; }
@@ -28,7 +29,13 @@ function assetManifestArg() { return arg('--asset-manifest', null); }
 
 async function main() {
   const command = process.argv[2] || 'dry-run';
-  if (!['dry-run','apply','audit','pending-manifest','discover','asset-intake-manifest','asset-intake-dry-run','asset-intake-apply'].includes(command)) throw new Error('Usage: node tools/media-ingestion/index.js <audit|pending-manifest|asset-intake-manifest|asset-intake-dry-run|asset-intake-apply|discover|dry-run|apply> [options]');
+  if (!['dry-run','apply','audit','pending-manifest','reference-audit','reference-manifest','discover','asset-intake-manifest','asset-intake-dry-run','asset-intake-apply'].includes(command)) throw new Error('Usage: node tools/media-ingestion/index.js <audit|pending-manifest|asset-intake-manifest|asset-intake-dry-run|asset-intake-apply|discover|dry-run|apply> [options]');
+  if (command === 'reference-audit' || command === 'reference-manifest') {
+    const target = arg('--output', 'tools/media-ingestion/manifests/reference-index.json');
+    const manifest = writeReferenceManifest(path.resolve(process.cwd(), target));
+    console.log(JSON.stringify({ output: path.relative(process.cwd(), path.resolve(target)).replace(/\\/g, '/'), indexVersion: manifest.indexVersion, catalogue: manifest.catalogue, coverage: manifest.coverage }, null, 2));
+    return;
+  }
   if (command === 'pending-manifest') { const target = arg('--output', 'tools/media-ingestion/manifests/pending-catalogue.json'); const manifest = writePendingManifest(path.resolve(process.cwd(), target)); console.log(JSON.stringify({ output: target, ...manifest.counts }, null, 2)); return; }
   if (command === 'asset-intake-manifest') {
     const target = path.resolve(process.cwd(), arg('--output', path.relative(process.cwd(), DEFAULT_PENDING_OUTPUT)));
