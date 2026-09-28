@@ -63,8 +63,7 @@ async function identifyAssetVisually(asset){
   const identity=asset.sha256||asset.id||asset.filename;
   const sourceResult=await visualMatcher.embeddingForBlob(sourceBlob,identity,updateVisualStatus);
   const referenceResult=await getVisualReferenceIndex(products);
-  const ranked=visualMatcher.rankByEmbedding(sourceResult.embedding,referenceResult.index);
-  const localResult=visualMatcher.classifyVisualMatches(ranked);
+  const localResult=visualMatcher.evaluateVisualMatch(sourceResult.embedding,referenceResult.index);
   return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length};
 }
 async function enrichVisualSuggestions(){
