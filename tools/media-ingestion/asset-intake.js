@@ -321,10 +321,79 @@ function buildAppliedManifest(report, output = DEFAULT_APPLIED_OUTPUT) {
   return next;
 }
 
+
+async function processBatchAssets(items, worker, options = {}) {
+  const concurrency = Math.max(1, Math.min(Number(options.concurrency || 4), 8));
+  const retryLimit = Math.max(0, Math.min(Number(options.retries || 1), 3));
+  const cache = options.cache instanceof Map ? options.cache : new Map();
+  const results = new Array(items.length);
+  let cursor = 0;
+  let completed = 0;
+  const startedAt = Date.now();
+
+  const runOne = async (index) => {
+    const item = items[index];
+    const checksum = String(item?.sha256 || "");
+    if (checksum && cache.has(checksum)) {
+      results[index] = { ...cache.get(checksum), asset: item.asset, cached: true };
+      completed += 1;
+      options.onProgress?.({ completed, total: items.length, result: results[index] });
+      return;
+    }
+    let lastError = null;
+    for (let attempt = 0; attempt <= retryLimit; attempt += 1) {
+      try {
+        const value = await worker(item, { attempt, checksum });
+        results[index] = { ...value, asset: item.asset, attempts: attempt + 1 };
+        if (checksum) cache.set(checksum, results[index]);
+        completed += 1;
+        options.onProgress?.({ completed, total: items.length, result: results[index] });
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attempt < retryLimit) continue;
+      }
+    }
+    results[index] = {
+      asset: item.asset,
+      state: "FAILED",
+      reason: lastError?.message || String(lastError || "asset processing failed"),
+      attempts: retryLimit + 1
+    };
+    completed += 1;
+    options.onProgress?.({ completed, total: items.length, result: results[index] });
+  };
+
+  const workerLoop = async () => {
+    while (true) {
+      const index = cursor++;
+      if (index >= items.length) return;
+      await runOne(index);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, Math.max(1, items.length)) }, workerLoop));
+
+  const summary = {
+    total: items.length,
+    completed,
+    elapsedMs: Date.now() - startedAt,
+    validated: results.filter(x => ["VERIFIED","REVIEW","UNRESOLVED","DUPLICATE"].includes(x?.state)).length,
+    duplicates: results.filter(x => x?.state === "DUPLICATE" || x?.duplicate).length,
+    matched: results.filter(x => x?.state === "VERIFIED" || x?.state === "MATCHED").length,
+    review: results.filter(x => x?.state === "REVIEW").length,
+    newCandidates: results.filter(x => x?.state === "NEW_PRODUCT_CANDIDATE").length,
+    rejected: results.filter(x => x?.state === "REJECTED").length,
+    unresolved: results.filter(x => x?.state === "UNRESOLVED").length,
+    failed: results.filter(x => x?.state === "FAILED").length,
+    cached: results.filter(x => x?.cached).length
+  };
+  return { results, summary, cache };
+}
+
 module.exports = {
   ROOT, SUPPORTED_EXTENSIONS, MIN_DIMENSION, DEFAULT_ASSET_ROOT, DEFAULT_PENDING_OUTPUT,
   DEFAULT_REPORT_OUTPUT, DEFAULT_APPLIED_OUTPUT, slug, expectedAssetPath, pendingAssetRecord,
   buildPendingAssetManifest, writePendingAssetManifest, discoverLocalAssets, inspectImage,
   fileSha256, normalizeAssetManifest, loadAssetManifest, filenameEvidence, scoreAssetAgainstProduct,
-  chooseFuzzyProduct, processAsset, processAssets, buildAppliedManifest
+  chooseFuzzyProduct, processAsset, processAssets, processBatchAssets, buildAppliedManifest
 };
