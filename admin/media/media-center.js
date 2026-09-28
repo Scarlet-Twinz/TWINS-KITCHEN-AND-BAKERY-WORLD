@@ -342,6 +342,8 @@ async function createNewProductCandidate(assetId){
   setActionStatus(assetId,"Creating candidate…","pending");
   try{
     const result=await api("/api/admin/media/candidates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assetIds:[assetId]})});
+    const progress=loadBatchProgress()||{clientBatchId:"current",total:assets.length,completed:0,summary:{}};
+    progress.summary=progress.summary||{};progress.summary.newCandidates=(Number(progress.summary.newCandidates)||0)+1;saveBatchProgress(progress);renderBatchProgress(progress);
     setActionStatus(assetId,"New Product Candidate created — awaiting owner approval","success");
     setQueueFeedback("New product candidate created. Review it below.","success");
     await loadCandidates();
@@ -603,6 +605,7 @@ $("refresh").addEventListener("click",async()=>{
     const d=await api("/api/account/me");
     if(d.user.role!=="owner")throw new Error("Owner access required");
     $("identity").textContent=d.user.name+" · OWNER";
+    renderBatchProgress(loadBatchProgress());
     $("locked").classList.add("hidden");
     $("app").classList.remove("hidden");
     await refresh();
