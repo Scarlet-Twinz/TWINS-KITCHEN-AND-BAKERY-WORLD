@@ -6,7 +6,7 @@
   const MODEL_REVISION="main";
   const TRANSFORMERS_MODULE="https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
   const DB_NAME="twins-media-vision";
-  const DB_VERSION=1;
+  const DB_VERSION=2;
   const STORE_NAME="embeddings";
   const DEFAULTS={highThreshold:0.78,mediumThreshold:0.62,highMargin:0.07,mediumMargin:0.025,maxSuggestions:5};
   const memoryCache=new Map();
@@ -177,7 +177,7 @@
       if(!response.ok)throw new Error("HTTP "+response.status);
       const blob=await response.blob();
       const embedding=await embedBlob(blob,onStatus);
-      await putCachedEmbedding(key,embedding,{kind:"reference",url});
+      await putCachedEmbedding(key,embedding,{kind:"reference",url,referenceAssetId:metadata.referenceAssetId||url,checksum:metadata.checksum||"",model:MODEL_ID,modelRevision:MODEL_REVISION,embeddingVersion:metadata.embeddingVersion||1,indexVersion:metadata.indexVersion||1});
       return{embedding,cached:false,referenceUnavailable:false};
     }catch(error){
       return{embedding:null,cached:false,referenceUnavailable:true,status:"REFERENCE_UNAVAILABLE",error:String(error?.message||error)};
@@ -191,16 +191,20 @@
     const candidates=(Array.isArray(products)?products:[]).filter(product=>product&&product.id!=null&&product.n);
     let usable=0,unavailable=0,completed=0;
     for(const product of candidates){
-      const urls=Array.isArray(referenceResolver(product))?referenceResolver(product):[];
-      if(!urls.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
-      let added=false;
-      for(const url of urls){
-        const result=await embedReference(url,onStatus);
+      const rawReferences=referenceResolver(product);
+      const references=Array.isArray(rawReferences)?rawReferences:[]; 
+      if(!references.length){completed++;if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});continue;}
+      let added=0;
+      for(const raw of references){
+        const metadata=typeof raw==="string"?{url:raw}:raw||{};
+        const url=metadata.url||metadata.referenceUrl||metadata.mediaPath;
+        if(!url)continue;
+        const result=await embedReference(url,onStatus,metadata);
         if(!result.embedding){unavailable++;unavailableReferences.push({url,status:"REFERENCE_UNAVAILABLE",error:result.error||""});continue;}
-        index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceUrl:url,embedding:result.embedding});
-        usable++;added=true;break;
+        index.push({productId:String(product.id),name:String(product.n),category:product.category||product.categoryName||product.c||product.tag||"",referenceAssetId:metadata.referenceAssetId||null,checksum:metadata.checksum||null,model:MODEL_ID,modelRevision:MODEL_REVISION,embeddingVersion:metadata.embeddingVersion||1,indexVersion:metadata.indexVersion||1,referenceUrl:url,embedding:result.embedding});
+        usable++;added++;
       }
-      if(!added&&urls.length)unavailable++;
+      if(!added&&references.length)unavailable++;
       completed++;
       if(onProgress)onProgress({completed,total:candidates.length,usable,unavailable});
       await new Promise(resolve=>setTimeout(resolve,0));
