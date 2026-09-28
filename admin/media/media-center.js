@@ -374,9 +374,9 @@ async function editNewProductCandidate(id){
   const name=prompt("Correct the suggested product name if necessary:",candidate.suggestedName||"");
   if(!name||!name.trim())return;
   try{
-    const result=await api("/api/admin/media/candidates/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim()})});
-    setQueueFeedback("Product created by backend: "+result.product.id+" · "+result.product.name,"success");
-    await refresh(false); await loadCandidates();
+    await api("/api/admin/media/candidates/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim()})});
+    setQueueFeedback("Candidate name updated. It is still awaiting owner approval.","success");
+    await loadCandidates();
   }catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
 }
 async function keepCandidatePending(id){
