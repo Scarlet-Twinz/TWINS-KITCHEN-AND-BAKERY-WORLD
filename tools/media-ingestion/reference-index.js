@@ -10,8 +10,8 @@ const {
 } = require("./validator");
 const { inspectImage, fileSha256 } = require("./asset-intake");
 
-const REFERENCE_SCHEMA_VERSION = 1;
-const REFERENCE_INDEX_VERSION = 1;
+const REFERENCE_SCHEMA_VERSION = 2;
+const REFERENCE_INDEX_VERSION = 2;
 const MODEL = "Xenova/mobileclip_s0";
 const MODEL_REVISION = "main";
 const LOCAL_MEDIA_PREFIX = "assets/media/";
@@ -160,6 +160,7 @@ function buildReferenceManifest(options = {}) {
       ...base,
       referenceAssetId: referenceAssetId(checksum, candidate.productId),
       assetId: legacyAssetId(checksum),
+      mediaAssetId: legacyAssetId(checksum),
       checksum,
       width: validation.width,
       height: validation.height,
