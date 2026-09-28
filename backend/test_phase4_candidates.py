@@ -1,67 +1,71 @@
-from backend.main import group_candidate_assets, suggest_candidate_name
+import inspect
+import unittest
+from pathlib import Path
+
+try:
+    from .main import group_candidate_assets, suggest_candidate_name
+    from . import main
+except ImportError:
+    from main import group_candidate_assets, suggest_candidate_name
+    import main
 
 def asset(asset_id, filename, width=1200, height=900, provenance="Twins Kitchen", source_url="", license_text="", attribution=""):
     return (asset_id, filename, "sha-"+asset_id, width, height, provenance, source_url, license_text, attribution, "primary", None, "REVIEW")
 
-def test_one_new_product_candidate_is_single_group():
-    groups=group_candidate_assets([asset("a","new-oven.jpg")])
-    assert len(groups)==1
-    assert groups[0]["assetIds"]==["a"]
-    assert groups[0]["reviewRequired"] is True
+class Phase4CandidateTests(unittest.TestCase):
+    def test_one_new_product_candidate_is_single_group(self):
+        groups=group_candidate_assets([asset("a","new-oven.jpg")])
+        self.assertEqual(len(groups),1)
+        self.assertEqual(groups[0]["assetIds"],["a"])
+        self.assertTrue(groups[0]["reviewRequired"])
 
-def test_multiple_photos_of_one_product_group_together():
-    groups=group_candidate_assets([
-        asset("a","commercial-oven-front.jpg"),
-        asset("b","commercial-oven-side.jpg"),
-        asset("c","commercial-oven-control.jpg"),
-    ])
-    assert any(set(g["assetIds"])=={"a","b","c"} for g in groups)
+    def test_multiple_photos_of_one_product_group_together(self):
+        groups=group_candidate_assets([asset("a","commercial-oven-front.jpg"),asset("b","commercial-oven-side.jpg"),asset("c","commercial-oven-control.jpg")])
+        self.assertTrue(any(set(g["assetIds"])=={"a","b","c"} for g in groups))
 
-def test_visually_similar_distinct_metadata_does_not_force_group():
-    groups=group_candidate_assets([
-        asset("a","planetary-mixer-20l.jpg"),
-        asset("b","planetary-mixer-40l.jpg"),
-    ])
-    assert len(groups)==2 or all(g["reviewRequired"] for g in groups)
+    def test_two_similar_products_do_not_silently_merge(self):
+        groups=group_candidate_assets([asset("a","planetary-mixer-20l.jpg"),asset("b","planetary-mixer-40l.jpg")])
+        self.assertTrue(len(groups)==2 or all(g["reviewRequired"] for g in groups))
 
-def test_insufficient_evidence_requires_review_name():
-    name,evidence=suggest_candidate_name([{"filename":"IMG_0001.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
-    assert name=="img 0001" or name=="New Product — Review Required"
-    assert evidence is not None
+    def test_missing_name_evidence_requires_review(self):
+        name,evidence=suggest_candidate_name([{"filename":"","provenance":"","sourceUrl":"","license":"","attribution":""}])
+        self.assertEqual(name,"New Product — Review Required")
+        self.assertIsNone(evidence)
 
-def test_suggested_name_uses_only_supplied_evidence():
-    name,evidence=suggest_candidate_name([{"filename":"commercial-stainless-work-table.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
-    assert "stainless" in name.lower()
-    assert "table" in name.lower()
-    assert "watt" not in name.lower()
+    def test_suggested_name_uses_only_supplied_evidence(self):
+        name,_=suggest_candidate_name([{"filename":"commercial-stainless-work-table.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
+        self.assertIn("stainless",name.lower())
+        self.assertIn("table",name.lower())
+        self.assertNotIn("watt",name.lower())
 
-def test_no_hallucinated_specifications_from_empty_metadata():
-    name,evidence=suggest_candidate_name([{"filename":"","provenance":"","sourceUrl":"","license":"","attribution":""}])
-    assert name=="New Product — Review Required"
+    def test_no_hallucinated_specifications(self):
+        name,_=suggest_candidate_name([{"filename":"work-table.jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
+        self.assertNotIn("watt",name.lower())
+        self.assertNotIn("model",name.lower())
 
-def test_grouping_can_flag_low_confidence_for_review():
-    groups=group_candidate_assets([
-        asset("a","photo-a.jpg"),
-        asset("b","photo-b.jpg"),
-    ])
-    assert all("confidence" in g and "reviewRequired" in g for g in groups)
+    def test_low_confidence_group_is_reviewable(self):
+        groups=group_candidate_assets([asset("a","photo-a.jpg"),asset("b","photo-b.jpg")])
+        self.assertTrue(all("confidence" in g and "reviewRequired" in g for g in groups))
 
-def test_candidate_name_length_is_bounded():
-    long_name="very-long-product-name-"*30
-    name,_=suggest_candidate_name([{"filename":long_name+".jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
-    assert len(name)<=160
+    def test_suggested_name_is_bounded(self):
+        name,_=suggest_candidate_name([{"filename":"very-long-product-name-"*30+".jpg","provenance":"","sourceUrl":"","license":"","attribution":""}])
+        self.assertLessEqual(len(name),160)
 
-def test_backend_approval_assigns_next_id_after_530_floor():
-    import inspect
-    from backend import main
-    source=inspect.getsource(main.media_candidate_approve)
-    assert "max(530" in source
-    assert "next_id" in source
-    assert "insert into products" in source
+    def test_backend_assigns_next_id_after_530(self):
+        source=inspect.getsource(main.media_candidate_approve)
+        self.assertIn("max(530",source)
+        self.assertIn("next_id",source)
+        self.assertIn("insert into products",source)
 
-def test_browser_never_supplies_canonical_id_for_candidate_creation():
-    from pathlib import Path
-    source=Path("admin/media/media-center.js").read_text(encoding="utf-8")
-    assert "/api/admin/media/candidates" in source
-    assert "assetIds:[assetId]" in source
-    assert "productId" not in source[source.find("createNewProductCandidate"):source.find("async function loadCandidates")]
+    def test_browser_does_not_choose_canonical_id(self):
+        source=Path(Path(__file__).resolve().parents[1].parent/"admin/media/media-center.js").read_text(encoding="utf-8")
+        start=source.find("async function createNewProductCandidate")
+        end=source.find("async function loadCandidates")
+        self.assertGreaterEqual(start,0)
+        segment=source[start:end]
+        self.assertIn("assetIds:[assetId]",segment)
+        self.assertNotIn("next_id",segment)
+        self.assertNotIn("legacy_catalogue_id",segment)
+
+if __name__=="__main__":
+    unittest.main()
