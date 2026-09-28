@@ -1,4 +1,4 @@
-const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
+// Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.\nconst API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
 function visualReferenceUrls(product){
   if(!product)return [];
   const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
@@ -80,27 +80,20 @@ async function enrichVisualSuggestions(){
       const asset=targets[index];
       try{
         const result=await identifyAssetVisually(asset);
-      asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
-      asset.suggestionSource=result?.engine||"local visual similarity";
-      asset.suggestionStatus=result?.status||"UNRESOLVED";
-      asset.suggestionReason=result?.reason||"visual evidence unavailable";
-      asset.topScore=result?.topScore||0;
-      asset.secondScore=result?.secondScore||0;
-      asset.margin=result?.margin||0;
-      asset.referenceCount=result?.referenceCount||0;
-      asset.supportingReferences=result?.supportingReferences||[];
-      if(run===visualRun)render();
-    }catch(e){
-      asset.suggestions=[];
-      asset.suggestionSource="local visual similarity";
-      asset.suggestionStatus="UNRESOLVED";
-      asset.suggestionReason="visual matching could not inspect the uploaded image";
+        asset.suggestions=result&&Array.isArray(result.suggestions)?result.suggestions:[];
+        asset.suggestionSource=result?.engine||"local visual similarity";
+        asset.suggestionStatus=result?.status||"UNRESOLVED";
+        asset.suggestionReason=result?.reason||"visual evidence unavailable";
+        asset.topScore=result?.topScore||0;
+        asset.secondScore=result?.secondScore||0;
+        asset.margin=result?.margin||0;
+        asset.referenceCount=result?.referenceCount||0;
+        asset.supportingReferences=result?.supportingReferences||[];
         if(run===visualRun)render();
         progress.completed=(Number(progress.completed)||0)+1;
         progress.summary=progress.summary||{};
-        const state=asset.suggestionStatus;
-        if(state==="HIGH")progress.summary.matched=(Number(progress.summary.matched)||0)+1;
-        else if(state==="MEDIUM")progress.summary.review=(Number(progress.summary.review)||0)+1;
+        if(asset.suggestionStatus==="HIGH")progress.summary.matched=(Number(progress.summary.matched)||0)+1;
+        else if(asset.suggestionStatus==="MEDIUM")progress.summary.review=(Number(progress.summary.review)||0)+1;
         else progress.summary.unresolved=(Number(progress.summary.unresolved)||0)+1;
         saveBatchProgress(progress);renderBatchProgress(progress);
       }catch(e){
