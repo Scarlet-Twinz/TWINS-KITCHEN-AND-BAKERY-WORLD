@@ -32,7 +32,9 @@ test("canonical product ID is assigned by backend, not browser code",()=>{
 test("candidate approval requires owner session, authorized rights and validates duplicate names",()=>{
   assert.match(backend,/def media_candidate_approve/);
   assert.match(backend,/actor=require_owner\(request\)/);
-  assert.match(backend,/Possible duplicate existing product/);\n  assert.match(backend,/authorized provenance and rights/);\n  assert.match(backend,/status=\x27APPROVED\x27/);\n  assert.match(backend,/media_production_mappings/);
+  assert.match(backend,/Possible duplicate existing product/);
+  assert.match(backend,/authorized provenance and rights/);
+  assert.match(backend,/status='APPROVED'/);\n  assert.match(backend,/media_production_mappings/);
 });
 
 test("candidate persistence records approver and creation provenance in audit logs",()=>{
