@@ -79,6 +79,11 @@ async function enrichVisualSuggestions(){
       asset.suggestionSource=result?.engine||"local visual similarity";
       asset.suggestionStatus=result?.status||"UNRESOLVED";
       asset.suggestionReason=result?.reason||"visual evidence unavailable";
+      asset.topScore=result?.topScore||0;
+      asset.secondScore=result?.secondScore||0;
+      asset.margin=result?.margin||0;
+      asset.referenceCount=result?.referenceCount||0;
+      asset.supportingReferences=result?.supportingReferences||[];
       if(run===visualRun)render();
     }catch(e){
       asset.suggestions=[];
@@ -169,17 +174,22 @@ function render(){
   $("queue").innerHTML=list.length?list.map(a=>{
     const suggestionHtml=a.productId?"":`
       <div class="suggestions">
-        <strong>Suggested products<span class="suggestion-source"> · local ONNX vision · cached catalogue embeddings</span></strong>
-        ${Array.isArray(a.suggestions)&&a.suggestions.length?a.suggestions.map((s,i)=>`
+        <strong>${escapeHtml(a.suggestionStatus||"UNRESOLVED")} — Visual catalogue decision<span class="suggestion-source"> · local ONNX vision · product-level evidence</span></strong>
+        <small>${escapeHtml(a.suggestionReason||"No reliable catalogue match.")}</small>
+        ${a.suggestionStatus==="HIGH"&&a.suggestions?.length?`
           <div class="suggestion">
-            <div>
-              <strong>${escapeHtml((i+1)+". "+s.name)}</strong>
-              <span>ID: ${escapeHtml(s.productId)}${s.category?" · "+escapeHtml(s.category):""} · Confidence: ${escapeHtml(s.confidence)}</span>
+            <div><strong>Suggested Product: ${escapeHtml(a.suggestions[0].name)}</strong>
+              <span>ID: ${escapeHtml(a.suggestions[0].productId)} · Score: ${Number(a.topScore||a.suggestions[0].score||0).toFixed(3)} · Margin: ${Number(a.margin||0).toFixed(3)}</span>
             </div>
-            <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(s.productId)}" onclick="selectSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Select</button>
+            <button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(a.suggestions[0].productId)}" onclick="confirmSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Confirm</button>
+          </div>`:a.suggestionStatus==="MEDIUM"&&a.suggestions?.length?`
+          <div class="suggestion-list">
+            ${a.suggestions.map((s,i)=>`<div class="suggestion"><div><strong>${escapeHtml((i+1)+". "+s.name)}</strong><span>ID: ${escapeHtml(s.productId)} · Score: ${Number(s.score||0).toFixed(3)}</span></div><button type="button" class="btn light" data-suggestion-asset="${escapeHtml(a.id)}" data-suggestion-product="${escapeHtml(s.productId)}" onclick="selectSuggestedProduct(this.dataset.suggestionAsset,this.dataset.suggestionProduct)">Select</button></div>`).join("")}
           </div>
-        `).join(""):'<div class="suggestion-empty">UNRESOLVED — insufficient local catalogue evidence.</div>'}
-        <button type="button" class="btn light" onclick="keepUnresolved(this)">Keep Unresolved</button>
+          <button type="button" class="btn light" onclick="keepUnresolved(this)">None of these</button>`: `
+          <div class="suggestion-empty">No reliable catalogue match.</div>
+          <button type="button" class="btn light" onclick="markNewProductCandidate(this)">Mark as New Product Candidate</button>`}
+        ${a.suggestionStatus==="HIGH"&&a.suggestions?.length?"":'<button type="button" class="btn light" onclick="keepUnresolved(this)">Keep Unresolved</button>'}
       </div>`;
     return '<article class="asset-card"><div class="asset-thumb">'+
       (a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+
@@ -293,6 +303,24 @@ document.addEventListener("click",event=>{
   });
 });
 function selectSuggestedProduct(assetId,productId){selectCatalogueProduct(assetId,productId);}
+async function confirmSuggestedProduct(assetId,productId){
+  selectCatalogueProduct(assetId,productId);
+  const asset=assets.find(x=>String(x.id)===String(assetId));
+  if(!asset)return;
+  asset.confirmedProductId=String(productId);
+  setActionStatus(assetId,"Candidate confirmed — owner approval still required","success");
+}
+function markNewProductCandidate(button){
+  const card=button.closest(".asset-card");
+  const assetId=card?.querySelector("[data-id]")?.getAttribute("data-id");
+  const asset=assets.find(x=>String(x.id)===String(assetId));
+  if(!asset)return;
+  asset.suggestionStatus="NEW_PRODUCT_CANDIDATE";
+  asset.suggestionReason="Existing catalogue evidence is insufficient; owner review is required before creating a canonical product.";
+  button.textContent="New Product Candidate — Review Required";
+  button.disabled=true;
+  render();
+}
 function keepUnresolved(button){button.textContent="Kept Unresolved";button.disabled=true;}
 async function updateAsset(id){
   const p=document.querySelector('[data-id="'+id+'"][data-field="productId"]'),r=document.querySelector('[data-id="'+id+'"][data-field="role"]');
