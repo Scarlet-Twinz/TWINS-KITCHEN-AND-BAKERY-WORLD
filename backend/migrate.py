@@ -37,6 +37,18 @@ create table if not exists media_supporting_documents (
  mime_type text not null default 'application/pdf', uploaded_by uuid not null references users(id), created_at timestamptz not null default now()
 );
 create index if not exists idx_media_supporting_documents_batch on media_supporting_documents(batch_id,created_at);
+create table if not exists media_product_candidates (
+ id uuid primary key,
+ suggested_name text,
+ category text,
+ source_asset_ids jsonb not null default '[]'::jsonb,
+ evidence jsonb not null default '{}'::jsonb,
+ status text not null default 'PENDING_OWNER' check (status in ('PENDING_OWNER','CREATED','MERGED','KEPT_UNRESOLVED','REJECTED')),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create index if not exists idx_media_product_candidates_status on media_product_candidates(status,created_at desc);
+
 """
 
 def migrate_owner_role(conn):
