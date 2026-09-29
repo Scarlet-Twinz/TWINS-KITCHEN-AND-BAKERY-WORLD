@@ -490,7 +490,7 @@ def media_candidate_list(request:Request,status:str|None=None):
     require_owner(request)
     with db() as conn:
         rows=conn.execute("""select id,suggested_name,category,source_asset_ids,evidence,status,created_at,updated_at
-        from media_product_candidates where (%s is null or status=%s) order by created_at desc limit 200""",(status,status)).fetchall()
+        from media_product_candidates where (%s::text is null or status=%s) order by created_at desc limit 200""",(status,status)).fetchall()
     return {"candidates":[{"id":str(r[0]),"suggestedName":r[1],"category":r[2],"assetIds":r[3],"evidence":r[4],"status":r[5],"createdAt":r[6].isoformat(),"updatedAt":r[7].isoformat()} for r in rows]}
 
 @app.post("/api/admin/media/candidates",status_code=201)
