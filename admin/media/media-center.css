@@ -16,3 +16,5 @@
 .candidate-meta h3{margin:0}
 .candidate-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 @media(max-width:720px){.candidate-card{grid-template-columns:1fr}.candidate-photos{grid-template-columns:repeat(3,1fr)}}
+
+.open-world-result{display:grid;gap:5px;padding:10px;border:1px solid #dfe7f3;border-radius:12px;background:#f8fbff}.open-world-result strong{font-size:.82rem}.open-world-result span,.open-world-result small{font-size:.68rem;color:#5f6b7a;line-height:1.35}
