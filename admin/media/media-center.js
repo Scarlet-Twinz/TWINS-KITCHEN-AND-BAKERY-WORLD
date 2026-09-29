@@ -298,7 +298,8 @@ async function refresh(showFeedback=false){
       a.suggestionStatus="UNRESOLVED";
     });
     render();
-    void Promise.all([enrichVisualSuggestions(),enrichOpenWorldSuggestions()]);
+    void enrichVisualSuggestions();
+    void enrichOpenWorldSuggestions();
     if(showFeedback)setQueueFeedback("Queue refreshed","success");
     return d;
   }catch(e){
