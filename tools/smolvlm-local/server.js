@@ -34,12 +34,88 @@ function readBody(req,maxBytes=15*1024*1024){
     req.on("error",reject);
   });
 }
+function cleanGeneratedText(text){
+  return String(text||"").trim().replace(/^\`\`\`(?:json)?\\s*/i,"").replace(/\\s*\`\`\`$/,"").trim();
+}
+function normalizeConfidence(value){
+  if(typeof value==="string"){
+    const match=value.match(/-?\\d+(?:\\.\\d+)?/);
+    if(!match)return 0;
+    const n=Number(match[0]);
+    return Number.isFinite(n)?(n>1?n/100:n):0;
+  }
+  const n=Number(value);
+  return Number.isFinite(n)?(n>1?n/100:n):0;
+}
+function isSchemaRepetition(text){
+  const raw=cleanGeneratedText(text).toLowerCase();
+  const fields=["productname","category","description","visibleattributes","confidence","status"];
+  const hits=fields.filter(field=>raw.includes(field));
+  if(hits.length<4)return false;
+  const compact=raw.replace(/[\\s,:;{}\\[\\]"'_-]+/g,"");
+  return compact.length<180 || hits.length===fields.length;
+}
+function normalizeStatus(value){
+  const status=String(value||"").trim().toUpperCase();
+  return ["IDENTIFIED","UNCERTAIN","UNRESOLVED"].includes(status)?status:"UNRESOLVED";
+}
+function normalizeStructuredResult(value){
+  if(!value||typeof value!=="object"||Array.isArray(value))return null;
+  const productName=String(value.productName||"").trim();
+  const category=String(value.category||"").trim();
+  const description=String(value.description||"").trim();
+  const visibleAttributes=Array.isArray(value.visibleAttributes)
+    ? value.visibleAttributes.map(v=>String(v).trim()).filter(Boolean).slice(0,12)
+    : [];
+  if(!productName&&!description)return null;
+  if([productName,category,description,...visibleAttributes].some(isSchemaRepetition))return null;
+  return {
+    productName,
+    category,
+    description,
+    visibleAttributes,
+    confidence:Math.max(0,Math.min(1,normalizeConfidence(value.confidence))),
+    status:normalizeStatus(value.status)
+  };
+}
 function extractJson(text){
-  const raw=String(text||"").trim();
-  try{return JSON.parse(raw)}catch{}
-  const match=raw.match(/\{[\s\S]*\}/);
-  if(match)try{return JSON.parse(match[0])}catch{}
+  const raw=cleanGeneratedText(text);
+  if(isSchemaRepetition(raw))return null;
+  try{return normalizeStructuredResult(JSON.parse(raw))}catch{}
+  const match=raw.match(/\\{[\\s\\S]*\\}/);
+  if(match&&!isSchemaRepetition(match[0])){
+    try{return normalizeStructuredResult(JSON.parse(match[0]))}catch{}
+    try{
+      const repaired=match[0].replace(/,\\s*([}])/g,"$1").replace(/,\\s*([\\]])/g,"$1");
+      return normalizeStructuredResult(JSON.parse(repaired));
+    }catch{}
+  }
   return null;
+}
+function parseNaturalLanguage(text){
+  const raw=cleanGeneratedText(text);
+  if(!raw||isSchemaRepetition(raw))return null;
+  const productMatch=raw.match(/(?:^|\\n)\\s*(?:product|item)\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
+  const categoryMatch=raw.match(/(?:^|\\n)\\s*category\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
+  const descriptionMatch=raw.match(/(?:^|\\n)\\s*description\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
+  const attributesMatch=raw.match(/(?:^|\\n)\\s*(?:visible\\s+attributes|attributes)\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
+  const confidenceMatch=raw.match(/(?:confidence|certainty)\\s*[:=-]\\s*(\\d+(?:\\.\\d+)?%?)/i);
+  const statusMatch=raw.match(/(?:status)\\s*[:=-]\\s*(IDENTIFIED|UNCERTAIN|UNRESOLVED)/i);
+  const sentences=raw.split(/(?<=[.!?])\\s+/).filter(Boolean);
+  const productName=(productMatch?.[1]||sentences[0]||"").trim();
+  if(!productName)return null;
+  const visibleAttributes=attributesMatch
+    ? attributesMatch[1].split(/[,;•|]/).map(x=>x.trim()).filter(Boolean).slice(0,12)
+    : [];
+  return {
+    productName,
+    category:(categoryMatch?.[1]||"").trim(),
+    description:(descriptionMatch?.[1]||raw).trim(),
+    visibleAttributes,
+    confidence:Math.max(0,Math.min(1,normalizeConfidence(confidenceMatch?.[1]))),
+    status:normalizeStatus(statusMatch?.[1]||(confidenceMatch?"UNCERTAIN":"UNRESOLVED")),
+    naturalLanguageFallback:true
+  };
 }
 async function loadRuntime(){
   if(runtimePromise)return runtimePromise;
@@ -64,7 +140,7 @@ async function analyze(body,mime,filename){
   const image=await RawImage.fromBlob(new Blob([body],{type:mime||"image/jpeg"}));
   const messages=[{role:"user",content:[
     {type:"image"},
-    {type:"text",text:"Analyze this product photograph. Return ONLY valid JSON with exactly these fields: productName, category, description, visibleAttributes, confidence, status. Identify the product from the image alone; do not assume it is in any catalogue. productName must be the most specific defensible name. category should be a concise equipment/category name. description must be one concise sentence. visibleAttributes must be an array of short strings containing only visibly supported attributes. confidence must be a number from 0 to 1 representing your confidence in the identification. status must be one of IDENTIFIED, UNCERTAIN, UNRESOLVED. Never invent an exact model, capacity, brand, or specification that is not visibly supported."}
+    {type:"text",text:"Identify what is visibly shown in this product photograph. Respond in plain language, not JSON. Use 1 to 3 concise sentences. Start with the most specific defensible product name, then describe the visible object and useful visible characteristics. If an exact brand, model, capacity, dimension, or specification cannot be read or determined from the image, omit it. Do not output JSON, field names, schema names, labels, or a list of required fields. Never invent facts."}
   ]}];
   const prompt=processor.apply_chat_template(messages,{add_generation_prompt:true});
   const inputs=await processor(prompt,[image]);
@@ -74,7 +150,7 @@ async function analyze(body,mime,filename){
   const generated=generatedOutput
     ? processor.batch_decode(generatedOutput,{skip_special_tokens:true})[0]||""
     : "";
-  const parsed=extractJson(generated);
+  const parsed=extractJson(generated)||parseNaturalLanguage(generated);
   const result=parsed||{
     productName:"",
     category:"",
@@ -121,3 +197,5 @@ const server=http.createServer(async(req,res)=>{
   }
 });
 server.listen(PORT,HOST,()=>console.log("SmolVLM local service listening on http://"+HOST+":"+PORT));
+
+module.exports={cleanGeneratedText,normalizeConfidence,isSchemaRepetition,normalizeStructuredResult,extractJson,parseNaturalLanguage};
