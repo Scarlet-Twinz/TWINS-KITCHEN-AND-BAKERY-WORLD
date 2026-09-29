@@ -1,5 +1,5 @@
 // Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.
-const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;
+const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;let openWorldRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;const openWorld=window.TwinsSmolVlmLocal||null;
 function visualReferenceUrls(product){
   if(!product)return [];
   const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
@@ -67,6 +67,75 @@ async function identifyAssetVisually(asset){
   const localResult=visualMatcher.evaluateVisualMatch(sourceResult.embedding,referenceResult.index);
   return{...localResult,engine:"ONNX vision / Transformers.js",referenceCount:referenceResult.index.length};
 }
+let openWorldStatus={message:"Local SmolVLM service not checked",state:"loading"};
+function ensureOpenWorldStatus(){
+  let node=document.getElementById("smolVlmStatus");
+  if(!node){
+    node=document.createElement("div");
+    node.id="smolVlmStatus";
+    node.className="operation-feedback pending";
+    const toolbar=document.querySelector(".toolbar");
+    if(toolbar)toolbar.prepend(node);
+  }
+  node.textContent="Open-world AI: "+openWorldStatus.message;
+  node.className="operation-feedback "+(openWorldStatus.state==="ready"?"success":openWorldStatus.state==="unavailable"?"error":"pending");
+}
+function updateOpenWorldStatus(info){
+  openWorldStatus={message:String(info?.message||"Unavailable — open-world understanding disabled"),state:info?.state||"loading"};
+  ensureOpenWorldStatus();
+}
+async function identifyAssetOpenWorld(asset){
+  if(!openWorld||!asset||asset.productId)return null;
+  const sourceBlob=await loadVisualSource(asset);
+  if(!sourceBlob)return{available:false,error:"uploaded image could not be decoded from the Media API"};
+  return openWorld.analyze(sourceBlob,asset.filename);
+}
+async function enrichOpenWorldSuggestions(){
+  if(!openWorld)return false;
+  const run=++openWorldRun;
+  const health=await openWorld.available();
+  if(!health.available){
+    updateOpenWorldStatus({message:"Unavailable — start the local SmolVLM service on port 8787",state:"unavailable"});
+    return false;
+  }
+  updateOpenWorldStatus({message:"Ready — SmolVLM-500M-Instruct local ONNX service",state:"ready"});
+  const targets=assets.filter(a=>!a.productId&&a.suggestionStatus==="UNRESOLVED");
+  let cursor=0;
+  const worker=async()=>{
+    while(true){
+      const index=cursor++;
+      if(index>=targets.length||run!==openWorldRun)return;
+      const asset=targets[index];
+      try{
+        const result=await identifyAssetOpenWorld(asset);
+        if(run!==openWorldRun)return;
+        if(result?.available){
+          asset.openWorldResult={
+            model:result.model||openWorld.MODEL_ID,
+            modelVersion:result.modelVersion||openWorld.MODEL_VERSION,
+            productName:result.productName||"",
+            category:result.category||"",
+            description:result.description||"",
+            visibleAttributes:Array.isArray(result.visibleAttributes)?result.visibleAttributes:[],
+            confidence:Number(result.confidence)||0,
+            status:result.status||"UNRESOLVED",
+            catalogueReference:result.catalogueReference||"NONE",
+            inferenceMs:Number(result.inferenceMs)||0
+          };
+        }else{
+          asset.openWorldResult={status:"UNRESOLVED",catalogueReference:"NONE",error:result?.error||"Local service unavailable"};
+        }
+        render();
+      }catch(error){
+        asset.openWorldResult={status:"UNRESOLVED",catalogueReference:"NONE",error:String(error?.message||error)};
+        render();
+      }
+    }
+  };
+  await Promise.all([worker(),worker()]);
+  return true;
+}
+
 async function enrichVisualSuggestions(){
   if(!visualMatcher)return false;
   const run=++visualRun;
@@ -213,7 +282,9 @@ function render(){
     return '<article class="asset-card"><div class="asset-thumb">'+
       (a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+
       '</div><div class="asset-meta"><strong>'+escapeHtml(a.filename)+'</strong><span class="badge">'+escapeHtml(a.status)+'</span><small>Product: '+escapeHtml(productLabel(a.productId))+' · '+a.width+'×'+a.height+' · '+escapeHtml(a.sha256.slice(0,16))+'…</small><small>Rights: '+escapeHtml(a.rightsStatus)+' · Source: '+escapeHtml(a.sourceType)+'</small><small>'+escapeHtml(a.provenance||"No provenance recorded")+'</small></div><div class="actions">'+
-      suggestionHtml+productPickerHtml(a)+
+      suggestionHtml+
+      (a.openWorldResult?'<div class="open-world-result"><strong>Open-world image understanding</strong><small>Model: '+escapeHtml(a.openWorldResult.model||"SmolVLM-500M-Instruct")+' · Version: '+escapeHtml(a.openWorldResult.modelVersion||"ONNX q4")+' · Inference: '+escapeHtml(a.openWorldResult.inferenceMs||0)+' ms</small><span><b>Product:</b> '+escapeHtml(a.openWorldResult.productName||"Unresolved")+'</span><span><b>Category:</b> '+escapeHtml(a.openWorldResult.category||"Unresolved")+'</span><span><b>Description:</b> '+escapeHtml(a.openWorldResult.description||"")+'</span><span><b>Visible attributes:</b> '+escapeHtml((a.openWorldResult.visibleAttributes||[]).join(", ")||"None reported")+'</span><span><b>Confidence:</b> '+Number(a.openWorldResult.confidence||0).toFixed(3)+' · <b>Status:</b> '+escapeHtml(a.openWorldResult.status||"UNRESOLVED")+' · <b>CATALOGUE REFERENCE:</b> NONE</span></div>':"")+
+      productPickerHtml(a)+
       '<input data-id="'+a.id+'" data-field="role" value="'+escapeHtml(a.role)+'" placeholder="role"><button class="btn light" data-action-id="'+a.id+'" onclick="updateAsset(this.dataset.actionId)">Save metadata</button><button class="btn light" data-action-id="'+a.id+'" onclick="revalidate(this.dataset.actionId)">Revalidate</button><button class="btn red" data-action-id="'+a.id+'" onclick="approveAsset(this.dataset.actionId)">Owner approve</button><button class="btn light" data-action-id="'+a.id+'" onclick="rejectAsset(this.dataset.actionId)">Reject</button><button class="btn light danger-outline" data-action-id="'+a.id+'" onclick="deleteAsset(this.dataset.actionId)">Delete</button><div class="action-status" data-status-id="'+a.id+'" aria-live="polite"></div></div></article>';
   }).join(""):'<div class="panel"><h3>No media assets match.</h3><p class="muted">Upload a batch or change the filters.</p></div>';
 }
@@ -228,7 +299,7 @@ async function refresh(showFeedback=false){
         a.suggestionStatus="UNRESOLVED";
       });
       render();
-      void enrichVisualSuggestions();
+      void enrichVisualSuggestions().then(()=>enrichOpenWorldSuggestions());
     }else{
       render();
     }
