@@ -773,10 +773,10 @@ def signup(payload:AuthPayload,response:Response):
     return {"user":{"id":str(uid),"name":payload.name,"email":str(payload.email).lower(),"role":"customer"}}
 
 @app.post("/api/auth/login")
-def login(payload:AuthPayload,response:Response):
+def login(payload:AuthPayload,request:Request,response:Response):
     with db() as conn:row=conn.execute("select id,name,email,password_hash,role from users where email=%s",(str(payload.email).lower(),)).fetchone()
     if not row or not bcrypt.checkpw(payload.password.encode(),row[3].encode()):raise HTTPException(status_code=401,detail="Invalid email or password")
-    response.set_cookie("twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=settings.cookie_secure,samesite="lax",max_age=604800,path="/")
+    response.set_cookie("twins_session",sign_session(str(row[0]),row[4]),httponly=True,secure=(settings.cookie_secure and request.url.scheme=="https"),samesite="lax",max_age=604800,path="/")
     return {"user":{"id":str(row[0]),"name":row[1],"email":row[2],"role":row[4]}}
 
 @app.post("/api/auth/logout")
