@@ -33,7 +33,8 @@ test("local service uses all three required q4 ONNX components",()=>{
   assert.match(server,/decoder_model_merged_q4\.onnx/);
   assert.match(server,/embed_tokens_q4\.onnx/);
   assert.match(server,/AutoModelForVision2Seq/);
-  assert.match(server,/generatedTokens/);
+  assert.match(server,/generatedOutput/);
+  assert.match(server,/\.slice\?\./);
 });
 
 test("local service returns required open-world proof fields",()=>{
