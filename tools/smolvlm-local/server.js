@@ -96,7 +96,7 @@ function extractJson(text){
       if(parsed)return parsed;
     }catch{}
   }
-  return isSchemaRepetition(raw)?null:null;
+  return null;
 }
 function parseNaturalLanguage(text){
   const raw=cleanGeneratedText(text);
