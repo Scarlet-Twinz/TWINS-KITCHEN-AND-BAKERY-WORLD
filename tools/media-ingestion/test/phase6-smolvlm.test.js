@@ -59,3 +59,66 @@ test("model preparation reuses the user's verified isolated weights",()=>{
   assert.match(prep,/decoder_model_merged_q4\.onnx/);
   assert.match(prep,/embed_tokens_q4\.onnx/);
 });
+
+const smolvlm=require("../../smolvlm-local/server.js");
+
+test("SmolVLM parser accepts valid structured JSON and normalizes confidence",()=>{
+  const result=smolvlm.extractJson(JSON.stringify({
+    productName:"Planetary mixer",
+    category:"Commercial kitchen equipment",
+    description:"Floor-standing mixer with a stainless-steel bowl.",
+    visibleAttributes:["stainless steel bowl","control panel"],
+    confidence:"89%",
+    status:"IDENTIFIED"
+  }));
+  assert.equal(result.productName,"Planetary mixer");
+  assert.equal(result.confidence,0.89);
+  assert.equal(result.status,"IDENTIFIED");
+});
+
+test("SmolVLM parser rejects schema repetition instead of treating field names as an answer",()=>{
+  const raw="productName category description visibleAttributes confidence status productName category description visibleAttributes confidence status";
+  assert.equal(smolvlm.extractJson(raw),null);
+  assert.equal(smolvlm.parseNaturalLanguage(raw),null);
+});
+
+test("SmolVLM parser falls back safely to natural-language visual identification",()=>{
+  const raw="White and blue vertical bookshelf with blue trim.";
+  const result=smolvlm.extractJson(raw)||smolvlm.parseNaturalLanguage(raw);
+  assert.equal(result.productName,"White and blue vertical bookshelf with blue trim.");
+  assert.equal(result.description,raw);
+  assert.equal(result.status,"UNRESOLVED");
+  assert.equal(result.confidence,0);
+});
+
+test("SmolVLM parser repairs simple trailing-comma JSON",()=>{
+  const raw='{"productName":"Commercial blender","category":"Blender","description":"Countertop blender.","visibleAttributes":["jar","base"],"confidence":0.72,"status":"UNCERTAIN",}';
+  const result=smolvlm.extractJson(raw);
+  assert.equal(result.productName,"Commercial blender");
+  assert.equal(result.confidence,0.72);
+  assert.equal(result.status,"UNCERTAIN");
+});
+
+test("Media Center keeps open-world processing independent from MobileCLIP",()=>{
+  assert.match(center,/void Promise\.all\(\[enrichVisualSuggestions\(\),enrichOpenWorldSuggestions\(\)\]\)/);
+  assert.match(center,/assets\.filter\(a=>!a\.productId\)/);
+  assert.match(center,/data-open-world-action/);
+});
+
+test("owner open-world decisions are sent to an authenticated backend audit route",()=>{
+  assert.match(center,/\/api\/admin\/media\/.*\/open-world-decision/);
+  assert.match(server,/\/api\/admin\/media\/\{asset_id\}\/open-world-decision/);
+  assert.match(server,/MEDIA_OPEN_WORLD_DECISION/);
+});
+
+test("candidate creation carries the preserved open-world result",()=>{
+  assert.match(center,/openWorldResult:asset\.openWorldResult/);
+  assert.match(server,/evidence_payload\["aiResult"\]=ai_result/);
+  assert.match(server,/aiResult/);
+});
+
+test("candidate queue endpoint and local development CORS are present",()=>{
+  assert.match(server,/\/api\/admin\/media\/candidates/);
+  assert.match(server,/allow_origin_regex/);
+  assert.match(server,/require_owner\(request\)/);
+});
