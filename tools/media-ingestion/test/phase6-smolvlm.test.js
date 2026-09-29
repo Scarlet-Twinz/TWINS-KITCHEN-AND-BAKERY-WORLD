@@ -33,6 +33,7 @@ test("local service uses all three required q4 ONNX components",()=>{
   assert.match(server,/decoder_model_merged_q4\.onnx/);
   assert.match(server,/embed_tokens_q4\.onnx/);
   assert.match(server,/AutoModelForVision2Seq/);
+  assert.match(server,/generatedTokens/);
 });
 
 test("local service returns required open-world proof fields",()=>{
@@ -53,7 +54,7 @@ test("local server syntax parses",()=>{
 
 test("model preparation reuses the user's verified isolated weights",()=>{
   assert.match(prep,/twins-smolvlm-proof/);
-  assert.match(prep,/vision_encoder_q4\.test\.onnx/);
+  assert.match(prep,/vision_encoder_q4\.onnx/);
   assert.match(prep,/decoder_model_merged_q4\.onnx/);
   assert.match(prep,/embed_tokens_q4\.onnx/);
 });
