@@ -64,7 +64,7 @@ const serverModule={exports:{}};
 const serverRequire=id=>id==="@huggingface/transformers"
   ? {AutoProcessor:{},AutoModelForVision2Seq:{},RawImage:{},env:{}}
   : require(id);
-vm.runInNewContext(server+"\\nmodule.exports={cleanGeneratedText,normalizeConfidence,isSchemaRepetition,normalizeStructuredResult,extractJson,parseNaturalLanguage};",{
+vm.runInNewContext(server+"\nmodule.exports={cleanGeneratedText,normalizeConfidence,isSchemaRepetition,normalizeStructuredResult,extractJson,parseNaturalLanguage};",{
   module:serverModule,
   exports:serverModule.exports,
   require:Object.assign(serverRequire,{main:{filename:"phase6-test"}}),
