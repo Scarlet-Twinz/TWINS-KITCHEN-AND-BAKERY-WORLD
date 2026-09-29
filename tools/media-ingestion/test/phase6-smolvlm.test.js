@@ -60,17 +60,11 @@ test("model preparation reuses the user's verified isolated weights",()=>{
   assert.match(prep,/embed_tokens_q4\.onnx/);
 });
 
+const parserStart=server.indexOf("function cleanGeneratedText");
+const parserEnd=server.indexOf("async function loadRuntime");
+const parserSource=server.slice(parserStart,parserEnd)+"\nmodule.exports={cleanGeneratedText,normalizeConfidence,isSchemaRepetition,normalizeStructuredResult,extractJson,parseNaturalLanguage};";
 const serverModule={exports:{}};
-const serverRequire=id=>id==="@huggingface/transformers"
-  ? {AutoProcessor:{},AutoModelForVision2Seq:{},RawImage:{},env:{}}
-  : require(id);
-vm.runInNewContext(server+"\nmodule.exports={cleanGeneratedText,normalizeConfidence,isSchemaRepetition,normalizeStructuredResult,extractJson,parseNaturalLanguage};",{
-  module:serverModule,
-  exports:serverModule.exports,
-  require:Object.assign(serverRequire,{main:{filename:"phase6-test"}}),
-  __dirname:require("node:path").resolve("tools/smolvlm-local"),
-  console
-});
+vm.runInNewContext(parserSource,{module:serverModule,exports:serverModule.exports});
 const smolvlm=serverModule.exports;
 
 test("SmolVLM parser accepts valid structured JSON and normalizes confidence",()=>{
