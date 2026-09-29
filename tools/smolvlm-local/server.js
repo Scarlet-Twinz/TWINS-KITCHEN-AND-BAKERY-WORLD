@@ -7,6 +7,7 @@ const HOST=process.env.SMOLVLM_HOST||"127.0.0.1";
 const PORT=Number(process.env.SMOLVLM_PORT||8787);
 const MODEL_DIR=path.resolve(process.env.SMOLVLM_MODEL_DIR||path.join(__dirname,"model"));
 const MODEL_ID="HuggingFaceTB/SmolVLM-500M-Instruct";
+const LOCAL_MODEL_NAME=process.env.SMOLVLM_LOCAL_MODEL_NAME||"model";
 const MODEL_VERSION=process.env.SMOLVLM_MODEL_VERSION||"SmolVLM-500M-Instruct / ONNX q4";
 let runtimePromise=null;
 
@@ -47,8 +48,8 @@ async function loadRuntime(){
     if(!fs.existsSync(path.join(MODEL_DIR,"onnx","vision_encoder_q4.onnx")))throw new Error("SmolVLM local model is not prepared: vision_encoder_q4.onnx is missing");
     if(!fs.existsSync(path.join(MODEL_DIR,"onnx","decoder_model_merged_q4.onnx")))throw new Error("SmolVLM local model is not prepared: decoder_model_merged_q4.onnx is missing");
     if(!fs.existsSync(path.join(MODEL_DIR,"onnx","embed_tokens_q4.onnx")))throw new Error("SmolVLM local model is not prepared: embed_tokens_q4.onnx is missing");
-    const processor=await AutoProcessor.from_pretrained(MODEL_DIR,{local_files_only:true});
-    const model=await AutoModelForVision2Seq.from_pretrained(MODEL_DIR,{
+    const processor=await AutoProcessor.from_pretrained(LOCAL_MODEL_NAME,{local_files_only:true});
+    const model=await AutoModelForVision2Seq.from_pretrained(LOCAL_MODEL_NAME,{
       dtype:{embed_tokens:"q4",vision_encoder:"q4",decoder_model_merged:"q4"},
       device:"cpu",
       local_files_only:true
