@@ -23,7 +23,7 @@ settings=Settings()
 logger=logging.getLogger("twins.media")
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
-app.add_middleware(CORSMiddleware,allow_origins=origins,allow_origin_regex=r"https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$",allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
+app.add_middleware(CORSMiddleware,allow_origins=origins,allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
 
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
