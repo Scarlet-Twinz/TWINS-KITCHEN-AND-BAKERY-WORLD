@@ -23,7 +23,7 @@ settings=Settings()
 logger=logging.getLogger("twins.media")
 app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
-app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
+app.add_middleware(CORSMiddleware,allow_origins=origins,allow_origin_regex=r"https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$",allow_credentials=True,allow_methods=["GET","POST","PATCH","DELETE","OPTIONS"],allow_headers=["Content-Type"])
 
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
@@ -524,14 +524,19 @@ def media_candidate_create(request:Request,payload:dict):
         if existing: raise HTTPException(status_code=409,detail="One or more assets already belong to an active product candidate")
         assets=[{"filename":r[1],"provenance":r[5],"sourceUrl":r[6],"license":r[7],"attribution":r[8]} for r in rows]
         suggested,evidence=suggest_candidate_name(assets)
+        ai_result=payload.get("openWorldResult") if isinstance(payload.get("openWorldResult"),dict) else {}
+        ai_name=str(ai_result.get("productName") or "").strip()
+        ai_category=str(ai_result.get("category") or "").strip()
+        if ai_name and ai_name.lower()!="new product — review required": suggested=ai_name
         candidate_id=uuid.uuid4()
-        evidence_payload=evidence or {"basis":"insufficient evidence"}
+        evidence_payload=dict(evidence or {"basis":"insufficient evidence"})
         evidence_payload["assetCount"]=len(rows)
         evidence_payload["grouping"]="owner-review" if len(rows)>1 else "single-asset"
+        if ai_result: evidence_payload["aiResult"]=ai_result
         conn.execute("""insert into media_product_candidates
           (id,suggested_name,category,source_asset_ids,evidence,status) values (%s,%s,%s,%s,%s,'PENDING_OWNER')""",
-          (candidate_id,suggested_name:=suggested,None,json.dumps([str(x) for x in asset_uuids]),json.dumps(evidence_payload)))
-        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_CREATED",str(candidate_id),{"assetIds":[str(x) for x in asset_uuids],"suggestedName":suggested})
+          (candidate_id,suggested,ai_category or None,json.dumps([str(x) for x in asset_uuids]),json.dumps(evidence_payload)))
+        audit_media_action(conn,actor,"MEDIA_PRODUCT_CANDIDATE_CREATED",str(candidate_id),{"assetIds":[str(x) for x in asset_uuids],"suggestedName":suggested,"aiResult":ai_result or {}})
         conn.commit()
     return {"candidate":{"id":str(candidate_id),"suggestedName":suggested,"assetIds":[str(x) for x in asset_uuids],"status":"PENDING_OWNER","evidence":evidence_payload}}
 
@@ -642,6 +647,21 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
         item["suggestions"]=[] if item["productId"] else catalogue_suggestions(item,products)
         assets.append(item)
     return {"assets":assets}
+
+@app.patch("/api/admin/media/{asset_id}/open-world-decision")
+def media_open_world_decision(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    decision=str(payload.get("decision") or "").strip().upper()
+    allowed={"ACCEPTED_IDENTIFICATION","OWNER_CORRECTED","CREATE_CANDIDATE","KEEP_UNRESOLVED"}
+    if decision not in allowed: raise HTTPException(status_code=422,detail="Unsupported open-world owner decision")
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    with db() as conn:
+        row=conn.execute("select id,product_legacy_id,filename from media_assets where id=%s",(asset_uuid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Media asset not found")
+        audit_media_action(conn,actor,"MEDIA_OPEN_WORLD_DECISION",asset_id,{"decision":decision,"aiResult":payload.get("aiResult") or {},"ownerCorrection":payload.get("ownerCorrection") or None,"timestamp":datetime.now(timezone.utc).isoformat()})
+        conn.commit()
+    return {"ok":True,"status":decision,"assetId":asset_id}
 
 @app.patch("/api/admin/media/{asset_id}")
 def media_update(asset_id:str,request:Request,payload:dict):
