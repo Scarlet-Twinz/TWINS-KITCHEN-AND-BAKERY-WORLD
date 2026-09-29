@@ -60,7 +60,7 @@
     if(typeof indexedDB==="undefined")return Promise.resolve(null);
     return new Promise((resolve,reject)=>{
       const request=indexedDB.open(DB_NAME,DB_VERSION);
-      request.onupgradeneeded=()=>request.result.createObjectStore(STORE_NAME,{keyPath:"key"});
+      request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(STORE_NAME))request.result.createObjectStore(STORE_NAME,{keyPath:"key"});};
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(request.error);
     });
