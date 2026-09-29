@@ -1,5 +1,5 @@
 // Images and ZIP files stay outside Git; only metadata, manifests, and code are tracked.
-const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;let openWorldRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;const openWorld=window.TwinsSmolVlmLocal||null;
+const API=(window.TWINS_API_BASE||((window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1")?"http://"+window.location.hostname+":8000":"http://localhost:8000")).replace(/\/$/,"");const $=id=>document.getElementById(id);let selected=[];let assets=[];let visualRun=0;let openWorldRun=0;const visualSignatureCache=new Map();const visualMatcher=window.TwinsMediaVisualMatcher||null;const openWorld=window.TwinsSmolVlmLocal||null;
 function visualReferenceUrls(product){
   if(!product)return [];
   const overrides=typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"?CATALOG_MEDIA_OVERRIDES_BY_ID:{};
@@ -453,6 +453,8 @@ async function markNewProductCandidate(button){
 async function loadCandidates(){
   const box=document.getElementById("candidates");
   if(!box)return;
+  const feedback=document.getElementById("candidateFeedback");
+  if(feedback){feedback.className="operation-feedback pending";feedback.textContent="Refreshing candidates…";}
   try{
     const d=await api("/api/admin/media/candidates?status=PENDING_OWNER");
     const candidates=d.candidates||[];
@@ -464,8 +466,12 @@ async function loadCandidates(){
       return '<article class="candidate-card"><div class="candidate-photos">'+(photoHtml||'<div class="candidate-photo-empty">No preview available</div>')+'</div><div class="candidate-meta"><span class="badge">NEW PRODUCT CANDIDATE</span><h3>'+escapeHtml(candidate.suggestedName||"New Product — Review Required")+'</h3><small>'+photos.length+' photo(s) · Awaiting Owner Approval</small>'+evidenceHtml+'<div class="candidate-actions"><button class="btn red" data-candidate-action="approve" data-candidate-id="'+escapeHtml(candidate.id)+'">Approve &amp; Create Product</button><button class="btn light" data-candidate-action="edit" data-candidate-id="'+escapeHtml(candidate.id)+'">Edit Name</button><button class="btn light" data-candidate-action="pending" data-candidate-id="'+escapeHtml(candidate.id)+'">Keep Pending</button><button class="btn light danger-outline" data-candidate-action="reject" data-candidate-id="'+escapeHtml(candidate.id)+'">Reject Candidate</button></div></div></article>';
     }).join(""):'<div class="panel"><p class="muted">No new product candidates are awaiting approval.</p></div>';
   }catch(e){
-    box.innerHTML='<div class="panel"><p class="muted">Candidate queue unavailable: '+escapeHtml(e.message)+'</p></div>';
+    const message=(e.status?("HTTP "+e.status+": "):"")+e.message;
+    box.innerHTML='<div class="panel"><p class="muted">Candidate queue unavailable: '+escapeHtml(message)+'</p></div>';
+    if(feedback){feedback.className="operation-feedback error";feedback.textContent=message;}
+    throw e;
   }
+  if(feedback){feedback.className="operation-feedback success";feedback.textContent="Candidate queue refreshed";}
 }
 async function candidateData(id){
   const d=await api("/api/admin/media/candidates?status=PENDING_OWNER");
@@ -705,7 +711,7 @@ $("refresh").addEventListener("click",async()=>{
     $("locked").classList.remove("hidden");
   }
 })();
-document.getElementById("refreshCandidates")?.addEventListener("click",loadCandidates);
+document.getElementById("refreshCandidates")?.addEventListener("click",async()=>{const button=document.getElementById("refreshCandidates");button.disabled=true;button.textContent="Refreshing…";try{await loadCandidates();}catch{}finally{button.disabled=false;button.textContent="Refresh candidates";}});
 document.getElementById("candidates")?.addEventListener("click",event=>{const b=event.target.closest("[data-candidate-action]");if(!b)return;const id=b.getAttribute("data-candidate-id");const action=b.getAttribute("data-candidate-action");if(action==="approve")approveNewProductCandidate(id);else if(action==="edit")editNewProductCandidate(id);else if(action==="pending")keepCandidatePending(id);else if(action==="reject")rejectNewProductCandidate(id);});
 
 document.getElementById("queue")?.addEventListener("click",event=>{
