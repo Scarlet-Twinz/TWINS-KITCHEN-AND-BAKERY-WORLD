@@ -299,7 +299,7 @@ async function refresh(showFeedback=false){
         a.suggestionStatus="UNRESOLVED";
       });
       render();
-      void enrichVisualSuggestions().then(()=>enrichOpenWorldSuggestions());
+      void Promise.all([enrichVisualSuggestions(),enrichOpenWorldSuggestions()]);
     }else{
       render();
     }
