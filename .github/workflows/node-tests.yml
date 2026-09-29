@@ -43,3 +43,5 @@ jobs:
         run: node --check admin/media/media-center.js
       - name: Check Media Center vision matcher JavaScript
         run: node --check admin/media/media-visual-matcher.js
+      - name: Check local SmolVLM adapter and service JavaScript
+        run: node --check admin/media/smolvlm-local.js && node --check tools/smolvlm-local/server.js
