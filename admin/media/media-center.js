@@ -704,11 +704,13 @@ $("refresh").addEventListener("click",async()=>{
     renderBatchProgress(loadBatchProgress());
     $("locked").classList.add("hidden");
     $("app").classList.remove("hidden");
-    await refresh();
-    await loadCandidates();
+    try{await refresh();}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
+    try{await loadCandidates();}catch(e){const node=$("candidateFeedback");if(node){node.className="operation-feedback error";node.textContent=(e.status?"HTTP "+e.status+": ":"")+e.message;}}
   }catch(e){
     $("app").classList.add("hidden");
     $("locked").classList.remove("hidden");
+    const message=$("loginStateMessage")||$("locked").querySelector?.("p");
+    if(message&&e?.status!==401)message.textContent=(e.status?"HTTP "+e.status+": ":"")+String(e?.message||e);
   }
 })();
 document.getElementById("refreshCandidates")?.addEventListener("click",async()=>{const button=document.getElementById("refreshCandidates");button.disabled=true;button.textContent="Refreshing…";try{await loadCandidates();}catch{}finally{button.disabled=false;button.textContent="Refresh candidates";}});
