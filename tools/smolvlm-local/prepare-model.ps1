@@ -5,7 +5,7 @@ $onnx = Join-Path $model "onnx"
 New-Item -ItemType Directory -Force -Path $onnx | Out-Null
 
 $source = Join-Path $env:USERPROFILE "twins-smolvlm-proof"
-Copy-Item (Join-Path $source "vision_encoder_q4.test.onnx") (Join-Path $onnx "vision_encoder_q4.onnx") -Force
+Copy-Item (Join-Path $source "vision_encoder_q4.onnx") (Join-Path $onnx "vision_encoder_q4.onnx") -Force
 Copy-Item (Join-Path $source "decoder_model_merged_q4.onnx") (Join-Path $onnx "decoder_model_merged_q4.onnx") -Force
 Copy-Item (Join-Path $source "embed_tokens_q4.onnx") (Join-Path $onnx "embed_tokens_q4.onnx") -Force
 
