@@ -80,17 +80,23 @@ function normalizeStructuredResult(value){
 }
 function extractJson(text){
   const raw=cleanGeneratedText(text);
-  if(isSchemaRepetition(raw))return null;
-  try{return normalizeStructuredResult(JSON.parse(raw))}catch{}
+  try{
+    const parsed=normalizeStructuredResult(JSON.parse(raw));
+    if(parsed)return parsed;
+  }catch{}
   const match=raw.match(/\{[\s\S]*\}/);
-  if(match&&!isSchemaRepetition(match[0])){
-    try{return normalizeStructuredResult(JSON.parse(match[0]))}catch{}
+  if(match){
+    try{
+      const parsed=normalizeStructuredResult(JSON.parse(match[0]));
+      if(parsed)return parsed;
+    }catch{}
     try{
       const repaired=match[0].replace(/,\s*([}])/g,"$1").replace(/,\s*([\]])/g,"$1");
-      return normalizeStructuredResult(JSON.parse(repaired));
+      const parsed=normalizeStructuredResult(JSON.parse(repaired));
+      if(parsed)return parsed;
     }catch{}
   }
-  return null;
+  return isSchemaRepetition(raw)?null:null;
 }
 function parseNaturalLanguage(text){
   const raw=cleanGeneratedText(text);
