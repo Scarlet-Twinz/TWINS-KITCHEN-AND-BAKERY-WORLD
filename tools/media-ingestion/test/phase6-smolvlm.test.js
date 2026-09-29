@@ -8,6 +8,7 @@ const center=fs.readFileSync("admin/media/media-center.js","utf8");
 const html=fs.readFileSync("admin/media/index.html","utf8");
 const server=fs.readFileSync("tools/smolvlm-local/server.js","utf8");
 const prep=fs.readFileSync("tools/smolvlm-local/prepare-model.ps1","utf8");
+const backend=fs.readFileSync("backend/main.py","utf8");
 
 test("local SmolVLM adapter is loaded by Media Center",()=>{
   assert.match(html,/\.\/smolvlm-local\.js/);
@@ -105,25 +106,26 @@ test("SmolVLM parser repairs simple trailing-comma JSON",()=>{
 });
 
 test("Media Center keeps open-world processing independent from MobileCLIP",()=>{
-  assert.match(center,/void Promise\.all\(\[enrichVisualSuggestions\(\),enrichOpenWorldSuggestions\(\)\]\)/);
+  assert.match(center,/void enrichVisualSuggestions\(\);/);
+  assert.match(center,/void enrichOpenWorldSuggestions\(\);/);
   assert.match(center,/assets\.filter\(a=>!a\.productId\)/);
   assert.match(center,/data-open-world-action/);
 });
 
 test("owner open-world decisions are sent to an authenticated backend audit route",()=>{
   assert.match(center,/\/api\/admin\/media\/.*\/open-world-decision/);
-  assert.match(server,/\/api\/admin\/media\/\{asset_id\}\/open-world-decision/);
-  assert.match(server,/MEDIA_OPEN_WORLD_DECISION/);
+  assert.match(backend,/\/api\/admin\/media\/\{asset_id\}\/open-world-decision/);
+  assert.match(backend,/MEDIA_OPEN_WORLD_DECISION/);
 });
 
 test("candidate creation carries the preserved open-world result",()=>{
   assert.match(center,/openWorldResult:asset\.openWorldResult/);
-  assert.match(server,/evidence_payload\["aiResult"\]=ai_result/);
-  assert.match(server,/aiResult/);
+  assert.match(backend,/evidence_payload\["aiResult"\]=ai_result/);
+  assert.match(backend,/aiResult/);
 });
 
 test("candidate queue endpoint and local development CORS are present",()=>{
-  assert.match(server,/\/api\/admin\/media\/candidates/);
-  assert.match(server,/allow_origin_regex/);
-  assert.match(server,/require_owner\(request\)/);
+  assert.match(backend,/\/api\/admin\/media\/candidates/);
+  assert.match(backend,/allow_origin_regex/);
+  assert.match(backend,/require_owner\(request\)/);
 });
