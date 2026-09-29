@@ -99,7 +99,7 @@ async function enrichOpenWorldSuggestions(){
     return false;
   }
   updateOpenWorldStatus({message:"Ready — SmolVLM-500M-Instruct local ONNX service",state:"ready"});
-  const targets=assets.filter(a=>!a.productId&&a.suggestionStatus==="UNRESOLVED");
+  const targets=assets.filter(a=>!a.productId&&(!a.suggestionStatus||a.suggestionStatus==="UNRESOLVED"));
   let cursor=0;
   const worker=async()=>{
     while(true){
@@ -183,7 +183,7 @@ async function enrichVisualSuggestions(){
   if(run===visualRun){progress.status="PROCESSED";progress.finishedAt=new Date().toISOString();saveBatchProgress(progress);renderBatchProgress(progress);}
   return true;
 }
-async function api(path,opts={}){const r=await fetch(API+path,{credentials:"include",...opts});const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
+async function api(path,opts={}){let r;try{r=await fetch(API+path,{credentials:"include",...opts})}catch(error){const e=new Error("Cannot reach Media API at "+API+". Check that the backend is running and that this page origin is allowed by CORS.");e.cause=error;throw e}const raw=await r.text();let d={};try{d=raw?JSON.parse(raw):{}}catch{}if(!r.ok){let message=d.detail||d.message||raw||("Request failed ("+r.status+")");if(Array.isArray(message))message=message.map(x=>x.msg||JSON.stringify(x)).join("; ");const e=new Error(message);e.status=r.status;throw e}return d}
 function normalizeCatalogueMediaPath(src){
   if(!src)return "";
   let value=String(src).trim().split(String.fromCharCode(92)).join("/");
@@ -283,7 +283,7 @@ function render(){
       (a.mimeType&&a.mimeType.startsWith("image/")?'<img src="'+escapeHtml(mediaContentUrl(a.id))+'" alt="'+escapeHtml(a.filename)+'" loading="lazy">':'<div class="file-thumb">'+(a.mimeType==="application/pdf"?"PDF":"FILE")+'</div>')+
       '</div><div class="asset-meta"><strong>'+escapeHtml(a.filename)+'</strong><span class="badge">'+escapeHtml(a.status)+'</span><small>Product: '+escapeHtml(productLabel(a.productId))+' · '+a.width+'×'+a.height+' · '+escapeHtml(a.sha256.slice(0,16))+'…</small><small>Rights: '+escapeHtml(a.rightsStatus)+' · Source: '+escapeHtml(a.sourceType)+'</small><small>'+escapeHtml(a.provenance||"No provenance recorded")+'</small></div><div class="actions">'+
       suggestionHtml+
-      (a.openWorldResult?'<div class="open-world-result"><strong>Open-world image understanding</strong><small>Model: '+escapeHtml(a.openWorldResult.model||"SmolVLM-500M-Instruct")+' · Version: '+escapeHtml(a.openWorldResult.modelVersion||"ONNX q4")+' · Inference: '+escapeHtml(a.openWorldResult.inferenceMs||0)+' ms</small><span><b>Product:</b> '+escapeHtml(a.openWorldResult.productName||"Unresolved")+'</span><span><b>Category:</b> '+escapeHtml(a.openWorldResult.category||"Unresolved")+'</span><span><b>Description:</b> '+escapeHtml(a.openWorldResult.description||"")+'</span><span><b>Visible attributes:</b> '+escapeHtml((a.openWorldResult.visibleAttributes||[]).join(", ")||"None reported")+'</span><span><b>Confidence:</b> '+Number(a.openWorldResult.confidence||0).toFixed(3)+' · <b>Status:</b> '+escapeHtml(a.openWorldResult.status||"UNRESOLVED")+' · <b>CATALOGUE REFERENCE:</b> NONE</span></div>':"")+
+      (a.openWorldResult?'<div class="open-world-result"><strong>Open-world image understanding</strong><small>Model: '+escapeHtml(a.openWorldResult.model||"SmolVLM-500M-Instruct")+' · Version: '+escapeHtml(a.openWorldResult.modelVersion||"ONNX q4")+' · Inference: '+escapeHtml(a.openWorldResult.inferenceMs||0)+' ms</small><span><b>Product:</b> '+escapeHtml(a.openWorldResult.productName||"Unresolved")+'</span><span><b>Category:</b> '+escapeHtml(a.openWorldResult.category||"Unresolved")+'</span><span><b>Description:</b> '+escapeHtml(a.openWorldResult.description||"")+'</span><span><b>Visible attributes:</b> '+escapeHtml((a.openWorldResult.visibleAttributes||[]).join(", ")||"None reported")+'</span><span><b>Confidence:</b> '+Number(a.openWorldResult.confidence||0).toFixed(3)+' · <b>Status:</b> '+escapeHtml(a.openWorldResult.status||"UNRESOLVED")+' · <b>CATALOGUE REFERENCE:</b> NONE</span><div class="open-world-actions">'+(a.openWorldOwnerDecision?'<span class="badge">'+escapeHtml(a.openWorldOwnerDecision)+'</span>':'<button type="button" class="btn light" data-open-world-action="accept" data-open-world-id="'+escapeHtml(a.id)+'">Accept Identification</button><button type="button" class="btn light" data-open-world-action="edit" data-open-world-id="'+escapeHtml(a.id)+'">Edit Identification</button><button type="button" class="btn light" data-open-world-action="candidate" data-open-world-id="'+escapeHtml(a.id)+'">Create New Product Candidate</button><button type="button" class="btn light" data-open-world-action="keep" data-open-world-id="'+escapeHtml(a.id)+'">Keep Unresolved</button>')+'</div></div>':"")+
       productPickerHtml(a)+
       '<input data-id="'+a.id+'" data-field="role" value="'+escapeHtml(a.role)+'" placeholder="role"><button class="btn light" data-action-id="'+a.id+'" onclick="updateAsset(this.dataset.actionId)">Save metadata</button><button class="btn light" data-action-id="'+a.id+'" onclick="revalidate(this.dataset.actionId)">Revalidate</button><button class="btn red" data-action-id="'+a.id+'" onclick="approveAsset(this.dataset.actionId)">Owner approve</button><button class="btn light" data-action-id="'+a.id+'" onclick="rejectAsset(this.dataset.actionId)">Reject</button><button class="btn light danger-outline" data-action-id="'+a.id+'" onclick="deleteAsset(this.dataset.actionId)">Delete</button><div class="action-status" data-status-id="'+a.id+'" aria-live="polite"></div></div></article>';
   }).join(""):'<div class="panel"><h3>No media assets match.</h3><p class="muted">Upload a batch or change the filters.</p></div>';
@@ -292,17 +292,13 @@ async function refresh(showFeedback=false){
   try{
     const d=await api("/api/admin/media?status="+encodeURIComponent($("status").value)+"&q="+encodeURIComponent($("search").value));
     assets=d.assets||[];
-    if(visualMatcher){
-      assets.filter(a=>!a.productId).forEach(a=>{
-        a.suggestions=[];
-        a.suggestionSource="visual";
-        a.suggestionStatus="UNRESOLVED";
-      });
-      render();
-      void Promise.all([enrichVisualSuggestions(),enrichOpenWorldSuggestions()]);
-    }else{
-      render();
-    }
+    assets.filter(a=>!a.productId).forEach(a=>{
+      a.suggestions=[];
+      a.suggestionSource="visual";
+      a.suggestionStatus="UNRESOLVED";
+    });
+    render();
+    void Promise.all([enrichVisualSuggestions(),enrichOpenWorldSuggestions()]);
     if(showFeedback)setQueueFeedback("Queue refreshed","success");
     return d;
   }catch(e){
@@ -401,12 +397,40 @@ async function confirmSuggestedProduct(assetId,productId){
   const result=await updateAsset(assetId);
   if(result) setActionStatus(assetId,"HIGH match confirmed — owner approval remains required","success");
 }
+async function recordOpenWorldDecision(assetId,decision,ownerCorrection=null){
+  const asset=assets.find(x=>String(x.id)===String(assetId));
+  if(!asset||!asset.openWorldResult)return null;
+  const result=await api("/api/admin/media/"+encodeURIComponent(assetId)+"/open-world-decision",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({decision,aiResult:asset.openWorldResult,ownerCorrection})});
+  asset.openWorldOwnerDecision=decision;
+  render();
+  return result;
+}
+async function acceptOpenWorldIdentification(assetId){
+  try{await recordOpenWorldDecision(assetId,"ACCEPTED_IDENTIFICATION");setQueueFeedback("Open-world identification accepted by owner. Create a candidate if this is a new product.","success")}
+  catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
+}
+async function editOpenWorldIdentification(assetId){
+  const asset=assets.find(x=>String(x.id)===String(assetId));
+  if(!asset?.openWorldResult)return;
+  const correction=prompt("Correct the product identification:",asset.openWorldResult.productName||"");
+  if(!correction||!correction.trim())return;
+  try{
+    await recordOpenWorldDecision(assetId,"OWNER_CORRECTED",correction.trim());
+    asset.openWorldResult.productName=correction.trim();
+    setQueueFeedback("Owner correction recorded; original AI output remains in the audit record.","success");
+    render();
+  }catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
+}
+async function keepOpenWorldUnresolved(assetId){
+  try{await recordOpenWorldDecision(assetId,"KEEP_UNRESOLVED");setQueueFeedback("Open-world result kept unresolved.","success")}
+  catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
+}
 async function createNewProductCandidate(assetId){
   const asset=assets.find(x=>String(x.id)===String(assetId));
   if(!asset)return null;
   setActionStatus(assetId,"Creating candidate…","pending");
   try{
-    const result=await api("/api/admin/media/candidates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assetIds:[assetId]})});
+    const result=await api("/api/admin/media/candidates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assetIds:[assetId],openWorldResult:asset.openWorldResult||null})});
     const progress=loadBatchProgress()||{clientBatchId:"current",total:assets.length,completed:0,summary:{}};
     progress.summary=progress.summary||{};progress.summary.newCandidates=(Number(progress.summary.newCandidates)||0)+1;saveBatchProgress(progress);renderBatchProgress(progress);
     setActionStatus(assetId,"New Product Candidate created — awaiting owner approval","success");
@@ -682,3 +706,14 @@ $("refresh").addEventListener("click",async()=>{
 })();
 document.getElementById("refreshCandidates")?.addEventListener("click",loadCandidates);
 document.getElementById("candidates")?.addEventListener("click",event=>{const b=event.target.closest("[data-candidate-action]");if(!b)return;const id=b.getAttribute("data-candidate-id");const action=b.getAttribute("data-candidate-action");if(action==="approve")approveNewProductCandidate(id);else if(action==="edit")editNewProductCandidate(id);else if(action==="pending")keepCandidatePending(id);else if(action==="reject")rejectNewProductCandidate(id);});
+
+document.getElementById("queue")?.addEventListener("click",event=>{
+  const b=event.target.closest("[data-open-world-action]");
+  if(!b)return;
+  const id=b.getAttribute("data-open-world-id");
+  const action=b.getAttribute("data-open-world-action");
+  if(action==="accept")acceptOpenWorldIdentification(id);
+  else if(action==="edit")editOpenWorldIdentification(id);
+  else if(action==="candidate")createNewProductCandidate(id);
+  else if(action==="keep")keepOpenWorldUnresolved(id);
+});
