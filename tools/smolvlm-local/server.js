@@ -66,10 +66,13 @@ async function analyze(body,mime,filename){
     {type:"image"},
     {type:"text",text:"Analyze this product photograph. Return ONLY valid JSON with exactly these fields: productName, category, description, visibleAttributes, confidence, status. Identify the product from the image alone; do not assume it is in any catalogue. productName must be the most specific defensible name. category should be a concise equipment/category name. description must be one concise sentence. visibleAttributes must be an array of short strings containing only visibly supported attributes. confidence must be a number from 0 to 1 representing your confidence in the identification. status must be one of IDENTIFIED, UNCERTAIN, UNRESOLVED. Never invent an exact model, capacity, brand, or specification that is not visibly supported."}
   ]}];
-  const text=processor.apply_chat_template(messages,{add_generation_prompt:true});
-  const inputs=await processor(text,[image]);
-  const output=await model.generate({...inputs,max_new_tokens:160});
-  const generated=processor.batch_decode(output,{skip_special_tokens:true})[0]||"";
+  const prompt=processor.apply_chat_template(messages,{add_generation_prompt:true});
+  const inputs=await processor(prompt,[image]);
+  const inputLength=Number(inputs?.input_ids?.dims?.[inputs.input_ids.dims.length-1]||0);
+  const output=await model.generate({...inputs,max_new_tokens:160,do_sample:false});
+  const outputIds=output?.tolist?.()||[];
+  const generatedTokens=Array.isArray(outputIds)&&Array.isArray(outputIds[0])?outputIds[0].slice(inputLength):outputIds;
+  const generated=generatedTokens.length?processor.batch_decode([generatedTokens],{skip_special_tokens:true})[0]||"":processor.batch_decode(output,{skip_special_tokens:true})[0]||"";
   const parsed=extractJson(generated);
   const result=parsed||{
     productName:"",
