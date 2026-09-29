@@ -35,11 +35,11 @@ function readBody(req,maxBytes=15*1024*1024){
   });
 }
 function cleanGeneratedText(text){
-  return String(text||"").trim().replace(/^\`\`\`(?:json)?\\s*/i,"").replace(/\\s*\`\`\`$/,"").trim();
+  return String(text||"").trim().replace(/^\`\`\`(?:json)?\s*/i,"").replace(/\s*\`\`\`$/,"").trim();
 }
 function normalizeConfidence(value){
   if(typeof value==="string"){
-    const match=value.match(/-?\\d+(?:\\.\\d+)?/);
+    const match=value.match(/-?\d+(?:\.\d+)?/);
     if(!match)return 0;
     const n=Number(match[0]);
     return Number.isFinite(n)?(n>1?n/100:n):0;
@@ -52,7 +52,7 @@ function isSchemaRepetition(text){
   const fields=["productname","category","description","visibleattributes","confidence","status"];
   const hits=fields.filter(field=>raw.includes(field));
   if(hits.length<4)return false;
-  const compact=raw.replace(/[\\s,:;{}\\[\\]"'_-]+/g,"");
+  const compact=raw.replace(/[\s,:;{}\[\]"'_-]+/g,"");
   return compact.length<180 || hits.length===fields.length;
 }
 function normalizeStatus(value){
@@ -82,11 +82,11 @@ function extractJson(text){
   const raw=cleanGeneratedText(text);
   if(isSchemaRepetition(raw))return null;
   try{return normalizeStructuredResult(JSON.parse(raw))}catch{}
-  const match=raw.match(/\\{[\\s\\S]*\\}/);
+  const match=raw.match(/\{[\s\S]*\}/);
   if(match&&!isSchemaRepetition(match[0])){
     try{return normalizeStructuredResult(JSON.parse(match[0]))}catch{}
     try{
-      const repaired=match[0].replace(/,\\s*([}])/g,"$1").replace(/,\\s*([\\]])/g,"$1");
+      const repaired=match[0].replace(/,\s*([}])/g,"$1").replace(/,\s*([\]])/g,"$1");
       return normalizeStructuredResult(JSON.parse(repaired));
     }catch{}
   }
@@ -95,13 +95,13 @@ function extractJson(text){
 function parseNaturalLanguage(text){
   const raw=cleanGeneratedText(text);
   if(!raw||isSchemaRepetition(raw))return null;
-  const productMatch=raw.match(/(?:^|\\n)\\s*(?:product|item)\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
-  const categoryMatch=raw.match(/(?:^|\\n)\\s*category\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
-  const descriptionMatch=raw.match(/(?:^|\\n)\\s*description\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
-  const attributesMatch=raw.match(/(?:^|\\n)\\s*(?:visible\\s+attributes|attributes)\\s*[:=-]\\s*(.+?)(?=\\n|$)/i);
-  const confidenceMatch=raw.match(/(?:confidence|certainty)\\s*[:=-]\\s*(\\d+(?:\\.\\d+)?%?)/i);
-  const statusMatch=raw.match(/(?:status)\\s*[:=-]\\s*(IDENTIFIED|UNCERTAIN|UNRESOLVED)/i);
-  const sentences=raw.split(/(?<=[.!?])\\s+/).filter(Boolean);
+  const productMatch=raw.match(/(?:^|\n)\s*(?:product|item)\s*[:=-]\s*(.+?)(?=\n|$)/i);
+  const categoryMatch=raw.match(/(?:^|\n)\s*category\s*[:=-]\s*(.+?)(?=\n|$)/i);
+  const descriptionMatch=raw.match(/(?:^|\n)\s*description\s*[:=-]\s*(.+?)(?=\n|$)/i);
+  const attributesMatch=raw.match(/(?:^|\n)\s*(?:visible\s+attributes|attributes)\s*[:=-]\s*(.+?)(?=\n|$)/i);
+  const confidenceMatch=raw.match(/(?:confidence|certainty)\s*[:=-]\s*(\d+(?:\.\d+)?%?)/i);
+  const statusMatch=raw.match(/(?:status)\s*[:=-]\s*(IDENTIFIED|UNCERTAIN|UNRESOLVED)/i);
+  const sentences=raw.split(/(?<=[.!?])\s+/).filter(Boolean);
   const productName=(productMatch?.[1]||sentences[0]||"").trim();
   if(!productName)return null;
   const visibleAttributes=attributesMatch
