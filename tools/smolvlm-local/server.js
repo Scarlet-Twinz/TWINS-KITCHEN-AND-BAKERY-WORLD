@@ -70,9 +70,10 @@ async function analyze(body,mime,filename){
   const inputs=await processor(prompt,[image]);
   const inputLength=Number(inputs?.input_ids?.dims?.[inputs.input_ids.dims.length-1]||0);
   const output=await model.generate({...inputs,max_new_tokens:160,do_sample:false});
-  const outputIds=output?.tolist?.()||[];
-  const generatedTokens=Array.isArray(outputIds)&&Array.isArray(outputIds[0])?outputIds[0].slice(inputLength):outputIds;
-  const generated=generatedTokens.length?processor.batch_decode([generatedTokens],{skip_special_tokens:true})[0]||"":processor.batch_decode(output,{skip_special_tokens:true})[0]||"";
+  const generatedOutput=output?.slice?.(null,[inputLength,null]);
+  const generated=generatedOutput
+    ? processor.batch_decode(generatedOutput,{skip_special_tokens:true})[0]||""
+    : "";
   const parsed=extractJson(generated);
   const result=parsed||{
     productName:"",
