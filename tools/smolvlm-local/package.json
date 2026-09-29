@@ -1,0 +1,11 @@
+{
+  "name": "twins-smolvlm-local",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "3.8.1"
+  }
+}
