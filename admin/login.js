@@ -1,4 +1,4 @@
-const API=(window.TWINS_API_BASE||"http://localhost:8000").replace(/\/$/,"");
+const API=(window.TWINS_API_BASE||((window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1")?"http://"+window.location.hostname+":8000":"http://localhost:8000")).replace(/\/$/,"");
 const form=document.getElementById("ownerLogin");
 const email=document.getElementById("email");
 const password=document.getElementById("password");
