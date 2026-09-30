@@ -638,7 +638,7 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
     require_owner(request)
     with db() as conn:
         rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at,
-        smolvlm_result,smolvlm_result_version,smolvlm_inference_at,smolvlm_inference_ms,smolvlm_owner_override,smolvlm_owner_decided_at,smolvlm_owner_decided_by,
+        smolvlm_result,smolvlm_result_version,smolvlm_inference_at,smolvlm_inference_ms,smolvlm_owner_override,smolvlm_owner_decision,smolvlm_owner_decided_at,smolvlm_owner_decided_by,
         visual_match_result,visual_match_result_version,visual_match_inference_at
         from media_assets where (nullif(%s,'')::text is null or status=%s) and (nullif(%s,'')::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
@@ -656,16 +656,17 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
             owner=dict(row[23]) if isinstance(row[23],dict) else (json.loads(row[23]) if row[23] else None)
             if owner:
                 smol["ownerCorrection"]=owner
-                smol["ownerDecisionAt"]=row[24].isoformat() if row[24] else None
-                smol["ownerDecisionBy"]=str(row[25]) if row[25] else None
+            smol["ownerDecision"]=row[24]
+            smol["ownerDecisionAt"]=row[25].isoformat() if row[25] else None
+            smol["ownerDecisionBy"]=str(row[26]) if row[26] else None
             smol["resultVersion"]=row[20]
             smol["inferenceAt"]=row[21].isoformat() if row[21] else None
             smol["inferenceMs"]=row[22]
             item["smolvlmResult"]=smol
         if row[26] is not None:
-            visual=dict(row[26]) if isinstance(row[26],dict) else json.loads(row[26])
-            visual["resultVersion"]=row[27]
-            visual["inferenceAt"]=row[28].isoformat() if row[28] else None
+            visual=dict(row[27]) if isinstance(row[27],dict) else json.loads(row[27])
+            visual["resultVersion"]=row[28]
+            visual["inferenceAt"]=row[29].isoformat() if row[29] else None
             item["visualMatchResult"]=visual
             item["suggestions"]=visual.get("suggestions",[])
         else:
@@ -709,7 +710,7 @@ def media_ai_results_clear(asset_id:str,request:Request):
         if not conn.execute("select id from media_assets where id=%s",(asset_uuid,)).fetchone():
             raise HTTPException(status_code=404,detail="Media asset not found")
         conn.execute("""update media_assets set smolvlm_result=null,smolvlm_result_version=null,
-            smolvlm_inference_at=null,smolvlm_inference_ms=null,smolvlm_owner_override=null,
+            smolvlm_inference_at=null,smolvlm_inference_ms=null,smolvlm_owner_override=null,smolvlm_owner_decision=null,
             smolvlm_owner_decided_at=null,smolvlm_owner_decided_by=null,
             visual_match_result=null,visual_match_result_version=null,visual_match_inference_at=null,
             updated_at=now() where id=%s""",(asset_uuid,))
@@ -730,7 +731,7 @@ def media_open_world_decision(asset_id:str,request:Request,payload:dict):
         if not row: raise HTTPException(status_code=404,detail="Media asset not found")
         owner_correction=payload.get("ownerCorrection") if isinstance(payload.get("ownerCorrection"),dict) else None
         conn.execute("""update media_assets set smolvlm_owner_override=%s,smolvlm_owner_decided_at=%s,smolvlm_owner_decided_by=%s,updated_at=now() where id=%s""",
-                     (json.dumps(owner_correction) if owner_correction else None,datetime.now(timezone.utc),uuid.UUID(actor["sub"]),asset_uuid))
+                     (json.dumps(owner_correction) if owner_correction else None,decision,datetime.now(timezone.utc),uuid.UUID(actor["sub"]),asset_uuid))
         audit_media_action(conn,actor,"MEDIA_OPEN_WORLD_DECISION",asset_id,{"decision":decision,"aiResult":payload.get("aiResult") or {},"ownerCorrection":owner_correction,"timestamp":datetime.now(timezone.utc).isoformat()})
         conn.commit()
     return {"ok":True,"status":decision,"assetId":asset_id}
