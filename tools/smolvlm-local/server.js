@@ -142,29 +142,39 @@ async function loadRuntime(){
 }
 async function analyze(body,mime,filename){
   const started=Date.now();
+  const runtimeStarted=Date.now();
   const {processor,model}=await loadRuntime();
+  const modelLoadMs=Date.now()-runtimeStarted;
+  const preprocessStarted=Date.now();
   const image=await RawImage.fromBlob(new Blob([body],{type:mime||"image/jpeg"}));
   const messages=[{role:"user",content:[
     {type:"image"},
-    {type:"text",text:"Identify what is visibly shown in this product photograph. Respond in plain language, not JSON. Use 1 to 3 concise sentences. Start with the most specific defensible product name, then describe the visible object and useful visible characteristics. If an exact brand, model, capacity, dimension, or specification cannot be read or determined from the image, omit it. Do not output JSON, field names, schema names, labels, or a list of required fields. Never invent facts."}
+    {type:"text",text:"Identify the commercial product or equipment visibly shown in this photograph. Reply with exactly one concise sentence beginning with the most specific defensible product type (for example, Commercial planetary mixer, Commercial blender, Dough sheeter, Commercial oven). Then mention only useful visible physical features. Do not give a brand, model, capacity, dimensions, specifications, or catalogue ID unless directly visible and readable. Do not output JSON, field names, schema names, or a list. If the product type cannot be identified reliably, describe only what is visibly certain."}
   ]}];
   const prompt=processor.apply_chat_template(messages,{add_generation_prompt:true});
   const inputs=await processor(prompt,[image]);
+  const preprocessMs=Date.now()-preprocessStarted;
   const inputLength=Number(inputs?.input_ids?.dims?.[inputs.input_ids.dims.length-1]||0);
-  const output=await model.generate({...inputs,max_new_tokens:160,do_sample:false});
+  const generationStarted=Date.now();
+  const output=await model.generate({...inputs,max_new_tokens:64,do_sample:false});
+  const generationMs=Date.now()-generationStarted;
   const generatedOutput=output?.slice?.(null,[inputLength,null]);
+  const generatedTokens=Number(generatedOutput?.dims?.[generatedOutput.dims.length-1]||0);
+  const decodeStarted=Date.now();
   const generated=generatedOutput
     ? processor.batch_decode(generatedOutput,{skip_special_tokens:true})[0]||""
     : "";
+  const decodeMs=Date.now()-decodeStarted;
   const parsed=extractJson(generated)||parseNaturalLanguage(generated);
   const result=parsed||{
-    productName:"",
+    productName:generated.trim(),
     category:"",
     description:generated.trim(),
     visibleAttributes:[],
     confidence:0,
     status:"UNRESOLVED"
   };
+  const inferenceMs=Date.now()-started;
   return{
     filename:filename||"unknown",
     model:MODEL_ID,
@@ -176,7 +186,9 @@ async function analyze(body,mime,filename){
     confidence:Math.max(0,Math.min(1,Number(result.confidence)||0)),
     status:["IDENTIFIED","UNCERTAIN","UNRESOLVED"].includes(result.status)?result.status:"UNRESOLVED",
     catalogueReference:"NONE",
-    inferenceMs:Date.now()-started,
+    inferenceMs,
+    inferenceAt:new Date().toISOString(),
+    telemetry:{modelLoadMs,preprocessMs,generationMs,decodeMs,totalMs:inferenceMs,inputTokens:inputLength,generatedTokens},
     rawOutput:generated.trim()
   };
 }
