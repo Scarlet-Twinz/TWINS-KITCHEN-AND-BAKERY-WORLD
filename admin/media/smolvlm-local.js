@@ -23,15 +23,20 @@
   }
 
   function productType(text){
-    const sentence=firstSentence(text);
-    return sentence
+    let value=cleanGeneratedText(text)
+      .replace(/^[\s"'“”]+|[\s"'“”]+$/g,"")
+      .replace(/[.!?]+$/g,"")
+      .trim();
+    value=value
       .replace(/^(the\s+)?(?:image|photo|picture)\s+(shows?|contains?|depicts?)\s+/i,"")
       .replace(/^this\s+is\s+/i,"")
       .trim();
+    const words=value.split(/\s+/).filter(Boolean);
+    return words.length>6?words.slice(0,6).join(" "):value;
   }
 
   function buildResult(rawOutput,inferenceMs,telemetry){
-    const description=cleanGeneratedText(rawOutput);
+    const description=productType(rawOutput);
     const productName=productType(description);
     return {
       model:MODEL_ID,
@@ -83,16 +88,22 @@
     const started=performance.now();
     const runtime=await loadRuntime();
     const image=await runtime.RawImage.fromBlob(blob);
-    const prompt="Identify the most specific defensible product type based only on visible physical features. Do not guess brand, model number, capacity, price, catalogue ID, or hidden specifications. Answer in one concise sentence.";
+    const prompt="Identify the most specific defensible commercial product type from visible physical features only. Output ONLY a short noun phrase, 2 to 6 words. Do not write a sentence. Do not mention brands, model numbers, capacity, dimensions, fuel type, power source, burner count, materials, price, catalogue IDs, or hidden specifications. If uncertain, use a broader product type. Example format: commercial multi-burner cooking range.";
     const inputs=await runtime.processor("<image>\n"+prompt,image);
     const generationStarted=performance.now();
     const outputIds=await runtime.model.generate({
       ...inputs,
-      max_new_tokens:64,
+      max_new_tokens:24,
       do_sample:false
     });
     const generationMs=performance.now()-generationStarted;
-    const decoded=runtime.processor.tokenizer.batch_decode(outputIds,{skip_special_tokens:true});
+    const inputLength=Number(runtime.processor?.tokenizer ? (inputs?.input_ids?.dims?.[1]||0) : 0);
+    let generatedIds=outputIds;
+    if(typeof outputIds?.tolist==="function"){
+      const rows=outputIds.tolist();
+      if(Array.isArray(rows)&&Array.isArray(rows[0]))generatedIds=[rows[0].slice(inputLength)];
+    }
+    const decoded=runtime.processor.tokenizer.batch_decode(generatedIds,{skip_special_tokens:true});
     const rawOutput=Array.isArray(decoded)?decoded[0]||"":String(decoded||"");
     const totalMs=performance.now()-started;
     return buildResult(rawOutput,totalMs,{
