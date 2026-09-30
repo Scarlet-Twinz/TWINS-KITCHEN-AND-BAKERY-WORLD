@@ -194,3 +194,10 @@ test("persisted visual catalogue results prevent repeated MobileCLIP inference",
   assert.match(center,/!a\.visualMatchResult/);
   assert.match(center,/kind:"visual"/);
 });
+
+test("existing databases receive the persistent AI result migration",()=>{
+  const migration=fs.readFileSync("backend/migrate.py","utf8");
+  assert.match(migration,/migrate_ai_results/);
+  assert.match(migration,/alter table media_assets add column if not exists smolvlm_result jsonb/);
+  assert.match(migration,/alter table media_assets add column if not exists visual_match_result jsonb/);
+});
