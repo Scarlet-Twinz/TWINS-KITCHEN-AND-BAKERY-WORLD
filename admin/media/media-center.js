@@ -317,8 +317,10 @@ async function refresh(showFeedback=false,options={}){
     assets.forEach(a=>{
       if(a.smolvlmResult){
         a.openWorldResult={...a.smolvlmResult};
+        if(a.smolvlmResult.ownerDecision){
+          a.openWorldOwnerDecision=a.smolvlmResult.ownerDecision;
+        }
         if(a.smolvlmResult.ownerCorrection){
-          a.openWorldOwnerDecision="OWNER_CORRECTED";
           a.openWorldResult={...a.openWorldResult,...a.smolvlmResult.ownerCorrection};
         }
       }
