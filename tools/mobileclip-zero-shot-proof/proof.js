@@ -34,8 +34,8 @@ async function loadRuntime(){
   status("Loading MobileCLIP tokenizer + text encoder + vision encoder locally…");
   const tokenizer=await AutoTokenizer.from_pretrained(MODEL);
   const processor=await AutoProcessor.from_pretrained(MODEL);
-  const textModel=await CLIPTextModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp16"});
-  const visionModel=await CLIPVisionModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp16"});
+  const textModel=await CLIPTextModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp32"});
+  const visionModel=await CLIPVisionModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp32"});
   runtime={tokenizer,processor,textModel,visionModel};
   status("MobileCLIP loaded. Building text concept embeddings…");
   return runtime;
