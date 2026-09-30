@@ -123,7 +123,8 @@ async function enrichOpenWorldSuggestions(targetIds=null){
             catalogueReference:result.catalogueReference||"NONE",
             inferenceMs:Number(result.inferenceMs)||0,
             inferenceAt:result.inferenceAt||new Date().toISOString(),
-            rawOutput:result.rawOutput||""
+            rawOutput:result.rawOutput||"",
+            telemetry:result.telemetry||null
           };
           asset.smolvlmResult={...asset.openWorldResult};
           try{
