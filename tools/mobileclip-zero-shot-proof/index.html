@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Twins MobileCLIP Open-World Proof</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:1100px;margin:32px auto;padding:0 20px;background:#0b1220;color:#eef4ff}
+h1{margin-bottom:6px}.muted{color:#aab8d0}.panel{background:#121c2e;border:1px solid #263653;border-radius:14px;padding:18px;margin:16px 0}
+textarea,input,button{font:inherit}textarea{width:100%;min-height:180px;box-sizing:border-box;background:#0a1020;color:#fff;border:1px solid #334563;border-radius:10px;padding:12px}
+button{border:0;border-radius:9px;padding:10px 15px;cursor:pointer;margin-right:8px}.primary{background:#4da3ff;color:#06111f}.secondary{background:#263653;color:#fff}
+#status{white-space:pre-wrap}.result{border-top:1px solid #263653;padding:14px 0}.rank{display:flex;justify-content:space-between;gap:12px;padding:7px 10px;background:#0d1728;border-radius:7px;margin:5px 0}.rank b{font-weight:650}.score{font-variant-numeric:tabular-nums;color:#9fd0ff}.thumb{max-width:220px;max-height:160px;border-radius:8px;object-fit:contain;background:#fff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+</style>
+</head>
+<body>
+<h1>Twins MobileCLIP Open-World Proof</h1>
+<p class="muted">Isolated experiment. This does not modify the Media Center. Upload real unresolved Twins photos and see whether MobileCLIP can suggest product types it has never matched by catalogue image.</p>
+<div class="panel">
+<label><b>Product-type concepts</b></label>
+<p class="muted">One concept per line. Start with these; edit them if a real photo needs a different concept.</p>
+<textarea id="labels">commercial planetary mixer
+commercial spiral dough mixer
+commercial dough mixer
+commercial dough sheeter
+commercial dough divider
+commercial bread slicer
+commercial bakery oven
+commercial deck oven
+commercial convection oven
+commercial cooking range
+commercial gas range
+commercial deep fryer
+commercial dishwasher
+commercial blender
+commercial food processor
+commercial meat grinder
+commercial meat mincer
+commercial sausage filler
+commercial poultry defeathering machine
+commercial ice cream machine
+commercial refrigerator
+commercial freezer
+commercial display refrigerator
+commercial cake display counter
+commercial food warmer
+commercial stainless steel work table
+commercial sink
+commercial coffee machine
+commercial coffee grinder
+commercial juice extractor
+commercial water chiller
+commercial reverse osmosis machine
+commercial bottle filling machine
+commercial packaging machine
+commercial dehydrator
+commercial ozone generator
+commercial potato peeler
+commercial vegetable cutter
+commercial planetary beater
+commercial bakery equipment</textarea>
+</div>
+<div class="panel">
+<input id="files" type="file" accept="image/*" multiple>
+<br><br>
+<button class="primary" id="run">Run proof on selected images</button>
+<button class="secondary" id="clear">Clear results</button>
+<p id="status" class="muted">Waiting for images.</p>
+</div>
+<div id="results" class="grid"></div>
+<script type="module" src="./proof.js"></script>
+</body>
+</html>
