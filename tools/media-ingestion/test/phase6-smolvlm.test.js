@@ -9,6 +9,7 @@ const html=fs.readFileSync("admin/media/index.html","utf8");
 const server=fs.readFileSync("tools/smolvlm-local/server.js","utf8");
 const prep=fs.readFileSync("tools/smolvlm-local/prepare-model.ps1","utf8");
 const backend=fs.readFileSync("backend/main.py","utf8");
+const schema=fs.readFileSync("backend/schema.sql","utf8");
 
 test("local SmolVLM adapter is loaded by Media Center",()=>{
   assert.match(html,/\.\/smolvlm-local\.js/);
@@ -131,7 +132,7 @@ test("candidate queue endpoint and local development CORS are present",()=>{
 });
 
 test("SmolVLM result persistence is server-authoritative",()=>{
-  assert.match(backend,/smolvlm_result jsonb/);
+  assert.match(schema,/smolvlm_result jsonb/);
   assert.match(backend,/MEDIA_AI_RESULT_PERSISTED/);
   assert.match(backend,/\/api\/admin\/media\/\{asset_id\}\/ai-result/);
   assert.match(center,/kind:"smolvlm"/);
@@ -166,7 +167,7 @@ test("owner corrections persist all editable identification fields",()=>{
   assert.match(center,/category:category\.trim\(\)/);
   assert.match(center,/description:description\.trim\(\)/);
   assert.match(center,/visibleAttributes:attributes\.split/);
-  assert.match(backend,/smolvlm_owner_override jsonb/);
+  assert.match(schema,/smolvlm_owner_override jsonb/);
 });
 
 test("original AI evidence remains separate from owner correction",()=>{
@@ -189,7 +190,7 @@ test("upload-time processing explicitly opts into inference",()=>{
 });
 
 test("persisted visual catalogue results prevent repeated MobileCLIP inference",()=>{
-  assert.match(backend,/visual_match_result jsonb/);
+  assert.match(schema,/visual_match_result jsonb/);
   assert.match(center,/!a\.visualMatchResult/);
   assert.match(center,/kind:"visual"/);
 });
