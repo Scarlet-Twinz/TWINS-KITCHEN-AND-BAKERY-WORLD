@@ -158,7 +158,7 @@ test("explicit Revalidate clears persisted AI results and then reruns inference"
 
 test("candidate refresh does not invoke inference",()=>{
   assert.match(center,/async function loadCandidates\(\)/);
-  assert.match(center,/await api\("/api/admin/media/candidates\?status=PENDING_OWNER")/);
+  assert.match(center,/admin\/media\/candidates\?status=PENDING_OWNER/);
 });
 
 test("owner corrections persist all editable identification fields",()=>{
