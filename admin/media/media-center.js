@@ -90,16 +90,17 @@ async function identifyAssetOpenWorld(asset){
   if(!sourceBlob)return{available:false,error:"uploaded image could not be decoded from the Media API"};
   return openWorld.analyze(sourceBlob,asset.filename);
 }
-async function enrichOpenWorldSuggestions(){
+async function enrichOpenWorldSuggestions(targetIds=null){
   if(!openWorld)return false;
   const run=++openWorldRun;
+  const allowedIds=Array.isArray(targetIds)?new Set(targetIds.map(String)):null;
   const health=await openWorld.available();
   if(!health.available){
     updateOpenWorldStatus({message:"Unavailable — start the local SmolVLM service on port 8787",state:"unavailable"});
     return false;
   }
   updateOpenWorldStatus({message:"Ready — SmolVLM-500M-Instruct local ONNX service",state:"ready"});
-  const targets=assets.filter(a=>!a.productId&&(!a.suggestionStatus||a.suggestionStatus==="UNRESOLVED"));
+  const targets=assets.filter(a=>!a.productId&&!a.smolvlmResult&&(!allowedIds||allowedIds.has(String(a.id)))&&(!a.suggestionStatus||a.suggestionStatus==="UNRESOLVED"));
   let cursor=0;
   const worker=async()=>{
     while(true){
@@ -120,8 +121,16 @@ async function enrichOpenWorldSuggestions(){
             confidence:Number(result.confidence)||0,
             status:result.status||"UNRESOLVED",
             catalogueReference:result.catalogueReference||"NONE",
-            inferenceMs:Number(result.inferenceMs)||0
+            inferenceMs:Number(result.inferenceMs)||0,
+            inferenceAt:result.inferenceAt||new Date().toISOString(),
+            rawOutput:result.rawOutput||""
           };
+          asset.smolvlmResult={...asset.openWorldResult};
+          try{
+            await api("/api/admin/media/"+encodeURIComponent(asset.id)+"/ai-result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind:"smolvlm",result:asset.smolvlmResult,resultVersion:"smolvlm-v1"})});
+          }catch(saveError){
+            asset.openWorldResult={...asset.openWorldResult,persistenceError:String(saveError?.message||saveError)};
+          }
         }else{
           asset.openWorldResult={status:"UNRESOLVED",catalogueReference:"NONE",error:result?.error||"Local service unavailable"};
         }
@@ -136,10 +145,11 @@ async function enrichOpenWorldSuggestions(){
   return true;
 }
 
-async function enrichVisualSuggestions(){
+async function enrichVisualSuggestions(targetIds=null){
   if(!visualMatcher)return false;
   const run=++visualRun;
-  const targets=assets.filter(a=>!a.productId);
+  const allowedIds=Array.isArray(targetIds)?new Set(targetIds.map(String)):null;
+  const targets=assets.filter(a=>!a.productId&&!a.visualMatchResult&&(!allowedIds||allowedIds.has(String(a.id))));
   let cursor=0;
   const progress=loadBatchProgress()||{clientBatchId:"current",total:targets.length,completed:0,summary:{}};
   const worker=async()=>{
@@ -159,6 +169,16 @@ async function enrichVisualSuggestions(){
         asset.margin=result?.margin||0;
         asset.referenceCount=result?.referenceCount||0;
         asset.supportingReferences=result?.supportingReferences||[];
+        asset.visualMatchResult={
+          ...result,
+          inferenceAt:new Date().toISOString(),
+          inferenceMs:Number(result?.inferenceMs)||0
+        };
+        try{
+          await api("/api/admin/media/"+encodeURIComponent(asset.id)+"/ai-result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind:"visual",result:asset.visualMatchResult,resultVersion:"visual-v1"})});
+        }catch(saveError){
+          asset.visualMatchResult.persistenceError=String(saveError?.message||saveError);
+        }
         if(run===visualRun)render();
         progress.completed=(Number(progress.completed)||0)+1;
         progress.summary=progress.summary||{};
@@ -288,18 +308,43 @@ function render(){
       '<input data-id="'+a.id+'" data-field="role" value="'+escapeHtml(a.role)+'" placeholder="role"><button class="btn light" data-action-id="'+a.id+'" onclick="updateAsset(this.dataset.actionId)">Save metadata</button><button class="btn light" data-action-id="'+a.id+'" onclick="revalidate(this.dataset.actionId)">Revalidate</button><button class="btn red" data-action-id="'+a.id+'" onclick="approveAsset(this.dataset.actionId)">Owner approve</button><button class="btn light" data-action-id="'+a.id+'" onclick="rejectAsset(this.dataset.actionId)">Reject</button><button class="btn light danger-outline" data-action-id="'+a.id+'" onclick="deleteAsset(this.dataset.actionId)">Delete</button><div class="action-status" data-status-id="'+a.id+'" aria-live="polite"></div></div></article>';
   }).join(""):'<div class="panel"><h3>No media assets match.</h3><p class="muted">Upload a batch or change the filters.</p></div>';
 }
-async function refresh(showFeedback=false){
+async function refresh(showFeedback=false,options={}){
+  const runInference=options.runInference===true;
+  const targetIds=Array.isArray(options.targetIds)?options.targetIds:null;
   try{
     const d=await api("/api/admin/media?status="+encodeURIComponent($("status").value)+"&q="+encodeURIComponent($("search").value));
     assets=d.assets||[];
-    assets.filter(a=>!a.productId).forEach(a=>{
-      a.suggestions=[];
-      a.suggestionSource="visual";
-      a.suggestionStatus="UNRESOLVED";
+    assets.forEach(a=>{
+      if(a.smolvlmResult){
+        a.openWorldResult={...a.smolvlmResult};
+        if(a.smolvlmResult.ownerCorrection){
+          a.openWorldOwnerDecision="OWNER_CORRECTED";
+          a.openWorldResult={...a.openWorldResult,...a.smolvlmResult.ownerCorrection};
+        }
+      }
+      if(a.visualMatchResult){
+        a.suggestions=Array.isArray(a.visualMatchResult.suggestions)?a.visualMatchResult.suggestions:[];
+        a.suggestionStatus=a.visualMatchResult.status||"UNRESOLVED";
+        a.suggestionSource=a.visualMatchResult.engine||"ONNX vision";
+        a.suggestionReason=a.visualMatchResult.reason||"";
+        a.topScore=Number(a.visualMatchResult.topScore)||0;
+        a.secondScore=Number(a.visualMatchResult.secondScore)||0;
+        a.margin=Number(a.visualMatchResult.margin)||0;
+        a.referenceCount=Number(a.visualMatchResult.referenceCount)||0;
+        a.supportingReferences=a.visualMatchResult.supportingReferences||[];
+      }else if(!a.productId){
+        a.suggestions=[];
+        a.suggestionSource="visual";
+        a.suggestionStatus="UNRESOLVED";
+      }
     });
     render();
-    void enrichVisualSuggestions();
-    void enrichOpenWorldSuggestions();
+    if(runInference){
+      await Promise.all([
+        enrichVisualSuggestions(targetIds),
+        enrichOpenWorldSuggestions(targetIds)
+      ]);
+    }
     if(showFeedback)setQueueFeedback("Queue refreshed","success");
     return d;
   }catch(e){
@@ -413,12 +458,26 @@ async function acceptOpenWorldIdentification(assetId){
 async function editOpenWorldIdentification(assetId){
   const asset=assets.find(x=>String(x.id)===String(assetId));
   if(!asset?.openWorldResult)return;
-  const correction=prompt("Correct the product identification:",asset.openWorldResult.productName||"");
-  if(!correction||!correction.trim())return;
+  const current=asset.openWorldResult;
+  const productName=prompt("Correct the product identification:",current.productName||"");
+  if(productName===null)return;
+  const category=prompt("Correct the category:",current.category||"");
+  if(category===null)return;
+  const description=prompt("Correct the description:",current.description||"");
+  if(description===null)return;
+  const attributes=prompt("Correct visible attributes (comma-separated):",(current.visibleAttributes||[]).join(", "));
+  if(attributes===null)return;
+  const ownerCorrection={
+    productName:productName.trim(),
+    category:category.trim(),
+    description:description.trim(),
+    visibleAttributes:attributes.split(",").map(x=>x.trim()).filter(Boolean).slice(0,12)
+  };
   try{
-    await recordOpenWorldDecision(assetId,"OWNER_CORRECTED",correction.trim());
-    asset.openWorldResult.productName=correction.trim();
-    setQueueFeedback("Owner correction recorded; original AI output remains in the audit record.","success");
+    await recordOpenWorldDecision(assetId,"OWNER_CORRECTED",ownerCorrection);
+    asset.openWorldResult={...current,...ownerCorrection,ownerCorrection};
+    asset.openWorldOwnerDecision="OWNER_CORRECTED";
+    setQueueFeedback("Owner correction persisted; original AI result remains preserved.","success");
     render();
   }catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error")}
 }
@@ -518,7 +577,19 @@ async function updateAsset(id){
   const p=document.querySelector('[data-id="'+id+'"][data-field="productId"]'),r=document.querySelector('[data-id="'+id+'"][data-field="role"]');
   return runAssetAction(id,()=>api("/api/admin/media/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId:p&&p.value.trim()?p.value.trim():null,sourceType:$("sourceType").value,rightsStatus:$("rightsStatus").value,provenance:$("provenance").value.trim(),sourceUrl:$("sourceUrl").value.trim(),license:$("license").value.trim(),attribution:$("attribution").value.trim(),role:r.value})}),result=>"Metadata saved. Product: "+(result&&result.status?result.status:"REVIEW"));
 }
-async function revalidate(id){return runAssetAction(id,()=>api("/api/admin/media/"+id+"/revalidate",{method:"POST"}),result=>"Revalidate complete: "+(result&&result.status?result.status:"success"))}
+async function revalidate(id){
+  setActionStatus(id,"Revalidating AI…","pending");
+  try{
+    await api("/api/admin/media/"+encodeURIComponent(id)+"/ai-results",{method:"DELETE"});
+    await refresh(false,{runInference:true,targetIds:[id]});
+    setActionStatus(id,"AI revalidation complete","success");
+    setQueueFeedback("Explicit Revalidate completed. New AI results were generated and persisted.","success");
+  }catch(e){
+    const message=(e.status?"HTTP "+e.status+": ":"")+e.message;
+    setActionStatus(id,message,"error");
+    setQueueFeedback(message,"error");
+  }
+}
 async function approveAsset(id){if(!confirm("Approve this asset? It will create a protected mapping but will not publish automatically."))return;return runAssetAction(id,()=>api("/api/admin/media/"+id+"/approve",{method:"POST"}),result=>"Owner approval complete: "+(result&&result.status?result.status:"APPROVED"))}
 async function rejectAsset(id){if(!confirm("Reject this asset?"))return;return runAssetAction(id,()=>api("/api/admin/media/"+id+"/reject",{method:"POST"}),result=>"Asset rejected")
 }
@@ -653,7 +724,7 @@ $("uploadBtn").addEventListener("click",async()=>{
     const result=await runBulkUpload(filesToUpload);
     setUploadFeedback("Batch upload completed. Validation and local visual processing continue without exposing unapproved media.","success");
     clearSelectedFiles();
-    await refresh(false);
+    await refresh(false,{runInference:true});
   }catch(error){
     setUploadFeedback("Batch upload stopped safely: "+error.message,"error");
   }finally{
