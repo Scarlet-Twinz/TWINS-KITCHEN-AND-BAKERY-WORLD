@@ -502,20 +502,20 @@ def media_candidate_create(request:Request,payload:dict):
     try: asset_uuids=[uuid.UUID(str(x)) for x in asset_ids]
     except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
     with db() as conn:
-        rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+        rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status,smolvlm_result
         from media_assets where id = any(%s) order by created_at""",(asset_uuids,)).fetchall()
         if len(rows)!=len(asset_uuids): raise HTTPException(status_code=404,detail="One or more media assets were not found")
         # A single new-photo signal may represent several views of the same physical product.
         # Expand only when deterministic local metadata gives a sufficiently strong group.
         if len(rows)==1:
-            pool=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+            pool=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status,smolvlm_result
               from media_assets where product_legacy_id is null and status in ('QUEUED','REVIEW','VERIFIED') order by created_at""").fetchall()
             groups=group_candidate_assets(pool)
             selected=str(asset_uuids[0])
             group=next((g for g in groups if selected in g["assetIds"] and not g["reviewRequired"]),None)
             if group and len(group["assetIds"])>1:
                 asset_uuids=[uuid.UUID(x) for x in group["assetIds"]]
-                rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status
+                rows=conn.execute("""select id,filename,sha256,width,height,provenance,source_url,license,attribution,role,product_legacy_id,status,smolvlm_result
                   from media_assets where id = any(%s) order by created_at""",(asset_uuids,)).fetchall()
         if any(r[10] is not None for r in rows): raise HTTPException(status_code=409,detail="Candidate assets cannot already be assigned to a canonical product")
         if any(r[11] in ("APPROVED","REJECTED","DUPLICATE") for r in rows): raise HTTPException(status_code=409,detail="Candidate contains an ineligible media asset")
@@ -524,8 +524,13 @@ def media_candidate_create(request:Request,payload:dict):
         if existing: raise HTTPException(status_code=409,detail="One or more assets already belong to an active product candidate")
         assets=[{"filename":r[1],"provenance":r[5],"sourceUrl":r[6],"license":r[7],"attribution":r[8]} for r in rows]
         suggested,evidence=suggest_candidate_name(assets)
-        ai_result=payload.get("openWorldResult") if isinstance(payload.get("openWorldResult"),dict) else {}
-        ai_name=str(ai_result.get("productName") or "").strip()
+        ai_result={}
+        for row in rows:
+            stored=row[12] if len(row)>12 else None
+            if isinstance(stored,dict): ai_result=dict(stored); break
+        if not ai_result and isinstance(payload.get("openWorldResult"),dict):
+            ai_result=dict(payload.get("openWorldResult"))
+        ai_name=str((ai_result.get("ownerCorrection") or {}).get("productName") or ai_result.get("productName") or "").strip()
         ai_category=str(ai_result.get("category") or "").strip()
         if ai_name and ai_name.lower()!="new product — review required": suggested=ai_name
         candidate_id=uuid.uuid4()
@@ -632,7 +637,9 @@ def media_candidate_keep_pending(candidate_id:str,request:Request):
 def media_list(request:Request,status:str|None=None,q:str|None=None):
     require_owner(request)
     with db() as conn:
-        rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at
+        rows=conn.execute("""select id,product_legacy_id,filename,storage_path,sha256,mime_type,width,height,source_type,rights_status,provenance,source_url,license,attribution,role,status,batch_id,created_at,verified_at,
+        smolvlm_result,smolvlm_result_version,smolvlm_inference_at,smolvlm_inference_ms,smolvlm_owner_override,smolvlm_owner_decided_at,smolvlm_owner_decided_by,
+        visual_match_result,visual_match_result_version,visual_match_inference_at
         from media_assets where (nullif(%s,'')::text is null or status=%s) and (nullif(%s,'')::text is null or lower(filename) like lower(%s) or cast(product_legacy_id as text)=%s)
         order by created_at desc limit 500""",(status,status,q,"%"+q+"%" if q else None,q)).fetchall()
     try:
@@ -644,9 +651,71 @@ def media_list(request:Request,status:str|None=None,q:str|None=None):
     assets=[]
     for row in rows:
         item=media_metadata_from_row(row)
-        item["suggestions"]=[] if item["productId"] else catalogue_suggestions(item,products)
+        if row[19] is not None:
+            smol=dict(row[19]) if isinstance(row[19],dict) else json.loads(row[19])
+            owner=dict(row[23]) if isinstance(row[23],dict) else (json.loads(row[23]) if row[23] else None)
+            if owner:
+                smol["ownerCorrection"]=owner
+                smol["ownerDecisionAt"]=row[24].isoformat() if row[24] else None
+                smol["ownerDecisionBy"]=str(row[25]) if row[25] else None
+            smol["resultVersion"]=row[20]
+            smol["inferenceAt"]=row[21].isoformat() if row[21] else None
+            smol["inferenceMs"]=row[22]
+            item["smolvlmResult"]=smol
+        if row[26] is not None:
+            visual=dict(row[26]) if isinstance(row[26],dict) else json.loads(row[26])
+            visual["resultVersion"]=row[27]
+            visual["inferenceAt"]=row[28].isoformat() if row[28] else None
+            item["visualMatchResult"]=visual
+            item["suggestions"]=visual.get("suggestions",[])
+        else:
+            item["suggestions"]=[] if item["productId"] else catalogue_suggestions(item,products)
         assets.append(item)
     return {"assets":assets}
+
+@app.post("/api/admin/media/{asset_id}/ai-result")
+def media_ai_result_save(asset_id:str,request:Request,payload:dict):
+    actor=require_owner(request)
+    kind=str(payload.get("kind") or "").strip().lower()
+    result=payload.get("result")
+    if kind not in {"smolvlm","visual"} or not isinstance(result,dict):
+        raise HTTPException(status_code=422,detail="AI result kind and result are required")
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    version=str(payload.get("resultVersion") or ("smolvlm-v1" if kind=="smolvlm" else "visual-v1"))
+    now=datetime.now(timezone.utc)
+    with db() as conn:
+        if not conn.execute("select id from media_assets where id=%s",(asset_uuid,)).fetchone():
+            raise HTTPException(status_code=404,detail="Media asset not found")
+        if kind=="smolvlm":
+            inference_ms=int(result.get("inferenceMs") or 0)
+            conn.execute("""update media_assets set smolvlm_result=%s,smolvlm_result_version=%s,
+                smolvlm_inference_at=%s,smolvlm_inference_ms=%s,updated_at=now() where id=%s""",
+                (json.dumps(result),version,now,inference_ms,asset_uuid))
+        else:
+            conn.execute("""update media_assets set visual_match_result=%s,visual_match_result_version=%s,
+                visual_match_inference_at=%s,updated_at=now() where id=%s""",
+                (json.dumps(result),version,now,asset_uuid))
+        audit_media_action(conn,actor,"MEDIA_AI_RESULT_PERSISTED",asset_id,{"kind":kind,"resultVersion":version,"inferenceMs":result.get("inferenceMs")})
+        conn.commit()
+    return {"ok":True,"kind":kind,"resultVersion":version,"persistedAt":now.isoformat()}
+
+@app.delete("/api/admin/media/{asset_id}/ai-results")
+def media_ai_results_clear(asset_id:str,request:Request):
+    actor=require_owner(request)
+    try: asset_uuid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid media asset ID")
+    with db() as conn:
+        if not conn.execute("select id from media_assets where id=%s",(asset_uuid,)).fetchone():
+            raise HTTPException(status_code=404,detail="Media asset not found")
+        conn.execute("""update media_assets set smolvlm_result=null,smolvlm_result_version=null,
+            smolvlm_inference_at=null,smolvlm_inference_ms=null,smolvlm_owner_override=null,
+            smolvlm_owner_decided_at=null,smolvlm_owner_decided_by=null,
+            visual_match_result=null,visual_match_result_version=null,visual_match_inference_at=null,
+            updated_at=now() where id=%s""",(asset_uuid,))
+        audit_media_action(conn,actor,"MEDIA_AI_RESULTS_CLEARED",asset_id,{})
+        conn.commit()
+    return {"ok":True,"assetId":asset_id}
 
 @app.patch("/api/admin/media/{asset_id}/open-world-decision")
 def media_open_world_decision(asset_id:str,request:Request,payload:dict):
@@ -659,7 +728,10 @@ def media_open_world_decision(asset_id:str,request:Request,payload:dict):
     with db() as conn:
         row=conn.execute("select id,product_legacy_id,filename from media_assets where id=%s",(asset_uuid,)).fetchone()
         if not row: raise HTTPException(status_code=404,detail="Media asset not found")
-        audit_media_action(conn,actor,"MEDIA_OPEN_WORLD_DECISION",asset_id,{"decision":decision,"aiResult":payload.get("aiResult") or {},"ownerCorrection":payload.get("ownerCorrection") or None,"timestamp":datetime.now(timezone.utc).isoformat()})
+        owner_correction=payload.get("ownerCorrection") if isinstance(payload.get("ownerCorrection"),dict) else None
+        conn.execute("""update media_assets set smolvlm_owner_override=%s,smolvlm_owner_decided_at=%s,smolvlm_owner_decided_by=%s,updated_at=now() where id=%s""",
+                     (json.dumps(owner_correction) if owner_correction else None,datetime.now(timezone.utc),uuid.UUID(actor["sub"]),asset_uuid))
+        audit_media_action(conn,actor,"MEDIA_OPEN_WORLD_DECISION",asset_id,{"decision":decision,"aiResult":payload.get("aiResult") or {},"ownerCorrection":owner_correction,"timestamp":datetime.now(timezone.utc).isoformat()})
         conn.commit()
     return {"ok":True,"status":decision,"assetId":asset_id}
 
