@@ -107,6 +107,7 @@ async function enrichOpenWorldSuggestions(targetIds=null){
       const index=cursor++;
       if(index>=targets.length||run!==openWorldRun)return;
       const asset=targets[index];
+      updateOpenWorldStatus({message:"WebGPU processing "+(index+1)+"/"+targets.length+" · "+asset.filename,state:"ready"});
       try{
         const result=await identifyAssetOpenWorld(asset);
         if(run!==openWorldRun)return;
