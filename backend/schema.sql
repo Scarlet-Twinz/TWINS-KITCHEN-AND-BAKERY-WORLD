@@ -253,6 +253,7 @@ alter table media_assets add column if not exists smolvlm_result_version text;
 alter table media_assets add column if not exists smolvlm_inference_at timestamptz;
 alter table media_assets add column if not exists smolvlm_inference_ms integer;
 alter table media_assets add column if not exists smolvlm_owner_override jsonb;
+alter table media_assets add column if not exists smolvlm_owner_decision text;
 alter table media_assets add column if not exists smolvlm_owner_decided_at timestamptz;
 alter table media_assets add column if not exists smolvlm_owner_decided_by uuid references users(id);
 alter table media_assets add column if not exists visual_match_result jsonb;
