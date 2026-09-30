@@ -99,7 +99,7 @@ async function enrichOpenWorldSuggestions(targetIds=null){
     updateOpenWorldStatus({message:"Unavailable — start the local SmolVLM service on port 8787",state:"unavailable"});
     return false;
   }
-  updateOpenWorldStatus({message:"Ready — SmolVLM-500M-Instruct local ONNX service",state:"ready"});
+  updateOpenWorldStatus({message:health.message||("Ready — "+(health.mode==="webgpu"?"SmolVLM WebGPU local inference":"SmolVLM local CPU fallback")),state:"ready"});
   const targets=assets.filter(a=>!a.productId&&!a.smolvlmResult&&(!allowedIds||allowedIds.has(String(a.id)))&&(!a.suggestionStatus||a.suggestionStatus==="UNRESOLVED"));
   let cursor=0;
   const worker=async()=>{
