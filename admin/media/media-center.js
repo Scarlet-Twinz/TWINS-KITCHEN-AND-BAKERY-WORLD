@@ -771,20 +771,23 @@ $("refresh").addEventListener("click",async()=>{
   finally{button.disabled=false;button.textContent="Refresh queue"}
 });
 (async()=>{
+  const boot=$("boot"),locked=$("locked"),app=$("app");
   try{
     const d=await api("/api/account/me");
-    if(d.user.role!=="owner")throw new Error("Owner access required");
+    if(!d?.user||d.user.role!=="owner")throw new Error("Owner access required");
     $("identity").textContent=d.user.name+" · OWNER";
     renderBatchProgress(loadBatchProgress());
-    $("locked").classList.add("hidden");
-    $("app").classList.remove("hidden");
+    if(boot)boot.classList.add("hidden");
+    locked.classList.add("hidden");
+    app.classList.remove("hidden");
     try{await refresh();}catch(e){setQueueFeedback((e.status?"HTTP "+e.status+": ":"")+e.message,"error");}
     try{await loadCandidates();}catch(e){const node=$("candidateFeedback");if(node){node.className="operation-feedback error";node.textContent=(e.status?"HTTP "+e.status+": ":"")+e.message;}}
   }catch(e){
-    $("app").classList.add("hidden");
-    $("locked").classList.remove("hidden");
-    const message=$("loginStateMessage")||$("locked").querySelector?.("p");
-    if(message&&e?.status!==401)message.textContent=(e.status?"HTTP "+e.status+": ":"")+String(e?.message||e);
+    app.classList.add("hidden");
+    if(boot)boot.classList.add("hidden");
+    locked.classList.remove("hidden");
+    const message=$("loginStateMessage")||locked.querySelector?.("p");
+    if(message)message.textContent=e?.status===401?"Please sign in as the OWNER to access the Media Center.":(e.status?"HTTP "+e.status+": ":"")+String(e?.message||e);
   }
 })();
 document.getElementById("refreshCandidates")?.addEventListener("click",async()=>{const button=document.getElementById("refreshCandidates");button.disabled=true;button.textContent="Refreshing…";try{await loadCandidates();}catch{}finally{button.disabled=false;button.textContent="Refresh candidates";}});
