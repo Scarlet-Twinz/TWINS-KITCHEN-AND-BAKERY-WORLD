@@ -146,16 +146,20 @@
     return{available:true,...data.result};
   }
 
+  async function probeWebGPU(){
+    if(!navigator.gpu)return null;
+    for(let attempt=0;attempt<3;attempt++){
+      const adapter=await navigator.gpu.requestAdapter({powerPreference:"high-performance"}).catch(()=>null);
+      if(adapter)return adapter;
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    return null;
+  }
+
   async function available(){
-    if(availabilityPromise)return availabilityPromise;
-    availabilityPromise=(async()=>{
-      if(!navigator.gpu)return{
-        available:false,
-        mode:"cpu-fallback",
-        error:"WebGPU is not available in this browser."
-      };
-      const adapter=await navigator.gpu.requestAdapter().catch(()=>null);
-      if(adapter)return{
+    const adapter=await probeWebGPU();
+    if(adapter){
+      return{
         available:true,
         mode:"webgpu",
         model:MODEL_ID,
@@ -163,21 +167,22 @@
         modelPath:MODEL_BASE,
         message:"WebGPU available — SmolVLM loads locally on first inference."
       };
-      const cpu=await cpuAvailable();
-      if(cpu.available)return{
-        available:true,
-        mode:"cpu-fallback",
-        model:cpu.model||MODEL_ID,
-        modelVersion:cpu.modelVersion||"SmolVLM-500M-Instruct / ONNX q4",
-        message:"WebGPU adapter unavailable — local CPU fallback available."
-      };
-      return{
-        available:false,
-        mode:"unavailable",
-        error:"Neither browser WebGPU nor the local SmolVLM CPU service is available."
-      };
-    })().catch(error=>({available:false,error:String(error?.message||error)}));
-    return availabilityPromise;
+    }
+    const cpu=await cpuAvailable();
+    if(cpu.available)return{
+      available:true,
+      mode:"cpu-fallback",
+      model:cpu.model||MODEL_ID,
+      modelVersion:cpu.modelVersion||"SmolVLM-500M-Instruct / ONNX q4",
+      message:"WebGPU adapter unavailable — local CPU fallback available."
+    };
+    return{
+      available:false,
+      mode:"unavailable",
+      error:navigator.gpu
+        ?"WebGPU is present but no adapter could be obtained after retrying."
+        :"Neither browser WebGPU nor the local SmolVLM CPU service is available."
+    };
   }
 
   async function analyze(blob,filename){
