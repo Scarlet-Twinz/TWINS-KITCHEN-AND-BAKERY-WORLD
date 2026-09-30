@@ -54,12 +54,30 @@ create index if not exists idx_media_product_candidates_status on media_product_
 def migrate_owner_role(conn):
     conn.execute(OWNER_ROLE_MIGRATION_SQL)
 
+AI_RESULT_MIGRATION_SQL="""
+alter table media_assets add column if not exists smolvlm_result jsonb;
+alter table media_assets add column if not exists smolvlm_result_version text;
+alter table media_assets add column if not exists smolvlm_inference_at timestamptz;
+alter table media_assets add column if not exists smolvlm_inference_ms integer;
+alter table media_assets add column if not exists smolvlm_owner_override jsonb;
+alter table media_assets add column if not exists smolvlm_owner_decision text;
+alter table media_assets add column if not exists smolvlm_owner_decided_at timestamptz;
+alter table media_assets add column if not exists smolvlm_owner_decided_by uuid references users(id);
+alter table media_assets add column if not exists visual_match_result jsonb;
+alter table media_assets add column if not exists visual_match_result_version text;
+alter table media_assets add column if not exists visual_match_inference_at timestamptz;
+"""
+
 def migrate_media_center(conn):
     conn.execute(MEDIA_CENTER_MIGRATION_SQL)
+
+def migrate_ai_results(conn):
+    conn.execute(AI_RESULT_MIGRATION_SQL)
 
 def migrate_all(conn):
     migrate_owner_role(conn)
     migrate_media_center(conn)
+    migrate_ai_results(conn)
 
 if __name__=="__main__":
     if not DATABASE_URL:
