@@ -91,7 +91,7 @@ test("Media Center uses ONNX vision embeddings, persistent indexing, background 
   assert.match(source,/buildReferenceIndex/);
   assert.match(source,/embeddingForBlob/);
   assert.match(source,/evaluateVisualMatch/);
-  assert.match(source,/void enrichVisualSuggestions\(\)/);
+  assert.match(source,/enrichVisualSuggestions\(targetIds=null\)/);
   assert.match(source,/function selectCatalogueProduct\(/);
   assert.match(source,/confirmSuggestedProduct/);
   assert.match(source,/markNewProductCandidate/);
