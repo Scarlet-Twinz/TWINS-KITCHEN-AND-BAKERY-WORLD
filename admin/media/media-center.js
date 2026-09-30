@@ -142,7 +142,7 @@ async function enrichOpenWorldSuggestions(targetIds=null){
       }
     }
   };
-  await Promise.all([worker(),worker()]);
+  await worker();
   return true;
 }
 
