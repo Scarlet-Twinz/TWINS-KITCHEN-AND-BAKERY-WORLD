@@ -129,3 +129,67 @@ test("candidate queue endpoint and local development CORS are present",()=>{
   assert.match(backend,/allow_origin_regex/);
   assert.match(backend,/require_owner\(request\)/);
 });
+
+test("SmolVLM result persistence is server-authoritative",()=>{
+  assert.match(backend,/smolvlm_result jsonb/);
+  assert.match(backend,/MEDIA_AI_RESULT_PERSISTED/);
+  assert.match(backend,/\/api\/admin\/media\/\{asset_id\}\/ai-result/);
+  assert.match(center,/kind:"smolvlm"/);
+});
+
+test("Media API hydrates persisted SmolVLM results",()=>{
+  assert.match(backend,/smolvlmResult/);
+  assert.match(center,/a\.smolvlmResult/);
+  assert.match(center,/a\.openWorldResult=\{\.\.\.a\.smolvlmResult\}/);
+});
+
+test("normal queue refresh does not invoke AI inference",()=>{
+  assert.match(center,/async function refresh\(showFeedback=false,options=\{\}\)/);
+  assert.match(center,/const runInference=options\.runInference===true/);
+  assert.match(center,/if\(runInference\)/);
+  assert.doesNotMatch(center,/async function refresh\(showFeedback=false\)[\\s\\S]*void enrichVisualSuggestions\(\);[\\s\\S]*void enrichOpenWorldSuggestions\(\);/);
+});
+
+test("explicit Revalidate clears persisted AI results and then reruns inference",()=>{
+  assert.match(center,/\/ai-results.*DELETE/);
+  assert.match(center,/refresh\(false,\{runInference:true,targetIds:\[id\]\}\)/);
+});
+
+test("candidate refresh does not invoke inference",()=>{
+  assert.match(center,/async function loadCandidates\(\)/);
+  assert.match(center,/await api\("/api/admin/media/candidates\?status=PENDING_OWNER")/);
+});
+
+test("owner corrections persist all editable identification fields",()=>{
+  assert.match(center,/ownerCorrection=\{/);
+  assert.match(center,/productName:productName\.trim\(\)/);
+  assert.match(center,/category:category\.trim\(\)/);
+  assert.match(center,/description:description\.trim\(\)/);
+  assert.match(center,/visibleAttributes:attributes\.split/);
+  assert.match(backend,/smolvlm_owner_override jsonb/);
+});
+
+test("original AI evidence remains separate from owner correction",()=>{
+  assert.match(backend,/smolvlm_result=%s/);
+  assert.match(backend,/smolvlm_owner_override=%s/);
+  assert.match(center,/original AI result remains preserved/);
+});
+
+test("SmolVLM uses a compact generation budget and exposes timing telemetry",()=>{
+  assert.match(server,/max_new_tokens:64/);
+  assert.match(server,/modelLoadMs/);
+  assert.match(server,/preprocessMs/);
+  assert.match(server,/generationMs/);
+  assert.match(server,/decodeMs/);
+  assert.match(server,/generatedTokens/);
+});
+
+test("upload-time processing explicitly opts into inference",()=>{
+  assert.match(center,/refresh\(false,\{runInference:true\}\)/);
+});
+
+test("persisted visual catalogue results prevent repeated MobileCLIP inference",()=>{
+  assert.match(backend,/visual_match_result jsonb/);
+  assert.match(center,/!a\.visualMatchResult/);
+  assert.match(center,/kind:"visual"/);
+});
