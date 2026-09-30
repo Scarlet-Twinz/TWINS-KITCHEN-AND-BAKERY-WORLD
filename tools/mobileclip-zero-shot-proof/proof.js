@@ -1,12 +1,4 @@
-import {
-  AutoTokenizer,
-  CLIPTextModelWithProjection,
-  AutoProcessor,
-  CLIPVisionModelWithProjection,
-  RawImage,
-  dot,
-  softmax
-} from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
+import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
 
 const MODEL="Xenova/mobileclip_s0";
 const statusEl=document.getElementById("status");
@@ -16,58 +8,30 @@ const labelsEl=document.getElementById("labels");
 const runEl=document.getElementById("run");
 const clearEl=document.getElementById("clear");
 
-let runtime=null;
-let textEmbeddings=null;
-let textLabels=[];
+let classifier=null;
 
 function status(message){statusEl.textContent=message;}
 
-function normalize(values){
-  const a=Array.from(values||[],Number);
-  let n=0; for(const x of a)n+=x*x; n=Math.sqrt(n);
-  return n?a.map(x=>x/n):a;
+function progress(info){
+  const name=String(info?.file||info?.name||"model file");
+  const pct=Number(info?.progress);
+  if(Number.isFinite(pct)){
+    status("Loading MobileCLIP… "+Math.round(pct)+"%\n"+name);
+  }else{
+    status("Loading MobileCLIP…\n"+name);
+  }
 }
 
-async function loadRuntime(){
-  if(runtime)return runtime;
+async function loadClassifier(){
+  if(classifier)return classifier;
   if(!navigator.gpu)throw new Error("WebGPU is unavailable in this browser.");
-  status("Loading MobileCLIP tokenizer + text encoder + vision encoder locally…");
-  const tokenizer=await AutoTokenizer.from_pretrained(MODEL);
-  const processor=await AutoProcessor.from_pretrained(MODEL);
-  const textModel=await CLIPTextModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp32"});
-  const visionModel=await CLIPVisionModelWithProjection.from_pretrained(MODEL,{device:"webgpu",dtype:"fp32"});
-  runtime={tokenizer,processor,textModel,visionModel};
-  status("MobileCLIP loaded. Building text concept embeddings…");
-  return runtime;
-}
-
-async function buildTextEmbeddings(labels){
-  if(textEmbeddings && labels.join("\n")===textLabels.join("\n"))return textEmbeddings;
-  const r=await loadRuntime();
-  const prompts=labels.map(x=>"a photo of "+x);
-  const inputs=r.tokenizer(prompts,{padding:"max_length",truncation:true});
-  const out=await r.textModel(inputs);
-  const rows=out.text_embeds.tolist();
-  textLabels=labels.slice();
-  textEmbeddings=rows.map(normalize);
-  return textEmbeddings;
-}
-
-async function imageEmbedding(file){
-  const r=await loadRuntime();
-  const image=await RawImage.fromBlob(file);
-  const inputs=await r.processor(image);
-  const out=await r.visionModel(inputs);
-  const row=out.image_embeds.normalize().tolist()[0];
-  return normalize(row);
-}
-
-function rank(imageVector,textVectors,labels){
-  const logits=textVectors.map(v=>100*dot(imageVector,v));
-  const probabilities=softmax(logits);
-  return labels.map((label,i)=>({label,score:logits[i],probability:probabilities[i]}))
-    .sort((a,b)=>b.score-a.score)
-    .slice(0,5);
+  status("Starting MobileCLIP zero-shot classifier…\nThe first run downloads the model into the browser cache. This can take time.");
+  classifier=await pipeline("zero-shot-image-classification",MODEL,{
+    device:"webgpu",
+    progress_callback:progress
+  });
+  status("MobileCLIP loaded. Ready to test a real image.");
+  return classifier;
 }
 
 function render(file,rows,index,total){
@@ -77,7 +41,7 @@ function render(file,rows,index,total){
   card.innerHTML='<img class="thumb" src="'+url+'" alt="">'+
     '<h3>'+escapeHtml(file.name)+'</h3>'+
     '<p class="muted">Image '+index+' of '+total+'</p>'+
-    rows.map((r,i)=>'<div class="rank"><span><b>'+((i+1)+". "+escapeHtml(r.label))+'</b></span><span class="score">similarity '+r.score.toFixed(3)+' · relative '+(r.probability*100).toFixed(1)+'%</span></div>').join("");
+    rows.map((r,i)=>'<div class="rank"><span><b>'+((i+1)+". "+escapeHtml(r.label))+'</b></span><span class="score">score '+Number(r.score).toFixed(4)+'</span></div>').join("");
   resultsEl.appendChild(card);
 }
 
@@ -91,17 +55,17 @@ runEl.onclick=async()=>{
   runEl.disabled=true;
   resultsEl.innerHTML="";
   try{
-    const r=await loadRuntime();
-    await buildTextEmbeddings(labels);
+    const classifier=await loadClassifier();
     for(let i=0;i<files.length;i++){
-      status("Analyzing image "+(i+1)+"/"+files.length+" — "+files[i].name+"\nOne image at a time; no catalogue matching is being used.");
-      const vector=await imageEmbedding(files[i]);
-      const rows=rank(vector,textEmbeddings,textLabels);
+      status("Analyzing image "+(i+1)+"/"+files.length+" — "+files[i].name+"\nNo catalogue matching is being used.");
+      const output=await classifier(files[i],labels);
+      const rows=Array.isArray(output)?output.slice(0,5):[output];
       render(files[i],rows,i+1,files.length);
     }
-    status("PROOF COMPLETE — "+files.length+" image(s) analyzed. Inspect the TOP 5 suggestions above. No result was written to the database.");
+    status("PROOF COMPLETE — "+files.length+" image(s) analyzed. No result was written to the database.");
   }catch(error){
     console.error(error);
+    classifier=null;
     status("PROOF FAILED\n"+(error?.stack||error));
   }finally{runEl.disabled=false;}
 };
