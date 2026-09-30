@@ -107,8 +107,8 @@ test("SmolVLM parser repairs simple trailing-comma JSON",()=>{
 });
 
 test("Media Center keeps open-world processing independent from MobileCLIP",()=>{
-  assert.match(center,/void enrichVisualSuggestions\(\);/);
-  assert.match(center,/void enrichOpenWorldSuggestions\(\);/);
+  assert.match(center,/enrichVisualSuggestions\(targetIds=null\)/);
+  assert.match(center,/enrichOpenWorldSuggestions\(targetIds=null\)/);
   assert.match(center,/assets\.filter\(a=>!a\.productId\)/);
   assert.match(center,/data-open-world-action/);
 });
