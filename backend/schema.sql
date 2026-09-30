@@ -245,3 +245,16 @@ create table if not exists media_product_candidates (
  updated_at timestamptz not null default now()
 );
 create index if not exists idx_media_product_candidates_status on media_product_candidates(status,created_at desc);
+
+
+-- Persistent local AI results for the private Owner Media Center.
+alter table media_assets add column if not exists smolvlm_result jsonb;
+alter table media_assets add column if not exists smolvlm_result_version text;
+alter table media_assets add column if not exists smolvlm_inference_at timestamptz;
+alter table media_assets add column if not exists smolvlm_inference_ms integer;
+alter table media_assets add column if not exists smolvlm_owner_override jsonb;
+alter table media_assets add column if not exists smolvlm_owner_decided_at timestamptz;
+alter table media_assets add column if not exists smolvlm_owner_decided_by uuid references users(id);
+alter table media_assets add column if not exists visual_match_result jsonb;
+alter table media_assets add column if not exists visual_match_result_version text;
+alter table media_assets add column if not exists visual_match_inference_at timestamptz;
