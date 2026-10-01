@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Twins Candidate Engine Proof</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:32px;background:#f6f8fb;color:#172033}
+h1{margin-bottom:8px}.muted{color:#667085}.panel{background:#fff;border:1px solid #d9e0ea;border-radius:14px;padding:18px;margin:16px 0}
+button{padding:11px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:700}button:disabled{opacity:.5;cursor:not-allowed}
+#run{background:#172033;color:#fff}.status{white-space:pre-wrap;font-family:ui-monospace,monospace;background:#101828;color:#e6edf5;padding:14px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.thumb{width:100%;max-height:360px;object-fit:contain;background:#eef2f6;border-radius:10px}
+.rank{display:flex;justify-content:space-between;gap:12px;border-top:1px solid #eaecf0;padding:12px 0}.score{font-family:ui-monospace,monospace;font-weight:700}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef4ff;font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+<h1>Twins Candidate Engine — isolated proof</h1>
+<p class="muted">Dynamic visual evidence proof. It does not assign Product IDs, write the application database, modify Media Center, or use a hand-authored product vocabulary.</p>
+<div class="panel">
+  <p><strong>Pipeline:</strong> uploaded image → MobileCLIP image embedding → dynamically discovered local catalogue reference photos → per-product visual evidence → ranked candidates.</p>
+  <p id="catalogue">Catalogue: not loaded.</p>
+  <p><span class="badge">No LFM2.5-VL</span> <span class="badge">No Tavily</span> <span class="badge">No Brave</span> <span class="badge">No hardcoded Product IDs</span></p>
+  <input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+  <button id="run" disabled>Run Candidate Engine</button>
+</div>
+<div class="panel"><div id="status" class="status">Loading proof…</div></div>
+<div id="results" class="grid"></div>
+<script src="../../admin/media/media-visual-matcher.js"></script>
+<script src="./proof.js"></script>
+</body>
+</html>
