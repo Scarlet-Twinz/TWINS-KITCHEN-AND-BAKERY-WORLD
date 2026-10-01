@@ -16,9 +16,10 @@ img{max-width:320px;max-height:260px;display:block;margin:10px 0;border-radius:8
 <body>
 <h1>LFM2.5-VL — Open-World Proof</h1>
 <p>This is an isolated proof. It does not read the catalogue, assign Product IDs, write the database, or modify Media Center.</p>
+<p><strong>Local model:</strong> run <code>./download-model.ps1</code> once from this folder before opening this page. Model weights are served by localhost, not downloaded by the browser from Hugging Face.</p>
 <input id="files" type="file" accept="image/*" multiple>
 <button id="run" disabled>Analyze selected images</button>
-<div id="status">Loading model…</div>
+<div id="status">Loading local model…</div>
 <div id="results"></div>
 <script type="module" src="./proof.js"></script>
 </body>
