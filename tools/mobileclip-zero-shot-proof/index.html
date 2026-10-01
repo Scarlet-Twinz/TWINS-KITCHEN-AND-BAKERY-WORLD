@@ -17,7 +17,7 @@ button{border:0;border-radius:9px;padding:10px 15px;cursor:pointer;margin-right:
 <p class="muted">Isolated experiment. This does not modify the Media Center. Upload real unresolved Twins photos and see whether MobileCLIP can suggest product types it has never matched by catalogue image.</p>
 <div class="panel">
 <label><b>Product-type concepts</b></label>
-<p class="muted">One concept per line. Start with these; edit them if a real photo needs a different concept.</p>
+<p class="muted">One concept per line. The text concepts are encoded once, then reused for every selected image. This proof does not use SmolVLM.</p>
 <textarea id="labels">commercial planetary mixer
 commercial spiral dough mixer
 commercial dough mixer
@@ -62,7 +62,7 @@ commercial bakery equipment</textarea>
 <div class="panel">
 <input id="files" type="file" accept="image/*" multiple>
 <br><br>
-<button class="primary" id="run">Run proof on selected images</button>
+<button class="primary" id="run">Run MobileCLIP proof</button>
 <button class="secondary" id="clear">Clear results</button>
 <p id="status" class="muted">Waiting for images.</p>
 </div>
