@@ -68,7 +68,7 @@ async function loadRuntime(){
     const textModel=await CLIPTextModelWithProjection.from_pretrained(MODEL,{
       ...common,
       device,
-      dtype:"q8",
+      dtype:"int8",
       progress_callback:progress
     });
     const visionModel=await CLIPVisionModelWithProjection.from_pretrained(MODEL,{
@@ -77,7 +77,7 @@ async function loadRuntime(){
       dtype:"fp32",
       progress_callback:progress
     });
-    status("MobileCLIP loaded. Ready.\nRuntime: "+(hasWebGPU?"WebGPU":"CPU/WASM")+"\nText: q8 · Vision: fp32");
+    status("MobileCLIP loaded. Ready.\nRuntime: "+(hasWebGPU?"WebGPU":"CPU/WASM")+"\nText: int8 · Vision: fp32");
     return{tokenizer,processor,textModel,visionModel,device};
   })().catch(error=>{runtimePromise=null;throw error;});
   return runtimePromise;
