@@ -61,13 +61,23 @@ async function loadRuntime(){
     const common={revision:REVISION};
     const tokenizer=await AutoTokenizer.from_pretrained(MODEL,common);
     const processor=await AutoProcessor.from_pretrained(MODEL,common);
+    // MobileCLIP exposes separate ONNX towers. The current repository has
+    // text_model_int8/text_model_q4/... and vision_model.onnx/...; asking the
+    // text tower for an unspecified dtype makes Transformers.js look for the
+    // generic model.onnx, which does not exist here.
     const textModel=await CLIPTextModelWithProjection.from_pretrained(MODEL,{
-      ...common,device,dtype,progress_callback:progress
+      ...common,
+      device,
+      dtype:"q8",
+      progress_callback:progress
     });
     const visionModel=await CLIPVisionModelWithProjection.from_pretrained(MODEL,{
-      ...common,device,dtype,progress_callback:progress
+      ...common,
+      device,
+      dtype:"fp32",
+      progress_callback:progress
     });
-    status("MobileCLIP loaded. Ready.\nRuntime: "+(hasWebGPU?"WebGPU":"CPU/WASM"));
+    status("MobileCLIP loaded. Ready.\nRuntime: "+(hasWebGPU?"WebGPU":"CPU/WASM")+"\nText: q8 · Vision: fp32");
     return{tokenizer,processor,textModel,visionModel,device};
   })().catch(error=>{runtimePromise=null;throw error;});
   return runtimePromise;
