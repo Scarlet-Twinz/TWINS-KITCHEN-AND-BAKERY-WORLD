@@ -4,7 +4,7 @@ import {
   RawImage,
 } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm";
 
-const MODEL_ID = "LiquidAI/LFM2.5-VL-450M-ONNX";
+const MODEL_ID = "onnx-community/LFM2.5-VL-450M-ONNX";
 const statusEl = document.querySelector("#status");
 const runButton = document.querySelector("#run");
 const filesEl = document.querySelector("#files");
@@ -24,14 +24,14 @@ async function main(){
   if (!adapter) throw new Error("No WebGPU adapter was returned.");
 
   setStatus("WebGPU available. Loading LFM2.5-VL-450M…\nFirst load downloads the model files into the browser cache.");
-  processor = await AutoProcessor.from_pretrained(MODEL_ID);
+  processor = await AutoProcessor.from_pretrained(MODEL_ID, { revision: "main" });
 
-  model = await AutoModelForImageTextToText.from_pretrained(MODEL_ID, {
+  model = await AutoModelForImageTextToText.from_pretrained(MODEL_ID, {\n    revision: "main",
     device: "webgpu",
     dtype: {
       vision_encoder: "fp16",
       embed_tokens: "fp16",
-      decoder_model_merged: "q4",
+      decoder_model_merged: "q4f16",
     },
   });
 
