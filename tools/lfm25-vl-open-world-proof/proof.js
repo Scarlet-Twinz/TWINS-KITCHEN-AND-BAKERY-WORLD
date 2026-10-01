@@ -26,7 +26,8 @@ async function main(){
   setStatus("WebGPU available. Loading LFM2.5-VL-450M…\nFirst load downloads the model files into the browser cache.");
   processor = await AutoProcessor.from_pretrained(MODEL_ID, { revision: "main" });
 
-  model = await AutoModelForImageTextToText.from_pretrained(MODEL_ID, {\n    revision: "main",
+  model = await AutoModelForImageTextToText.from_pretrained(MODEL_ID, {
+    revision: "main",
     device: "webgpu",
     dtype: {
       vision_encoder: "fp16",
