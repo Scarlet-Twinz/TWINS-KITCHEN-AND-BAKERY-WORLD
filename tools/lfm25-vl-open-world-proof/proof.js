@@ -30,9 +30,9 @@ async function main(){
     revision: "main",
     device: "webgpu",
     dtype: {
-      vision_encoder: "fp16",
-      embed_tokens: "fp16",
-      decoder_model_merged: "q4f16",
+      vision_encoder: "fp32",
+      embed_tokens: "fp32",
+      decoder_model_merged: "q4",
     },
   });
 
