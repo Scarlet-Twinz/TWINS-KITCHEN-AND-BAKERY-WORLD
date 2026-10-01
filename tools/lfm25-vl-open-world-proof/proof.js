@@ -1,10 +1,11 @@
 import {
+  env,
   AutoProcessor,
   AutoModelForImageTextToText,
   RawImage,
 } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm";
 
-const MODEL_ID = "onnx-community/LFM2.5-VL-450M-ONNX";
+const MODEL_PATH = "./model";
 const statusEl = document.querySelector("#status");
 const runButton = document.querySelector("#run");
 const filesEl = document.querySelector("#files");
@@ -20,23 +21,31 @@ async function main(){
   setStatus("Checking WebGPU…");
   if (!navigator.gpu) throw new Error("WebGPU is unavailable in this browser.");
 
-  const adapter = await navigator.gpu.requestAdapter({powerPreference:"high-performance"});
+  const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) throw new Error("No WebGPU adapter was returned.");
 
-  setStatus("WebGPU available. Loading LFM2.5-VL-450M…\nFirst load downloads the model files into the browser cache.");
-  processor = await AutoProcessor.from_pretrained(MODEL_ID, { revision: "main" });
+  env.allowLocalModels = true;
+  env.allowRemoteModels = false;
+  env.localModelPath = MODEL_PATH + "/";
 
-  model = await AutoModelForImageTextToText.from_pretrained(MODEL_ID, {
-    revision: "main",
+  setStatus("WebGPU available. Loading LFM2.5-VL from local files…");
+  processor = await AutoProcessor.from_pretrained(MODEL_PATH, { local_files_only: true });
+
+  model = await AutoModelForImageTextToText.from_pretrained(MODEL_PATH, {
+    local_files_only: true,
     device: "webgpu",
     dtype: {
-      vision_encoder: "fp32",
-      embed_tokens: "fp32",
+      vision_encoder: "q4",
+      embed_tokens: "q4",
       decoder_model_merged: "q4",
     },
   });
 
-  setStatus(`READY — LFM2.5-VL loaded locally in ${((performance.now()-started)/1000).toFixed(1)}s.\nNo external inference API. Select real product photos and run the proof.`);
+  setStatus(
+    `READY — LFM2.5-VL loaded locally in ${((performance.now()-started)/1000).toFixed(1)}s.
+No Hugging Face model-weight downloads are used by this proof.
+Select real product photos and run the proof.`
+  );
   runButton.disabled = false;
 }
 
@@ -86,7 +95,9 @@ runButton.addEventListener("click",async()=>{
     resultsEl.append(card);
     try{
       const out=await analyze(file);
-      result.textContent=`${out.text}\n\nInference time: ${out.seconds.toFixed(1)}s`;
+      result.textContent=`${out.text}
+
+Inference time: ${out.seconds.toFixed(1)}s`;
     }catch(error){
       result.textContent=`FAILED: ${error?.stack || error}`;
     }
@@ -95,5 +106,7 @@ runButton.addEventListener("click",async()=>{
 });
 
 main().catch(error=>{
-  setStatus(`MODEL FAILED\n\n${error?.stack || error}`);
+  setStatus(`MODEL FAILED
+
+${error?.stack || error}`);
 });
