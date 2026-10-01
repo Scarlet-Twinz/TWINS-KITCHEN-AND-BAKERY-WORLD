@@ -87,7 +87,7 @@ async function buildIndex(){
     }));
     const result=await matcher.buildReferenceIndex(
       products,
-      product=>({url:product.reference,referenceAssetId:product.id}),
+      product=>[{url:product.reference,referenceAssetId:product.id}],
       progress=>{completed=progress.completed;status("Building visual reference index… "+completed+"/"+progress.total+" products · "+progress.usable+" usable references.");},
       info=>{if(info?.message)status(info.message);},
       {indexVersion:2,embeddingVersion:1}
