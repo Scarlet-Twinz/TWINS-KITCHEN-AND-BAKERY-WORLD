@@ -26,7 +26,7 @@ async function loadCatalogue(){
     const text=await response.text();
 
     const products=[];
-    const productRe=/\{id:(\d+),n:"((?:\\\\.|[^"\\\\])*)",c:"((?:\\\\.|[^"\\\\])*)",p:([^,]+),i:"((?:\\\\.|[^"\\\\])*)"/g;
+    const productRe=/\\{id:(\\d+),n:"((?:\\.|[^"\\])*)",c:"((?:\\.|[^"\\])*)",p:([^,]+),i:"((?:\\.|[^"\\])*)"/g;
     let match;
     while((match=productRe.exec(text))){
       products.push({
@@ -42,7 +42,7 @@ async function loadCatalogue(){
     const overrides=new Map();
     if(overrideStart>=0&&overrideEnd>overrideStart){
       const block=text.slice(overrideStart,overrideEnd);
-      const overrideRe=/"(\d+)":"((?:\\\\.|[^"\\\\])*)"/g;
+      const overrideRe=/"(\d+)":"((?:\\.|[^"\\])*)"/g;
       while((match=overrideRe.exec(block)))overrides.set(Number(match[1]),decodeJsString(match[2]).trim());
     }
 
