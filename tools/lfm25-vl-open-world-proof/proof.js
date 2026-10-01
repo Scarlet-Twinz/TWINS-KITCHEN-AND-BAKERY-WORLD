@@ -2,7 +2,7 @@ import {
   AutoProcessor,
   AutoModelForImageTextToText,
   RawImage,
-} from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.1/+esm";
+} from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm";
 
 const MODEL_ID = "onnx-community/LFM2.5-VL-450M-ONNX";
 const statusEl = document.querySelector("#status");
