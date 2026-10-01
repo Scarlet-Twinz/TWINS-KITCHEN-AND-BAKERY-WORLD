@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Florence-2 — Open-World Proof</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:1100px;margin:40px auto;padding:0 20px;line-height:1.5}
+    .note{padding:14px 16px;background:#f3f4f6;border-radius:10px;margin:16px 0}
+    .status{padding:12px;border-radius:8px;background:#eef2ff;white-space:pre-wrap}
+    button,input{font:inherit}
+    button{padding:10px 16px;cursor:pointer}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:18px 0}
+    img{display:block;max-width:100%;max-height:420px;margin:12px 0;border-radius:8px}
+    .result{white-space:pre-wrap}
+    code{background:#f3f4f6;padding:2px 5px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>Florence-2 — Open-World Proof</h1>
+  <p>This is an isolated proof for visual understanding of products that may not exist in the catalogue.</p>
+  <div class="note">
+    <strong>Not catalogue-driven.</strong>
+    This proof does not read <code>data.js</code>, does not receive Product IDs, does not use a fixed product-name vocabulary, does not write the database, and does not modify Media Center.
+  </div>
+  <p><strong>Local model:</strong> run <code>./download-model.ps1</code> once from this folder before opening this page.</p>
+  <div id="status" class="status">Checking model…</div>
+  <p><input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple></p>
+  <button id="run" disabled>Analyze images</button>
+  <div id="results"></div>
+  <script type="module" src="./proof.js"></script>
+</body>
+</html>
