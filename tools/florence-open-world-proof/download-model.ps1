@@ -1,7 +1,8 @@
 $ErrorActionPreference = "Stop"
 
 $ModelDir = Join-Path $PSScriptRoot "model"
-$Base = "https://huggingface.co/onnx-community/Florence-2-base-ft/resolve/main"
+# Pin to a verified Florence-2-base-ft revision so the proof is reproducible.
+$Base = "https://huggingface.co/onnx-community/Florence-2-base-ft/resolve/1e91efa03c8accf81a8505f50668ad358b23ec7c"
 
 $Files = @(
   "config.json",
@@ -31,7 +32,7 @@ foreach ($Relative in $Files) {
     continue
   }
 
-  $Url = "$Base/$Relative?download=true"
+  $Url = "$Base/$Relative"
   Write-Host "Downloading: $Relative"
   curl.exe --fail --location --retry 5 --retry-delay 2 --http1.1 --output $Destination $Url
   if ($LASTEXITCODE -ne 0) {
