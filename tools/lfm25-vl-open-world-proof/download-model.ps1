@@ -31,14 +31,27 @@ foreach ($Relative in $Files) {
     continue
   }
 
-  $Url = "$Base/$Relative?download=true"
+  # Hugging Face requires the repo path to be encoded as a single URL path.
+  # Keep the URL free of the ?download=true query because Xet/LFS resolve URLs
+  # can reject that form for repository files.
+  $Url = "$Base/$Relative"
   Write-Host "Downloading: $Relative"
   curl.exe --fail --location --retry 5 --retry-delay 2 --http1.1 --output $Destination $Url
+
   if ($LASTEXITCODE -ne 0) {
+    Remove-Item -Force -ErrorAction SilentlyContinue $Destination
     throw "Download failed: $Relative"
+  }
+
+  $Length = (Get-Item $Destination).Length
+  if ($Length -eq 0) {
+    Remove-Item -Force $Destination
+    throw "Downloaded an empty file: $Relative"
   }
 }
 
 Write-Host ""
 Write-Host "LFM2.5-VL local model is ready:"
-Get-ChildItem -Recurse $ModelDir | Select-Object FullName,Length
+Get-ChildItem -Recurse $ModelDir |
+  Select-Object FullName,Length |
+  Format-Table -AutoSize
