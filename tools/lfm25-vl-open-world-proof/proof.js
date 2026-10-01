@@ -4,7 +4,7 @@ import {
   RawImage,
 } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm";
 
-const MODEL_ID = "onnx-community/LFM2.5-VL-450M-ONNX";
+const MODEL_ID = "LiquidAI/LFM2.5-VL-450M-ONNX";
 const statusEl = document.querySelector("#status");
 const runButton = document.querySelector("#run");
 const filesEl = document.querySelector("#files");
@@ -31,7 +31,7 @@ async function main(){
     dtype: {
       vision_encoder: "fp16",
       embed_tokens: "fp16",
-      decoder_model_merged: "q4f16",
+      decoder_model_merged: "q4",
     },
   });
 
