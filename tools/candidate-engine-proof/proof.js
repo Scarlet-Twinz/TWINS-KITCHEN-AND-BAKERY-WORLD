@@ -26,7 +26,7 @@ async function loadCatalogue(){
     const text=await response.text();
 
     const products=[];
-    const productRe=/\\{id:(\\d+),n:"((?:\\.|[^"\\])*)",c:"((?:\\.|[^"\\])*)",p:([^,]+),i:"((?:\\.|[^"\\])*)"/g;
+    const productRe=/\{id:(\d+),n:"((?:\\.|[^"\\])*)",c:"((?:\\.|[^"\\])*)",p:([^,]+),i:"((?:\\.|[^"\\])*)"/g;
     let match;
     while((match=productRe.exec(text))){
       products.push({
