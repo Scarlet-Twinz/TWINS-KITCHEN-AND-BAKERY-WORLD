@@ -211,7 +211,12 @@ class DeliveryStatusPayload(BaseModel):
     trackingReference:str|None=None
 
 
-@app.on_event("startup")\ndef apply_startup_migrations():\n    try: apply_operations_migration()\n    except Exception as exc: raise RuntimeError(f"Operations migration failed: {exc}")\n\n@app.get("/api/health")
+@app.on_event("startup")
+def apply_startup_migrations():
+    try: apply_operations_migration()
+    except Exception as exc: raise RuntimeError(f"Operations migration failed: {exc}")
+
+@app.get("/api/health")
 def health():
     if not settings.database_url:return {"ok":True,"database":"not-configured","mode":"configuration"}
     try:
