@@ -21,6 +21,7 @@ jobs:
           node --check data.js
           node --check app.js
           node --check admin.js
+          node --check operations.js
           node --check phase3.js
           node --check commerce-ux.js
           node --check marketplace.js
