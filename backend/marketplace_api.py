@@ -117,6 +117,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         priceMode: str = Field(default="on_request")
         price: float | None = Field(default=None,ge=0)
         location: str | None = Field(default=None,max_length=160)
+        mediaRightsAttested: bool = False
 
     class ProfilePayload(BaseModel):
         displayName: str = Field(min_length=2,max_length=120)
@@ -220,6 +221,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         session=require_session(request);uid=uuid.UUID(session["sub"])
         if payload.priceMode not in {"on_request","fixed","negotiable"}: raise HTTPException(status_code=422,detail="Unsupported price mode")
         if payload.priceMode=="fixed" and (payload.price is None or payload.price<=0): raise HTTPException(status_code=422,detail="A fixed-price listing needs a price")
+        if not payload.mediaRightsAttested: raise HTTPException(status_code=422,detail="Media rights confirmation is required")
         if payload.priceMode!="fixed": payload.price=None
         lid=uuid.uuid4()
         with db() as conn:
@@ -234,8 +236,8 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
               and status in ('pending_review','published','paused')""",(seller[0],)).fetchone()[0]
             if int(active_count)>=limit: raise HTTPException(status_code=409,detail=f"Your {plan_name} plan allows {limit} active listings")
             conn.execute("""insert into marketplace_listings
-              (id,seller_id,title,category,description,price_mode,price,location,status)
-              values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review')""",
+              (id,seller_id,title,category,description,price_mode,price,location,status,media_rights_attested_at)
+              values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review',now())""",
               (lid,seller[0],payload.title.strip(),payload.category.strip(),payload.description.strip(),
                payload.priceMode,payload.price,payload.location.strip() if payload.location else None))
             conn.commit()
