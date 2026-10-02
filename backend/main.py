@@ -645,7 +645,9 @@ def _next_catalogue_number(conn):
     return (conn.execute("select coalesce(max(catalogue_number),0)+1 from products").fetchone()[0] or 1)
 
 def _next_order_reference(conn):
-    row=conn.execute("select coalesce(max(cast(substring(reference from 'TK-([0-9]+)
+    value=conn.execute("select nextval('twins_order_reference_seq')").fetchone()[0]
+    return f"TK-{int(value):06d}"
+
 def _category_id(conn,name:str):
     row=conn.execute("select id from categories where lower(name)=lower(%s)",(name.strip(),)).fetchone()
     if row: return row[0]
