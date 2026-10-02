@@ -1,0 +1,24 @@
+-- Operations Admin v1 migration
+create table if not exists operations_schema_migrations (version text primary key, applied_at timestamptz not null default now());
+alter table orders add column if not exists subtotal numeric(14,2) not null default 0;
+alter table orders add column if not exists delivery_fee numeric(14,2) not null default 0;
+alter table orders add column if not exists customer_location text;
+alter table orders add column if not exists internal_notes text;
+alter table orders add column if not exists fulfilment_status text not null default 'pending';
+alter table order_items add column if not exists product_name_snapshot text;
+alter table order_items add column if not exists agreed_unit_price numeric(14,2);
+alter table order_items add column if not exists line_total numeric(14,2);
+update order_items set product_name_snapshot=name where product_name_snapshot is null;
+update order_items set agreed_unit_price=coalesce(unit_amount,0) where agreed_unit_price is null;
+update order_items set line_total=coalesce(agreed_unit_price,0)*quantity where line_total is null;
+alter table payment_transactions add column if not exists order_id uuid references orders(id);
+alter table payment_transactions add column if not exists provider_reference text;
+alter table payment_transactions add column if not exists paid_at timestamptz;
+alter table payment_transactions add column if not exists processed_at timestamptz;
+create unique index if not exists ux_payment_provider_reference on payment_transactions(gateway,provider_reference) where provider_reference is not null;
+create index if not exists idx_payment_transactions_order on payment_transactions(order_id,created_at desc);
+alter table products add column if not exists specifications jsonb not null default '{}'::jsonb;
+alter table products add column if not exists price numeric(14,2);
+alter table products add column if not exists currency text not null default 'NGN';
+alter table products add column if not exists availability_status text not null default 'available';
+insert into operations_schema_migrations(version) values ('001_operations_admin_v1') on conflict (version) do nothing;
