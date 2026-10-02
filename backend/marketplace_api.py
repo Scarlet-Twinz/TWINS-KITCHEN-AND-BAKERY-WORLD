@@ -142,13 +142,29 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
     @router.get("/plans")
     def plans():
         codes = _plan_codes()
+        paid=[]
+        for name,features in (
+            ("Verified Seller",["Higher listing limits","Verified profile badge","Seller analytics"]),
+            ("Promoted Seller",["Verified seller features","Priority placement","Campaign slots"])
+        ):
+            code=codes.get(name)
+            item={"name":name,"billing":"monthly","price":None,"currency":"NGN",
+                  "configured":bool(code and name in _plan_limits()),"features":features}
+            if code and item["configured"]:
+                try:
+                    plan=_paystack("GET","/plan/"+code)
+                    amount=int(plan.get("amount") or 0)
+                    item["price"]=amount/100 if str(plan.get("currency") or "NGN")=="NGN" else amount
+                    item["currency"]=str(plan.get("currency") or "NGN")
+                    item["interval"]=str(plan.get("interval") or "monthly")
+                except HTTPException:
+                    item["configured"]=False
+            paid.append(item)
         return {"plans":[
           {"name":"Community Starter","billing":"free","price":0,"currency":"NGN","configured":True,
            "features":["Up to 3 active listings","Moderation review","Seller profile"]},
-          {"name":"Verified Seller","billing":"monthly","configured":"Verified Seller" in codes and "Verified Seller" in _plan_limits(),
-           "features":["Higher listing limits","Verified profile badge","Seller analytics"]},
-          {"name":"Promoted Seller","billing":"monthly","configured":"Promoted Seller" in codes and "Promoted Seller" in _plan_limits(),
-           "features":["Verified seller features","Priority placement","Campaign slots"]}]}
+          paid[0],paid[1]
+        ]}
 
     @router.get("/listings")
     def public_listings(category:str|None=None,limit:int=50):
