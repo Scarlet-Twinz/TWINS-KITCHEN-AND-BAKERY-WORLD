@@ -1180,7 +1180,6 @@ def intake_product_status(product_id:str,payload:IntakeProductStatusPayload,requ
         write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_status_changed","product",pid,{"status":payload.status})
         conn.commit()
     return {"ok":True,"status":payload.status}
-) as integer)),0)+1 from orders where reference ~ '^TK-[0-9]+
 def _category_id(conn,name:str):
     row=conn.execute("select id from categories where lower(name)=lower(%s)",(name.strip(),)).fetchone()
     if row: return row[0]
@@ -1708,8 +1707,6 @@ def intake_product_status(product_id:str,payload:IntakeProductStatusPayload,requ
         write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_status_changed","product",pid,{"status":payload.status})
         conn.commit()
     return {"ok":True,"status":payload.status}
-").fetchone()
-    return f"TK-{int(row[0] or 1):06d}"
 
 def _category_id(conn,name:str):
     row=conn.execute("select id from categories where lower(name)=lower(%s)",(name.strip(),)).fetchone()
