@@ -803,22 +803,22 @@ def initialize_paystack_payment(order_id:str,request:Request):
     actor=require_admin(request); oid=uuid.UUID(order_id)
     if not settings.paystack_secret_key: raise HTTPException(status_code=503,detail="PAYSTACK_SECRET_KEY is not configured")
     with db() as conn:
-        order=conn.execute("select id,reference,total_amount,currency,customer_name,customer_email,customer_phone,payment_status from orders where id=%s for update",(oid,)).fetchone()
+        order=conn.execute("select id,user_id,reference,total_amount,currency,customer_name,customer_email,customer_phone,payment_status from orders where id=%s for update",(oid,)).fetchone()
         if not order: raise HTTPException(status_code=404,detail="Order not found")
-        if order[7]=="paid": raise HTTPException(status_code=409,detail="Order is already paid")
-        if not order[5]: raise HTTPException(status_code=422,detail="Customer email is required for Paystack payment")
+        if order[8]=="paid": raise HTTPException(status_code=409,detail="Order is already paid")
+        if not order[6]: raise HTTPException(status_code=422,detail="Customer email is required for Paystack payment")
         reference=f"TKPAY-{order[1]}-{secrets.token_hex(5).upper()}"
-        payload={"email":order[5],"amount":int(round(float(order[2])*100)),"currency":order[3],"reference":reference,"metadata":{"orderId":str(oid),"orderReference":order[1]}}
+        payload={"email":order[6],"amount":int(round(float(order[2])*100)),"currency":order[3],"reference":reference,"metadata":{"orderId":str(oid),"orderReference":order[1]}}
         try:
             with httpx.Client(timeout=20) as client: resp=client.post(settings.paystack_base_url+"/transaction/initialize",headers={"Authorization":"Bearer "+settings.paystack_secret_key,"Content-Type":"application/json"},json=payload)
         except httpx.HTTPError as exc: raise HTTPException(status_code=502,detail=f"Payment provider unavailable: {exc}")
         data=resp.json()
         if resp.status_code>=400 or not data.get("status"): raise HTTPException(status_code=502,detail=data.get("message","Paystack initialization failed"))
         provider_ref=data["data"]["reference"]
-        conn.execute("insert into payment_transactions(id,order_id,user_id,reference,provider_reference,gateway,purpose,amount,currency,status,gateway_status,metadata) values(%s,%s,%s,%s,%s,'paystack','order',%s,%s,'pending','initialized',%s)",(uuid.uuid4(),oid,order[0] if order[0] else None,reference,provider_ref,order[2],order[3],json.dumps(data.get("data",{}))))
+        conn.execute("insert into payment_transactions(id,order_id,user_id,reference,provider_reference,gateway,purpose,amount,currency,status,gateway_status,metadata) values(%s,%s,%s,%s,%s,'paystack','order',%s,%s,'pending','initialized',%s)",(uuid.uuid4(),oid,order[1],reference,provider_ref,order[3],order[4],json.dumps(data.get("data",{}))))
         conn.execute("update orders set payment_status='pending',updated_at=now() where id=%s",(oid,))
         write_audit(conn,uuid.UUID(actor["sub"]),"payment.request_created","order",oid,{"reference":reference}); conn.commit()
-    return {"payment":{"reference":reference,"providerReference":provider_ref,"authorizationUrl":data["data"].get("authorization_url"),"amount":float(order[2]),"currency":order[3],"status":"pending"}}
+    return {"payment":{"reference":reference,"providerReference":provider_ref,"authorizationUrl":data["data"].get("authorization_url"),"amount":float(order[3]),"currency":order[4],"status":"pending"}}
 
 @app.post("/api/payments/paystack/webhook")
 async def paystack_webhook(request:Request):
