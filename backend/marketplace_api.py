@@ -1,4 +1,4 @@
-import hashlib, hmac, json, os, secrets, shutil, urllib.error, urllib.request, uuid
+import hashlib, hmac, json, os, secrets, urllib.error, urllib.request, uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request, File, UploadFile
@@ -390,17 +390,33 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
                             if sub:
                                 now=datetime.now(timezone.utc)
                                 conn.execute("""update seller_subscriptions set status='active',starts_at=coalesce(starts_at,%s),
-                                  ends_at=%s,last_payment_at=%s,next_payment_at=%s,updated_at=now() where id=%s""",
-                                  (now,now+timedelta(days=31),now,now+timedelta(days=31),sub[0]))
+                                  last_payment_at=%s,updated_at=now() where id=%s""",(now,now,sub[0]))
+                        else:
+                            plan_obj=data.get("plan") or {}
+                            plan_code=str(plan_obj.get("plan_code") or "") if isinstance(plan_obj,dict) else ""
+                            customer_email=str((data.get("customer") or {}).get("email") or "").lower()
+                            if plan_code and customer_email:
+                                sub=conn.execute("""select ss.id,sp.user_id from seller_subscriptions ss
+                                  join seller_profiles sp on sp.id=ss.seller_id join users u on u.id=sp.user_id
+                                  where ss.gateway_plan_code=%s and lower(u.email)=%s and ss.status in ('active','past_due')
+                                  order by ss.created_at desc limit 1 for update""",(plan_code,customer_email)).fetchone()
+                                if sub:
+                                    conn.execute("""insert into payment_transactions
+                                      (id,user_id,seller_subscription_id,reference,gateway,purpose,amount,currency,status,processed_at,metadata)
+                                      values (%s,%s,%s,%s,'paystack','seller_membership',%s,%s,'successful',now(),%s)
+                                      on conflict (reference) do nothing""",
+                                      (uuid.uuid4(),sub[1],sub[0],reference,amount,currency,json.dumps({"paystackTransactionId":data.get("id"),"recurring":True,"planCode":plan_code})))
+                                    conn.execute("update seller_subscriptions set status='active',last_payment_at=%s,updated_at=now() where id=%s",(datetime.now(timezone.utc),sub[0]))
                 conn.commit()
             elif event_name=="subscription.create":
                 code=str(data.get("subscription_code") or "")
                 customer_email=str((data.get("customer") or {}).get("email") or "").lower()
                 if code and customer_email:
+                    next_payment=data.get("next_payment_date")
                     conn.execute("""update seller_subscriptions ss set gateway_subscription_code=%s,status='active',
-                      starts_at=coalesce(starts_at,now()),updated_at=now()
+                      starts_at=coalesce(starts_at,now()),next_payment_at=%s,updated_at=now()
                       from seller_profiles sp join users u on u.id=sp.user_id
-                      where ss.seller_id=sp.id and lower(u.email)=%s and ss.gateway='paystack' and ss.status='pending_payment'""",(code,customer_email))
+                      where ss.seller_id=sp.id and lower(u.email)=%s and ss.gateway='paystack' and ss.status='pending_payment'""",(code,next_payment,customer_email))
                 conn.commit()
             elif event_name in {"subscription.disable","subscription.not_renew"}:
                 code=str(data.get("subscription_code") or "");status="expired" if event_name=="subscription.disable" else "cancelled"
