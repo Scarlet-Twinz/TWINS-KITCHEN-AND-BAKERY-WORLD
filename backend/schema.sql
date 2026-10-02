@@ -279,3 +279,95 @@ create table if not exists marketplace_webhook_events (
   received_at timestamptz not null default now()
 );
 create index if not exists idx_marketplace_webhook_events_received on marketplace_webhook_events(received_at desc);
+
+
+-- Marketplace operations, promotion, analytics, order and dispute layer.
+create table if not exists marketplace_promotions (
+  id uuid primary key,
+  listing_id uuid not null references marketplace_listings(id) on delete cascade,
+  seller_id uuid not null references seller_profiles(id) on delete cascade,
+  placement text not null default 'featured' check (placement in ('featured','category_top','homepage','search_boost')),
+  status text not null default 'draft' check (status in ('draft','scheduled','active','paused','completed','cancelled')),
+  starts_at timestamptz,
+  ends_at timestamptz,
+  budget numeric(14,2) not null default 0 check (budget >= 0),
+  notes text,
+  created_by uuid references users(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_promotions_status_dates on marketplace_promotions(status,starts_at,ends_at);
+create index if not exists idx_marketplace_promotions_listing on marketplace_promotions(listing_id,status);
+
+create table if not exists marketplace_events (
+  id uuid primary key,
+  listing_id uuid not null references marketplace_listings(id) on delete cascade,
+  seller_id uuid not null references seller_profiles(id) on delete cascade,
+  event_type text not null check (event_type in ('view','contact','save','report','order_request')),
+  actor_user_id uuid references users(id),
+  session_key text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_events_listing_date on marketplace_events(listing_id,created_at desc);
+create index if not exists idx_marketplace_events_seller_type_date on marketplace_events(seller_id,event_type,created_at desc);
+
+create table if not exists marketplace_orders (
+  id uuid primary key,
+  reference text unique not null,
+  listing_id uuid not null references marketplace_listings(id),
+  seller_id uuid not null references seller_profiles(id),
+  buyer_user_id uuid references users(id),
+  buyer_name text not null,
+  buyer_email text,
+  buyer_phone text not null,
+  delivery_location text,
+  quantity integer not null check (quantity > 0),
+  unit_price numeric(14,2) not null check (unit_price >= 0),
+  currency text not null default 'NGN',
+  subtotal numeric(14,2) not null check (subtotal >= 0),
+  delivery_fee numeric(14,2) not null default 0 check (delivery_fee >= 0),
+  total numeric(14,2) not null check (total >= 0),
+  commission_rate numeric(6,3) not null default 0 check (commission_rate >= 0),
+  commission_amount numeric(14,2) not null default 0 check (commission_amount >= 0),
+  seller_net_amount numeric(14,2) not null default 0 check (seller_net_amount >= 0),
+  order_status text not null default 'requested' check (order_status in ('requested','accepted','preparing','ready','completed','cancelled','disputed','refunded')),
+  payment_status text not null default 'not_configured' check (payment_status in ('not_configured','pending','successful','failed','refunded')),
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_orders_seller_status on marketplace_orders(seller_id,order_status,created_at desc);
+create index if not exists idx_marketplace_orders_buyer on marketplace_orders(buyer_user_id,created_at desc);
+
+create table if not exists marketplace_disputes (
+  id uuid primary key,
+  order_id uuid not null references marketplace_orders(id) on delete cascade,
+  opened_by uuid references users(id),
+  reason text not null,
+  details text,
+  status text not null default 'open' check (status in ('open','reviewing','resolved','dismissed')),
+  resolution text,
+  resolved_by uuid references users(id),
+  resolved_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_disputes_status on marketplace_disputes(status,created_at desc);
+
+create table if not exists marketplace_refunds (
+  id uuid primary key,
+  order_id uuid not null references marketplace_orders(id) on delete cascade,
+  amount numeric(14,2) not null check (amount >= 0),
+  reason text not null,
+  status text not null default 'pending_gateway' check (status in ('pending_gateway','processed','rejected')),
+  gateway_reference text,
+  processed_by uuid references users(id),
+  processed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_refunds_order on marketplace_refunds(order_id,created_at desc);
+
+alter table marketplace_listings add column if not exists view_count bigint not null default 0;
+alter table marketplace_listings add column if not exists contact_count bigint not null default 0;
+alter table marketplace_listings add column if not exists save_count bigint not null default 0;
