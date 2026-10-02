@@ -872,7 +872,7 @@ def intake_name_group(group_id:str,payload:IntakeNamePayload,request:Request):
         pid=uuid.uuid4()
         max_id=conn.execute("select coalesce(max(catalogue_number),0) from products").fetchone()[0] or 0
         product_number=max_id+1
-        slug=re.sub(r"[^a-z0-9]+","-",name.lower()).strip("-") or f"product-{new_id}"
+        slug=re.sub(r"[^a-z0-9]+","-",name.lower()).strip("-") or f"product-{product_number}"
         base=slug
         n=2
         while conn.execute("select 1 from products where slug=%s",(slug,)).fetchone():
