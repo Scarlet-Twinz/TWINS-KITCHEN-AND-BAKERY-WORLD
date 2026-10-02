@@ -287,3 +287,81 @@ alter table users add column if not exists email_verified_at timestamptz;
 alter table seller_profiles add column if not exists verified_at timestamptz;
 alter table marketplace_listings add column if not exists published_at timestamptz;
 alter table payment_transactions add column if not exists processed_at timestamptz;
+
+
+-- Photo-first owner intake workflow.
+alter table products add column if not exists status text not null default 'PUBLISHED'
+  check (status in ('PENDING','DRAFT','APPROVED','PUBLISHED','ARCHIVED'));
+alter table products add column if not exists product_type text;
+alter table products add column if not exists owner_confirmed_at timestamptz;
+
+create table if not exists intake_batches (
+  id uuid primary key,
+  name text not null,
+  status text not null default 'OPEN' check (status in ('OPEN','COMPLETED','ARCHIVED')),
+  created_by uuid references users(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists intake_assets (
+  id uuid primary key,
+  batch_id uuid not null references intake_batches(id) on delete cascade,
+  original_name text not null,
+  relative_path text,
+  storage_path text not null unique,
+  mime_type text not null,
+  byte_size bigint not null,
+  sha256 text not null,
+  duplicate_of uuid references intake_assets(id),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_intake_assets_batch on intake_assets(batch_id,created_at);
+create index if not exists idx_intake_assets_sha on intake_assets(sha256);
+
+create table if not exists intake_buckets (
+  id uuid primary key,
+  batch_id uuid not null references intake_batches(id) on delete cascade,
+  name text not null,
+  normalized_key text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(batch_id,normalized_key)
+);
+
+create table if not exists candidate_groups (
+  id uuid primary key,
+  bucket_id uuid not null references intake_buckets(id) on delete cascade,
+  name text not null,
+  status text not null default 'SUGGESTED'
+    check (status in ('SUGGESTED','UNRESOLVED','CONFIRMED','NAMED','MERGED','ARCHIVED')),
+  grouping_basis text not null default 'OWNER_REVIEW'
+    check (grouping_basis in ('FILENAME','FOLDER','SESSION','DUPLICATE','MANUAL','OWNER_REVIEW')),
+  product_id uuid references products(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_candidate_groups_bucket on candidate_groups(bucket_id,status);
+
+create table if not exists candidate_group_assets (
+  group_id uuid not null references candidate_groups(id) on delete cascade,
+  asset_id uuid not null references intake_assets(id) on delete cascade,
+  position integer not null default 0,
+  created_at timestamptz not null default now(),
+  primary key(group_id,asset_id)
+);
+
+create index if not exists idx_candidate_group_assets_asset on candidate_group_assets(asset_id);
+
+create table if not exists catalogue_aliases (
+  id uuid primary key,
+  product_id uuid references products(id) on delete cascade,
+  alias text not null,
+  normalized_alias text not null,
+  created_at timestamptz not null default now(),
+  unique(product_id,normalized_alias)
+);
+
+create index if not exists idx_catalogue_aliases_normalized on catalogue_aliases(normalized_alias);
