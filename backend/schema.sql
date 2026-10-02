@@ -132,6 +132,7 @@ create table marketplace_listings (
   location text,
   status text not null default 'pending_review' check (status in ('draft','pending_review','published','rejected','paused','sold','archived')),
   moderation_note text,
+  media_rights_attested_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -207,6 +208,7 @@ create index if not exists idx_project_plans_user_updated on project_plans(user_
 alter table users add column if not exists email_verified_at timestamptz;
 alter table seller_profiles add column if not exists verified_at timestamptz;
 alter table marketplace_listings add column if not exists published_at timestamptz;
+alter table marketplace_listings add column if not exists media_rights_attested_at timestamptz;
 alter table payment_transactions add column if not exists processed_at timestamptz;
 alter table marketplace_listing_media add column if not exists mime_type text;
 alter table marketplace_listing_media add column if not exists sha256 text;
