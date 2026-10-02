@@ -889,56 +889,6 @@ def save_project_plan(payload:ProjectPlanPayload,request:Request):
         conn.execute("insert into project_plans (id,user_id,business,stage,location,capacity,space,utilities,owned,needs) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(pid,session["sub"],payload.business,payload.stage,payload.location,payload.capacity,payload.space,payload.utilities,payload.owned,payload.needs));conn.commit()
     return {"plan":{"id":str(pid),"business":payload.business,"stage":payload.stage,"location":payload.location,"capacity":payload.capacity,"space":payload.space,"utilities":payload.utilities,"owned":payload.owned,"needs":payload.needs}}
 
-@app.get("/api/seller/profile")
-def seller_profile(request:Request):
-    session=require_session(request)
-    with db() as conn: row=conn.execute("select id,display_name,phone,location,verification_status,seller_status,created_at from seller_profiles where user_id=%s",(session["sub"],)).fetchone()
-    if not row:return {"profile":None}
-    return {"profile":{"id":str(row[0]),"displayName":row[1],"phone":row[2],"location":row[3],"verificationStatus":row[4],"sellerStatus":row[5],"createdAt":row[6].isoformat()}}
-
-@app.post("/api/seller/profile",status_code=201)
-def create_seller_profile(payload:SellerProfilePayload,request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"])
-    with db() as conn:
-        row=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if row:
-            conn.execute("update seller_profiles set display_name=%s,phone=%s,location=%s,updated_at=now() where id=%s",(payload.displayName,payload.phone,payload.location,row[0]));sid=row[0]
-        else:
-            sid=uuid.uuid4();conn.execute("insert into seller_profiles (id,user_id,display_name,phone,location) values (%s,%s,%s,%s,%s)",(sid,uid,payload.displayName,payload.phone,payload.location))
-        conn.commit()
-    return {"profile":{"id":str(sid),"displayName":payload.displayName,"phone":payload.phone,"location":payload.location,"verificationStatus":"pending"}}
-
-@app.post("/api/marketplace/listings/{listing_id}/report",status_code=201)
-def report_listing(listing_id:str,payload:MarketplaceReportPayload,request:Request):
-    session=read_session(request);rid=uuid.uuid4()
-    with db() as conn:
-        exists=conn.execute("select id from marketplace_listings where id=%s",(uuid.UUID(listing_id),)).fetchone()
-        if not exists:raise HTTPException(status_code=404,detail="Listing not found")
-        conn.execute("insert into marketplace_reports (id,listing_id,reporter_user_id,reason,details) values (%s,%s,%s,%s,%s)",(rid,uuid.UUID(listing_id),uuid.UUID(session["sub"]) if session else None,payload.reason,payload.details));conn.commit()
-    return {"report":{"id":str(rid),"status":"open"}}
-
-@app.patch("/api/admin/marketplace/listings/{listing_id}")
-def moderate_listing(listing_id:str,status:str,request:Request):
-    require_admin(request)
-    allowed={"published","rejected","paused","sold","archived"}
-    if status not in allowed: raise HTTPException(status_code=422,detail="Unsupported moderation status")
-    try: lid=uuid.UUID(listing_id)
-    except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
-    with db() as conn:
-        if status=="published":
-            row=conn.execute("""select ml.id,sp.verification_status,sp.seller_status,
-              (select count(*) from marketplace_listing_media where listing_id=ml.id)
-              from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id where ml.id=%s for update""",(lid,)).fetchone()
-            if not row: raise HTTPException(status_code=404,detail="Listing not found")
-            if row[1]!="verified" or row[2]!="active": raise HTTPException(status_code=409,detail="Seller must be verified and active before publication")
-            if int(row[3])<1: raise HTTPException(status_code=409,detail="A listing must have at least one image before publication")
-            cur=conn.execute("update marketplace_listings set status='published',published_at=now(),updated_at=now() where id=%s",(lid,))
-        else:
-            cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,lid))
-            if cur.rowcount==0: raise HTTPException(status_code=404,detail="Listing not found")
-        conn.commit()
-    return {"ok":True,"status":status}
-
 @app.post("/api/quotes",status_code=201)
 def create_quote(payload:QuotePayload,request:Request):
     session=read_session(request);qid=uuid.uuid4();ref=payload.reference or f"TW-{datetime.now().year}-{secrets.token_hex(3).upper()}";uid=uuid.UUID(session["sub"]) if session else None
@@ -964,47 +914,10 @@ def admin_quotes(request:Request):
         rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0) from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
     return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
 
-@app.patch("/api/admin/marketplace/listings/{listing_id}")
-def moderate_listing(listing_id:str,status:str,request:Request):
-    require_admin(request)
-    allowed={"published","rejected","paused","sold","archived"}
-    if status not in allowed: raise HTTPException(status_code=422,detail="Unsupported moderation status")
-    with db() as conn:
-        try: lid=uuid.UUID(listing_id)
-        except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
-        if status=="published":
-            cur=conn.execute("update marketplace_listings set status=%s,published_at=now(),updated_at=now() where id=%s",(status,lid))
-        else:
-            cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,lid))
-        conn.commit()
-        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Listing not found")
-    return {"ok":True,"status":status}
 
-@app.post("/api/quotes",status_code=201)
-def create_quote(payload:QuotePayload,request:Request):
-    session=read_session(request);qid=uuid.uuid4();ref=payload.reference or f"TW-{datetime.now().year}-{secrets.token_hex(3).upper()}";uid=uuid.UUID(session["sub"]) if session else None
-    with db() as conn:
-        conn.execute("insert into quotes (id,reference,user_id,name,email,phone,business,project_stage,location,capacity,space,utilities,requirements,status,package_name) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Prepared',%s)",(qid,ref,uid,payload.name,payload.email,payload.phone,payload.business,payload.stage,payload.location,payload.capacity,payload.space,payload.utilities,payload.requirements,payload.packageName))
-        for item in payload.items:
-            row=conn.execute("select id from products where legacy_catalogue_id=%s",(item.id,)).fetchone();pid=row[0] if row else None
-            conn.execute("insert into quote_items (id,quote_id,product_id,quantity) values (%s,%s,%s,%s)",(uuid.uuid4(),qid,pid,item.quantity))
-        conn.commit()
-    return {"quote":{"id":str(qid),"reference":ref,"status":"Prepared","createdAt":datetime.now(timezone.utc).isoformat()}}
-
-@app.get("/api/quotes/me")
-def my_quotes(request:Request):
-    session=require_session(request)
-    with db() as conn:
-        rows=conn.execute("select reference,name,business,status,created_at from quotes where user_id=%s order by created_at desc limit 50",(session["sub"],)).fetchall()
-    return {"quotes":[{"reference":r[0],"name":r[1],"business":r[2],"status":r[3],"createdAt":r[4].isoformat()} for r in rows]}
-
-@app.get("/api/admin/quotes")
-def admin_quotes(request:Request):
-    require_admin(request)
-    with db() as conn:
-        rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0)
-          from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
-    return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
+# Marketplace operations are isolated from the private Owner Media Center.
+from marketplace_ops_api import register_marketplace_ops_routes
+register_marketplace_ops_routes(app, db, require_session, require_admin)
 
 # Production marketplace routes are isolated from the Operations Admin.
 from marketplace_api import register_marketplace_routes
