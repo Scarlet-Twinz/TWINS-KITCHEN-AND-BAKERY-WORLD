@@ -446,8 +446,6 @@ window.addEventListener("load", async function () {
   } catch (e) {}
   deny();
 });
-})();
-
 var intakeState = { batch:null, data:null, selectedAssets:new Set(), selectedGroups:new Set() };
 
 function intakeApi(path, options) { return request(path, options); }
@@ -634,3 +632,5 @@ async function completeIntake(){
   if(!confirm("Complete this intake batch? Unresolved groups will remain unresolved and can still be reviewed later."))return;
   try{await intakeApi("/api/admin/intake/batches/"+encodeURIComponent(intakeState.batch.id)+"/complete",{method:"POST",body:"{}"});await refreshIntake()}catch(e){alert(e.message)}
 }
+
+})();
