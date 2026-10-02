@@ -77,7 +77,7 @@ function renderShell() {
       '</aside>' +
       '<main class="main">' +
         '<header class="top"><div><button class="mobile" id="mobileMenu">☰</button><h1 id="adminTitle">Operations Overview</h1><p>Twins Kitchen & Bakery World · internal workspace</p></div>' +
-        '<div class="user"><div class="avatar">' + escapeHtml(initials) + '</div><span>' + escapeHtml((currentUser && currentUser.name) || "Administrator") + '</span><a class="btn light" href="index.html">Storefront</a></div></header>' +
+        '<div class="user"><div class="avatar">' + escapeHtml(initials) + '</div><span>' + escapeHtml((currentUser && currentUser.name) || "Administrator") + '</span><a class="btn light" href="operations.html">Business Operations</a><a class="btn light" href="index.html">Storefront</a></div></header>' +
         '<div class="content" id="adminViews"></div>' +
       '</main>' +
     '</div>' +
