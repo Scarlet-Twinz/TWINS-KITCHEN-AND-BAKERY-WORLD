@@ -265,7 +265,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
                     conn.execute("""insert into marketplace_listing_media
                       (id,listing_id,kind,storage_key,alt_text,sort_order,mime_type,sha256,size_bytes)
                       values (%s,%s,'image',%s,%s,%s,%s,%s,%s)""",
-                      (media_id,lid,str(relative).replace("\","/"),original[:240],sort_order,inspection.mime_type,digest,len(data)))
+                      (media_id,lid,str(relative).replace(chr(92),"/"),original[:240],sort_order,inspection.mime_type,digest,len(data)))
                     saved.append({"id":str(media_id),"filename":original,"url":(_public_base()+"/api/marketplace/media/"+str(media_id)) if _public_base() else "/api/marketplace/media/"+str(media_id)})
                 conn.commit()
             except Exception:
