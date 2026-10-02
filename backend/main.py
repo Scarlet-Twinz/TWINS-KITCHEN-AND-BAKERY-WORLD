@@ -870,8 +870,8 @@ def intake_name_group(group_id:str,payload:IntakeNamePayload,request:Request):
             category_id=conn.execute("select id from categories where lower(name)=lower(%s) limit 1",(payload.category,)).fetchone()
             category_id=category_id[0] if category_id else None
         pid=uuid.uuid4()
-        max_id=conn.execute("select coalesce(max(legacy_catalogue_id),0) from products").fetchone()[0] or 0
-        new_id=max_id+1
+        max_id=conn.execute("select coalesce(max(catalogue_number),0) from products").fetchone()[0] or 0
+        product_number=max_id+1
         slug=re.sub(r"[^a-z0-9]+","-",name.lower()).strip("-") or f"product-{new_id}"
         base=slug
         n=2
@@ -884,13 +884,13 @@ def intake_name_group(group_id:str,payload:IntakeNamePayload,request:Request):
         assets=conn.execute("select a.id,a.original_name,a.storage_path from candidate_group_assets cga join intake_assets a on a.id=cga.asset_id where cga.group_id=%s order by cga.position,a.created_at",(gid,)).fetchall()
         for pos,a in enumerate(assets):
             src="storage/intake/"+a[2].replace("\\","/")
-            conn.execute("insert into product_media (id,product_id,kind,src,alt_text,sort_order) values (%s,%s,'image',%s,%s,%s)",(uuid.uuid4(),pid,src,name,pos))
+            conn.execute("insert into product_media (id,product_id,kind,src,alt_text,sort_order,source,rights,provenance) values (%s,%s,'image',%s,%s,%s,'OWNER','OWNED','OWNER/LOCAL')",(uuid.uuid4(),pid,src,name,pos))
         alias=re.sub(r"\s+"," ",name.lower()).strip()
         conn.execute("insert into catalogue_aliases (id,product_id,alias,normalized_alias) values (%s,%s,%s,%s) on conflict do nothing",(uuid.uuid4(),pid,name,alias))
         conn.execute("update candidate_groups set name=%s,status='NAMED',product_id=%s,updated_at=now() where id=%s",(name,pid,gid))
-        write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_created","product",pid,{"groupId":str(gid),"assetCount":len(assets),"legacyCatalogueId":new_id})
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_created","product",pid,{"groupId":str(gid),"assetCount":len(assets),"catalogueNumber":product_number})
         conn.commit()
-    return {"product":{"id":str(pid),"legacyId":new_id,"name":name,"slug":slug,"assetCount":len(assets),"status":"DRAFT"}}
+    return {"product":{"id":str(pid),"catalogueNumber":product_number,"name":name,"slug":slug,"assetCount":len(assets),"status":"DRAFT"}}
 
 @app.post("/api/admin/intake/batches/{batch_id}/complete")
 def intake_complete_batch(batch_id:str,request:Request):
@@ -900,3 +900,36 @@ def intake_complete_batch(batch_id:str,request:Request):
         write_audit(conn,uuid.UUID(actor["sub"]),"intake.batch_completed","intake_batch",bid,{})
         conn.commit()
     return {"ok":True}
+
+@app.get("/api/admin/intake/name-suggestions")
+def intake_name_suggestions(q:str="",request:Request=None):
+    require_admin(request)
+    query=re.sub(r"\s+"," ",q.strip().lower())
+    if len(query)<2:return {"suggestions":[]}
+    with db() as conn:
+        rows=conn.execute("""select name from products where active=true and lower(name) like %s
+                             union select alias from catalogue_aliases where lower(alias) like %s
+                             order by name limit 12""",(f"%{query}%",f"%{query}%")).fetchall()
+    seen=set();suggestions=[]
+    for row in rows:
+        value=row[0]
+        if value and value.lower() not in seen:
+            seen.add(value.lower());suggestions.append(value)
+    return {"suggestions":suggestions}
+
+class IntakeProductStatusPayload(BaseModel):
+    status:str=Field(min_length=3,max_length=30)
+
+@app.patch("/api/admin/intake/products/{product_id}/status")
+def intake_product_status(product_id:str,payload:IntakeProductStatusPayload,request:Request):
+    actor=require_admin(request)
+    allowed={"DRAFT","APPROVED","PUBLISHED","ARCHIVED"}
+    if payload.status not in allowed: raise HTTPException(status_code=422,detail="Unsupported product status")
+    pid=uuid.UUID(product_id)
+    with db() as conn:
+        cur=conn.execute("update products set status=%s,active=%s,updated_at=now() where id=%s",
+                         (payload.status,payload.status!="ARCHIVED",pid))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Product not found")
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_status_changed","product",pid,{"status":payload.status})
+        conn.commit()
+    return {"ok":True,"status":payload.status}
