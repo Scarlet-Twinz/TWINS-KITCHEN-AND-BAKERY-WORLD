@@ -142,16 +142,22 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             return {"listing":_listing_dict(conn,row)}
 
     @router.get("/media/{media_id}")
-    def listing_media(media_id:str):
+    def listing_media(media_id:str,request:Request):
         try: mid=uuid.UUID(media_id)
         except ValueError: raise HTTPException(status_code=422,detail="Invalid media ID")
         root=_storage_root()
         with db() as conn:
-            row=conn.execute("""select lm.storage_key,lm.kind,lm.mime_type,ml.status,sp.seller_status
+            row=conn.execute("""select lm.storage_key,lm.kind,lm.mime_type,ml.status,sp.seller_status,sp.user_id
               from marketplace_listing_media lm join marketplace_listings ml on ml.id=lm.listing_id
               join seller_profiles sp on sp.id=ml.seller_id where lm.id=%s""",(mid,)).fetchone()
-        if not row or row[1]!="image" or row[3]!="published" or row[4]!="active":
+        if not row or row[1]!="image" or row[4]!="active":
             raise HTTPException(status_code=404,detail="Marketplace media not found")
+        allowed_public=row[3]=="published"
+        if not allowed_public:
+            try: session=require_session(request)
+            except HTTPException: raise HTTPException(status_code=404,detail="Marketplace media not found")
+            if str(session["sub"])!=str(row[5]):
+                raise HTTPException(status_code=404,detail="Marketplace media not found")
         path=(root/row[0]).resolve()
         try: path.relative_to(root)
         except ValueError: raise HTTPException(status_code=403,detail="Invalid media path")
