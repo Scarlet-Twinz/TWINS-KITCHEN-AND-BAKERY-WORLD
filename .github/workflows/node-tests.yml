@@ -42,5 +42,7 @@ jobs:
       - name: Compile backend
         run: |
           python -m py_compile backend/main.py
+          python -m py_compile backend/marketplace_api.py
           python -m py_compile backend/create_admin.py
           python backend/test_operations.py
+          python backend/test_marketplace.py
