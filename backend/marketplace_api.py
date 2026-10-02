@@ -324,6 +324,29 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             conn.commit()
         path.unlink(missing_ok=True);return {"ok":True}
 
+
+    @router.delete("/listings/{listing_id}")
+    def delete_listing(listing_id:str,request:Request):
+        session=require_session(request);uid=uuid.UUID(session["sub"])
+        try: lid=uuid.UUID(listing_id)
+        except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
+        root=_storage_root();paths=[]
+        with db() as conn:
+            row=conn.execute("""select ml.status from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
+              where ml.id=%s and sp.user_id=%s for update""",(lid,uid)).fetchone()
+            if not row: raise HTTPException(status_code=404,detail="Listing not found")
+            if row[0]=="published": raise HTTPException(status_code=409,detail="Published listings must be archived by marketplace staff")
+            rows=conn.execute("select storage_key from marketplace_listing_media where listing_id=%s",(lid,)).fetchall()
+            paths=[(root/r[0]).resolve() for r in rows]
+            conn.execute("delete from marketplace_listings where id=%s",(lid,));conn.commit()
+        for path in paths:
+            try:
+                path.relative_to(root)
+                path.unlink(missing_ok=True)
+            except ValueError:
+                pass
+        return {"ok":True}
+
     @router.post("/listings/{listing_id}/report",status_code=201)
     def report_listing(listing_id:str,payload:ReportPayload,request:Request):
         try: session=require_session(request)
