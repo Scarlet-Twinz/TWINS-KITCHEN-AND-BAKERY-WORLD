@@ -289,6 +289,13 @@ alter table marketplace_listings add column if not exists published_at timestamp
 alter table payment_transactions add column if not exists processed_at timestamptz;
 
 
+-- Photo-first product identity and media provenance.
+alter table products add column if not exists catalogue_number integer unique;
+create index if not exists idx_products_catalogue_number on products(catalogue_number);
+alter table product_media add column if not exists source text not null default 'OWNER';
+alter table product_media add column if not exists rights text not null default 'OWNED';
+alter table product_media add column if not exists provenance text not null default 'OWNER/LOCAL';
+
 -- Photo-first owner intake workflow.
 alter table products add column if not exists status text not null default 'PUBLISHED'
   check (status in ('PENDING','DRAFT','APPROVED','PUBLISHED','ARCHIVED'));
