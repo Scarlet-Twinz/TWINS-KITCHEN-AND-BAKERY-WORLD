@@ -1,4 +1,4 @@
-import hashlib, hmac, json, os, secrets, urllib.error, urllib.request, urllib.parse, uuid
+import hashlib, hmac, json, os, secrets, time, urllib.error, urllib.request, urllib.parse, uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request, File, UploadFile
@@ -17,6 +17,8 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             return value if isinstance(value, dict) else {}
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail=f"{name} is invalid JSON")
+
+    _plan_cache={"expires":0.0,"data":{}}
 
     def _plan_codes():
         return {str(k): str(v) for k, v in _json_env("SELLER_PLAN_CODES_JSON").items() if str(v).strip()}
@@ -152,7 +154,10 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
                   "configured":bool(code and name in _plan_limits()),"features":features}
             if code and item["configured"]:
                 try:
-                    plan=_paystack("GET","/plan/"+code)
+                    cached=_plan_cache["data"].get(name) if _plan_cache["expires"]>time.monotonic() else None
+                    plan=cached or _paystack("GET","/plan/"+code)
+                    _plan_cache["data"][name]=plan
+                    _plan_cache["expires"]=time.monotonic()+60
                     amount=int(plan.get("amount") or 0)
                     item["price"]=amount/100 if str(plan.get("currency") or "NGN")=="NGN" else amount
                     item["currency"]=str(plan.get("currency") or "NGN")
