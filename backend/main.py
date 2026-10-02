@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from marketplace_api import register_marketplace_routes
 
 class Settings(BaseSettings):
     database_url: str=""
@@ -90,6 +91,15 @@ def apply_operations_migration():
         for statement in statements: conn.execute(statement)
         conn.commit()
 
+def apply_marketplace_migration():
+    if not settings.database_url: return
+    migration_path=Path(__file__).resolve().parent/"migrations"/"20261002_marketplace_production.sql"
+    if not migration_path.exists(): return
+    statements=[x.strip() for x in migration_path.read_text(encoding="utf-8").split(";") if x.strip()]
+    with db() as conn:
+        for statement in statements: conn.execute(statement)
+        conn.commit()
+
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
     return psycopg.connect(settings.database_url)
@@ -130,6 +140,9 @@ def require_admin(request:Request):
     s=require_session(request)
     if s.get("role") not in ("admin","staff"):raise HTTPException(status_code=403,detail="Staff access required")
     return s
+
+
+register_marketplace_routes(app, db, settings, require_session, require_admin)
 
 class AuthPayload(BaseModel):
     name:str|None=Field(default=None,min_length=2,max_length=120)
@@ -213,8 +226,10 @@ class DeliveryStatusPayload(BaseModel):
 
 @app.on_event("startup")
 def apply_startup_migrations():
-    try: apply_operations_migration()
-    except Exception as exc: raise RuntimeError(f"Operations migration failed: {exc}")
+    try:
+        apply_operations_migration()
+        apply_marketplace_migration()
+    except Exception as exc: raise RuntimeError(f"Startup migration failed: {exc}")
 
 @app.get("/api/health")
 def health():
@@ -274,91 +289,6 @@ def catalogue():
     return {"products":[{"id":r[0],"name":r[1],"description":r[2],"tag":r[3],"priceMode":r[4],"active":r[5]} for r in rows]}
 
 
-@app.get("/api/marketplace/listings")
-def marketplace_listings(category:str|None=None,limit:int=50):
-    with db() as conn:
-        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,sp.display_name,sp.verification_status
-        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
-        where ml.status='published' and (%s is null or ml.category=%s)
-        order by ml.created_at desc limit %s""",(category,category,limit)).fetchall()
-    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"seller":r[8],"sellerVerification":r[9]} for r in rows]}
-
-@app.post("/api/marketplace/listings",status_code=201)
-def create_marketplace_listing(payload:MarketplaceListingPayload,request:Request):
-    session=require_session(request)
-    uid=uuid.UUID(session["sub"]);lid=uuid.uuid4()
-    with db() as conn:
-        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if not seller:
-            seller_id=uuid.uuid4()
-            conn.execute("insert into seller_profiles (id,user_id,display_name,phone,verification_status) values (%s,%s,(select name from users where id=%s),(select phone from users where id=%s),'pending')",(seller_id,uid,uid,uid))
-        else:seller_id=seller[0]
-        conn.execute("insert into marketplace_listings (id,seller_id,title,category,description,price_mode,price,location,status) values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review')",(lid,seller_id,payload.title,payload.category,payload.description,payload.priceMode,payload.price,payload.location))
-        conn.commit()
-    return {"listing":{"id":str(lid),"status":"pending_review"}}
-
-@app.get("/api/marketplace/me")
-def my_marketplace_listings(request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"])
-    with db() as conn:
-        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,ml.status,ml.created_at
-        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id where sp.user_id=%s order by ml.created_at desc limit 100""",(uid,)).fetchall()
-    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"status":r[8],"createdAt":r[9].isoformat()} for r in rows]}
-
-@app.post("/api/marketplace/seller-plan-intent",status_code=201)
-def seller_plan_intent(payload:SellerPlanPayload,request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"]);sid=uuid.uuid4()
-    with db() as conn:
-        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if not seller:raise HTTPException(status_code=400,detail="Create a seller profile first")
-        conn.execute("insert into seller_subscriptions (id,seller_id,plan,status) values (%s,%s,%s,'pending_payment')",(sid,seller[0],payload.plan))
-        conn.commit()
-    return {"subscription":{"id":str(sid),"plan":payload.plan,"status":"pending_payment"}}
-
-@app.get("/api/project-plans/me")
-def my_project_plan(request:Request):
-    session=require_session(request)
-    with db() as conn:
-        row=conn.execute("select id,business,stage,location,capacity,space,utilities,owned,needs,created_at,updated_at from project_plans where user_id=%s order by updated_at desc limit 1",(session["sub"],)).fetchone()
-    if not row:return {"plan":None}
-    return {"plan":{"id":str(row[0]),"business":row[1],"stage":row[2],"location":row[3],"capacity":row[4],"space":row[5],"utilities":row[6],"owned":row[7],"needs":row[8],"createdAt":row[9].isoformat(),"updatedAt":row[10].isoformat()}}
-
-@app.post("/api/project-plans",status_code=201)
-def save_project_plan(payload:ProjectPlanPayload,request:Request):
-    session=require_session(request);pid=uuid.uuid4()
-    with db() as conn:
-        conn.execute("delete from project_plans where user_id=%s",(session["sub"],))
-        conn.execute("insert into project_plans (id,user_id,business,stage,location,capacity,space,utilities,owned,needs) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(pid,session["sub"],payload.business,payload.stage,payload.location,payload.capacity,payload.space,payload.utilities,payload.owned,payload.needs));conn.commit()
-    return {"plan":{"id":str(pid),"business":payload.business,"stage":payload.stage,"location":payload.location,"capacity":payload.capacity,"space":payload.space,"utilities":payload.utilities,"owned":payload.owned,"needs":payload.needs}}
-
-@app.get("/api/seller/profile")
-def seller_profile(request:Request):
-    session=require_session(request)
-    with db() as conn: row=conn.execute("select id,display_name,phone,location,verification_status,seller_status,created_at from seller_profiles where user_id=%s",(session["sub"],)).fetchone()
-    if not row:return {"profile":None}
-    return {"profile":{"id":str(row[0]),"displayName":row[1],"phone":row[2],"location":row[3],"verificationStatus":row[4],"sellerStatus":row[5],"createdAt":row[6].isoformat()}}
-
-@app.post("/api/seller/profile",status_code=201)
-def create_seller_profile(payload:SellerProfilePayload,request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"])
-    with db() as conn:
-        row=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if row:
-            conn.execute("update seller_profiles set display_name=%s,phone=%s,location=%s,updated_at=now() where id=%s",(payload.displayName,payload.phone,payload.location,row[0]));sid=row[0]
-        else:
-            sid=uuid.uuid4();conn.execute("insert into seller_profiles (id,user_id,display_name,phone,location) values (%s,%s,%s,%s,%s)",(sid,uid,payload.displayName,payload.phone,payload.location))
-        conn.commit()
-    return {"profile":{"id":str(sid),"displayName":payload.displayName,"phone":payload.phone,"location":payload.location,"verificationStatus":"pending"}}
-
-@app.post("/api/marketplace/listings/{listing_id}/report",status_code=201)
-def report_listing(listing_id:str,payload:MarketplaceReportPayload,request:Request):
-    session=read_session(request);rid=uuid.uuid4()
-    with db() as conn:
-        exists=conn.execute("select id from marketplace_listings where id=%s",(uuid.UUID(listing_id),)).fetchone()
-        if not exists:raise HTTPException(status_code=404,detail="Listing not found")
-        conn.execute("insert into marketplace_reports (id,listing_id,reporter_user_id,reason,details) values (%s,%s,%s,%s,%s)",(rid,uuid.UUID(listing_id),uuid.UUID(session["sub"]) if session else None,payload.reason,payload.details));conn.commit()
-    return {"report":{"id":str(rid),"status":"open"}}
-
 @app.patch("/api/admin/marketplace/listings/{listing_id}")
 def moderate_listing(listing_id:str,status:str,request:Request):
     require_admin(request)
@@ -368,6 +298,7 @@ def moderate_listing(listing_id:str,status:str,request:Request):
         cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,uuid.UUID(listing_id)));conn.commit()
         if cur.rowcount==0:raise HTTPException(status_code=404,detail="Listing not found")
     return {"ok":True,"status":status}
+
 
 @app.post("/api/quotes",status_code=201)
 def create_quote(payload:QuotePayload,request:Request):
