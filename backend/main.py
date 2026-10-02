@@ -765,6 +765,15 @@ def operations_products(request:Request):
           (select count(*) from product_media pm where pm.product_id=p.id) from products p left join categories c on c.id=p.category_id order by p.catalogue_number nulls last,p.name""").fetchall()
     return {"products":[{"id":str(r[0]),"catalogueNumber":r[1],"name":r[2],"category":r[3],"description":r[4],"specifications":r[5] or {},"priceMode":r[6],"price":float(r[7]) if r[7] is not None else None,"currency":r[8],"availabilityStatus":r[9],"active":r[10],"status":r[11],"mediaCount":r[12]} for r in rows]}
 
+@app.get("/api/admin/operations/products/{product_id}")
+def operations_product_detail(product_id:str,request:Request):
+    require_admin(request)
+    pid=uuid.UUID(product_id)
+    with db() as conn:
+        p=conn.execute("select p.id,p.catalogue_number,p.name,coalesce(c.name,''),p.description,p.specifications,p.price_mode,p.price,p.currency,p.availability_status,p.active,p.status from products p left join categories c on c.id=p.category_id where p.id=%s",(pid,)).fetchone()
+        if not p: raise HTTPException(status_code=404,detail="Product not found")
+        media=conn.execute("select id,kind,src,alt_text,sort_order,source,rights,provenance from product_media where product_id=%s order by sort_order,id",(pid,)).fetchall()
+    return {"product":{"id":str(p[0]),"catalogueNumber":p[1],"name":p[2],"category":p[3],"description":p[4],"specifications":p[5] or {},"priceMode":p[6],"price":float(p[7]) if p[7] is not None else None,"currency":p[8],"availabilityStatus":p[9],"active":p[10],"status":p[11],"media":[{"id":str(m[0]),"kind":m[1],"src":m[2],"alt":m[3],"sortOrder":m[4],"source":m[5],"rights":m[6],"provenance":m[7]} for m in media]}}
 @app.post("/api/admin/operations/products",status_code=201)
 def create_operations_product(payload:ProductPayload,request:Request):
     actor=require_admin(request)
