@@ -259,3 +259,23 @@ alter table media_assets add column if not exists smolvlm_owner_decided_by uuid 
 alter table media_assets add column if not exists visual_match_result jsonb;
 alter table media_assets add column if not exists visual_match_result_version text;
 alter table media_assets add column if not exists visual_match_inference_at timestamptz;
+
+
+-- Production marketplace hardening.
+alter table marketplace_listing_media add column if not exists mime_type text;
+alter table marketplace_listing_media add column if not exists sha256 text;
+alter table marketplace_listing_media add column if not exists size_bytes bigint;
+create unique index if not exists uq_marketplace_listing_media_hash on marketplace_listing_media(listing_id,sha256) where sha256 is not null;
+create index if not exists idx_marketplace_listing_media_listing on marketplace_listing_media(listing_id,sort_order);
+alter table seller_subscriptions add column if not exists gateway_plan_code text;
+alter table seller_subscriptions add column if not exists gateway_subscription_code text;
+alter table seller_subscriptions add column if not exists last_payment_at timestamptz;
+alter table seller_subscriptions add column if not exists next_payment_at timestamptz;
+create index if not exists idx_seller_subscriptions_gateway_subscription on seller_subscriptions(gateway_subscription_code);
+create table if not exists marketplace_webhook_events (
+  event_key text primary key,
+  event_name text not null,
+  payload jsonb not null,
+  received_at timestamptz not null default now()
+);
+create index if not exists idx_marketplace_webhook_events_received on marketplace_webhook_events(received_at desc);
