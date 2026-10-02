@@ -21,6 +21,10 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
     def _plan_codes():
         return {str(k): str(v) for k, v in _json_env("SELLER_PLAN_CODES_JSON").items() if str(v).strip()}
 
+    def _plan_limits():
+        configured=_json_env("SELLER_PLAN_LIMITS_JSON")
+        return {str(k): int(v) for k,v in configured.items() if str(v).isdigit() and int(v)>0}
+
     def _storage_root():
         configured = str(getattr(settings, "marketplace_storage_root", "") or "").strip()
         root = Path(configured) if configured else Path(getattr(settings, "media_storage_root", "../storage/media-intake")).parent / "marketplace"
@@ -109,9 +113,9 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         return {"plans":[
           {"name":"Community Starter","billing":"free","price":0,"currency":"NGN","configured":True,
            "features":["Up to 3 active listings","Moderation review","Seller profile"]},
-          {"name":"Verified Seller","billing":"monthly","configured":"Verified Seller" in codes,
+          {"name":"Verified Seller","billing":"monthly","configured":"Verified Seller" in codes and "Verified Seller" in _plan_limits(),
            "features":["Higher listing limits","Verified profile badge","Seller analytics"]},
-          {"name":"Promoted Seller","billing":"monthly","configured":"Promoted Seller" in codes,
+          {"name":"Promoted Seller","billing":"monthly","configured":"Promoted Seller" in codes and "Promoted Seller" in _plan_limits(),
            "features":["Verified seller features","Priority placement","Campaign slots"]}]}
 
     @router.get("/listings")
@@ -192,6 +196,14 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         with db() as conn:
             seller=_ensure_profile(conn,uid)
             if seller[6]!="active": raise HTTPException(status_code=403,detail="Seller account is not active")
+            sub=conn.execute("""select plan,status from seller_subscriptions where seller_id=%s and status='active'
+              order by created_at desc limit 1""",(seller[0],)).fetchone()
+            plan_name=sub[0] if sub else "Community Starter"
+            limit=_plan_limits().get(plan_name,3 if plan_name=="Community Starter" else 0)
+            if limit<=0: raise HTTPException(status_code=503,detail="Seller plan listing limit is not configured")
+            active_count=conn.execute("""select count(*) from marketplace_listings where seller_id=%s
+              and status in ('pending_review','published','paused')""",(seller[0],)).fetchone()[0]
+            if int(active_count)>=limit: raise HTTPException(status_code=409,detail=f"Your {plan_name} plan allows {limit} active listings")
             conn.execute("""insert into marketplace_listings
               (id,seller_id,title,category,description,price_mode,price,location,status)
               values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review')""",
