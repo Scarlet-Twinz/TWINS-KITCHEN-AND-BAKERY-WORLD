@@ -432,7 +432,95 @@ function deny() {
     '<main style="min-height:100vh;display:grid;place-items:center;padding:20px"><div class="panel" style="max-width:520px;text-align:center"><span class="eyebrow">TWINS ADMIN</span><h1>Staff access required</h1><p class="muted">Sign in with a server-authenticated staff or admin account to open the operations workspace.</p><a class="btn red" href="login.html">Sign in</a></div></main>';
 }
 
+
+function operationsMoney(value,currency){
+  try{return new Intl.NumberFormat("en-NG",{style:"currency",currency:currency||"NGN",maximumFractionDigits:2}).format(Number(value||0));}
+  catch(e){return String(value||0);}
+}
+function operationsTable(headers,rows){
+  return '<div class="tablewrap"><table class="table"><thead><tr>'+headers.map(function(h){return '<th>'+escapeHtml(h)+'</th>';}).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
+}
+function operationsShell(user){
+  document.getElementById("admin").innerHTML=
+    '<div class="shell"><aside class="side" id="operationsSide"><div class="brand"><img src="brand.svg" alt="Twins Kitchen"><div><b>TWINS KITCHEN</b><span>Business Operations</span></div></div>'+
+    '<nav class="nav" id="operationsNav"></nav><div class="sidefoot">Internal operations only. Customer accounts cannot access these views or APIs.</div></aside>'+
+    '<main class="main"><header class="top"><div><button class="mobile" id="operationsMenu">☰</button><h1 id="operationsTitle">Overview</h1><p>Quotes · Orders · Payments · Customers · Fulfilment</p></div><div class="user"><div class="avatar">'+escapeHtml(((user.name||"Admin").split(" ").map(function(x){return x.charAt(0)}).slice(0,2).join("").toUpperCase()))+'</div><span>'+escapeHtml(user.name||"Administrator")+'</span><a class="btn light" href="admin.html">Media Center</a><a class="btn light" href="index.html">Storefront</a></div></header><div class="content" id="operationsViews"></div></main></div>';
+  var nav=[["overview","Overview"],["quotes","Quotes"],["orders","Orders"],["payments","Payments"],["customers","Customers"],["delivery","Delivery"],["products","Products"],["media","Media Center"]];
+  document.getElementById("operationsNav").innerHTML=nav.map(function(x){return '<button data-operations-view="'+x[0]+'">'+x[1]+'</button>';}).join("");
+  document.getElementById("operationsNav").addEventListener("click",function(e){
+    var b=e.target.closest("button[data-operations-view]");if(!b)return;
+    if(b.dataset.operationsView==="media"){location.href="admin.html";return;}
+    showOperationsView(b.dataset.operationsView);
+  });
+  document.getElementById("operationsMenu").onclick=function(){document.getElementById("operationsSide").classList.toggle("open");};
+  showOperationsView("overview");
+}
+async function operationsRequest(path,options){return request(path,options);}
+function showOperationsView(name){
+  var nav=document.querySelectorAll("[data-operations-view]");
+  nav.forEach(function(b){b.classList.toggle("active",b.dataset.operationsView===name);});
+  document.querySelectorAll("[data-operations-view]").forEach(function(b){});
+  var titles={overview:"Operations Overview",quotes:"Quotes",orders:"Orders",payments:"Payments",customers:"Customers",delivery:"Delivery",products:"Products"};
+  document.getElementById("operationsTitle").textContent=titles[name]||"Operations";
+  if(window.innerWidth<760)document.getElementById("operationsSide").classList.remove("open");
+  var v=document.getElementById("operationsViews");v.innerHTML='<div class="empty">Loading…</div>';
+  if(name==="overview")renderOperationsOverview();
+  else if(name==="quotes")renderOperationsQuotes();
+  else if(name==="orders")renderOperationsOrders();
+  else if(name==="payments")renderOperationsPayments();
+  else if(name==="customers")renderOperationsCustomers();
+  else if(name==="delivery")renderOperationsDelivery();
+  else if(name==="products")renderOperationsProducts();
+}
+async function renderOperationsOverview(){
+  var el=document.getElementById("operationsViews"),d=await operationsRequest("/api/admin/operations/overview"),k=d.kpis;
+  el.innerHTML='<div class="hero"><div><span class="eyebrow">TWINS OPERATIONS</span><h2>Business at a glance</h2><p class="muted small">Only server-calculated records are shown.</p></div></div>'+
+    '<div class="kpis">'+[["New quote requests",k.newQuotes],["Open orders",k.openOrders],["Awaiting payment",k.awaitingPayment],["Paid orders",k.paidOrders],["Awaiting fulfilment",k.awaitingFulfilment],["Awaiting delivery",k.awaitingDelivery]].map(function(x){return '<div class="kpi"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>';}).join("")+'</div>'+
+    '<div class="panel"><div class="head"><div><h3>Recent orders</h3></div></div>'+operationsTable(["Order","Customer","Total","Payment","Fulfilment"],d.recentOrders.map(function(o){return '<tr><td><button class="btn light mini" data-order-open="'+escapeHtml(o.reference)+'">'+escapeHtml(o.reference)+'</button></td><td>'+escapeHtml(o.customerName)+'</td><td>'+operationsMoney(o.total)+'</td><td>'+statusBadge(o.paymentStatus)+'</td><td>'+statusBadge(o.fulfilmentStatus)+'</td></tr>';}))+'</div>';
+  el.querySelectorAll("[data-order-open]").forEach(function(b){b.onclick=async function(){var rows=await operationsRequest("/api/admin/orders");var o=rows.orders.find(function(x){return x.reference===b.dataset.orderOpen});if(o)openOperationsOrder(o.id);};});
+}
+async function renderOperationsQuotes(){
+  var el=document.getElementById("operationsViews"),d=await operationsRequest("/api/admin/quotes");
+  el.innerHTML='<div class="hero"><div><span class="eyebrow">QUOTES</span><h2>Customer quote requests</h2><p class="muted small">Negotiation stays here until staff creates the final order.</p></div></div>'+operationsTable(["Reference","Customer","Items","Status","Received",""],d.quotes.map(function(q){return '<tr><td><button class="btn light mini" data-quote-open="'+escapeHtml(q.reference)+'">'+escapeHtml(q.reference)+'</button></td><td>'+escapeHtml(q.name)+'</td><td>'+q.itemCount+'</td><td>'+statusBadge(q.status)+'</td><td>'+formatDate(q.createdAt)+'</td><td><a class="btn light mini" target="_blank" href="https://wa.me/'+escapeHtml((q.phone||"").replace(/\\D/g,""))+'">WhatsApp</a></td></tr>';}));
+  el.querySelectorAll("[data-quote-open]").forEach(function(b){b.onclick=function(){openOperationsQuote(b.dataset.quoteOpen);};});
+}
+async function openOperationsQuote(reference){
+  var d=await operationsRequest("/api/admin/operations/quotes/"+encodeURIComponent(reference)),q=d.quote,el=document.getElementById("operationsViews");
+  el.innerHTML='<button class="btn light" id="opsBackQuotes">← Quotes</button><div class="panel" style="margin-top:12px"><div class="head"><div><span class="eyebrow">QUOTE</span><h2>'+escapeHtml(q.reference)+'</h2><p>'+escapeHtml(q.name)+' · '+escapeHtml(q.phone)+'</p></div>'+statusBadge(q.status)+'</div>'+
+    '<div class="detail">'+[["Email",q.email],["Business",q.business],["Location",q.location],["Project stage",q.stage],["Capacity",q.capacity],["Space",q.space],["Utilities",q.utilities],["Requirements",q.requirements]].map(function(x){return '<div><b>'+escapeHtml(x[0])+'</b><span>'+escapeHtml(x[1]||"—")+'</span></div>';}).join("")+'</div>'+
+    '<h3>Requested products</h3><div class="tablewrap"><table class="table"><tbody>'+q.items.map(function(i){return '<tr><td>'+escapeHtml(i.name)+'</td><td>'+i.quantity+'</td></tr>';}).join("")+'</tbody></table></div>'+
+    '<div style="margin-top:16px"><a class="btn light" target="_blank" href="https://wa.me/'+escapeHtml((q.phone||"").replace(/\\D/g,""))+'">Contact on WhatsApp</a> <button class="btn red" id="createOpsOrder">Create Order</button></div></div>';
+  document.getElementById("opsBackQuotes").onclick=function(){showOperationsView("quotes");};
+  document.getElementById("createOpsOrder").onclick=function(){openOperationsOrderForm(q);};
+}
+function openOperationsOrderForm(q){
+  var el=document.getElementById("operationsViews"),items=q.items.filter(function(i){return i.productId;});
+  el.innerHTML='<button class="btn light" id="opsBackQuote">← Quote</button><div class="panel" style="margin-top:12px"><span class="eyebrow">CREATE ORDER</span><h2>'+escapeHtml(q.name)+'</h2><div id="opsOrderLines">'+items.map(function(i,n){return '<div class="card" style="margin:10px 0"><b>'+escapeHtml(i.name)+'</b><div class="toolbar"><label>Quantity<input id="opsQty'+n+'" type="number" min="1" value="'+i.quantity+'"></label><label>Agreed unit price<input id="opsPrice'+n+'" type="number" min="0" step="0.01" value="0"></label></div></div>';}).join("")+'</div><label>Delivery fee<input id="opsDeliveryFee" type="number" min="0" step="0.01" value="0"></label><label>Delivery location<input id="opsLocation" value="'+escapeHtml(q.location||"")+'"></label><label>Customer notes<textarea id="opsCustomerNotes"></textarea></label><label>Internal notes<textarea id="opsInternalNotes"></textarea></label><button class="btn red" id="saveOpsOrder">Create Order</button></div>';
+  document.getElementById("opsBackQuote").onclick=function(){openOperationsQuote(q.reference);};
+  document.getElementById("saveOpsOrder").onclick=async function(){try{var payload={quoteReference:q.reference,deliveryFee:Number(document.getElementById("opsDeliveryFee").value||0),customerLocation:document.getElementById("opsLocation").value,customerNotes:document.getElementById("opsCustomerNotes").value,internalNotes:document.getElementById("opsInternalNotes").value,items:items.map(function(i,n){return {productId:i.productId,quantity:Number(document.getElementById("opsQty"+n).value),agreedUnitPrice:Number(document.getElementById("opsPrice"+n).value)}})};var d=await operationsRequest("/api/admin/operations/orders/from-quote",{method:"POST",body:JSON.stringify(payload)});openOperationsOrder(d.order.id);}catch(e){alert(e.message);}};
+}
+async function renderOperationsOrders(){
+  var el=document.getElementById("operationsViews"),d=await operationsRequest("/api/admin/orders");
+  el.innerHTML='<div class="hero"><div><span class="eyebrow">ORDERS</span><h2>Agreed customer orders</h2></div></div>'+operationsTable(["Reference","Customer","Total","Payment","Order status","Created"],d.orders.map(function(o){return '<tr><td><button class="btn light mini" data-ops-order="'+o.id+'">'+escapeHtml(o.reference)+'</button></td><td>'+escapeHtml(o.customerName)+'</td><td>'+operationsMoney(o.totalAmount,o.currency)+'</td><td>'+statusBadge(o.paymentStatus)+'</td><td>'+statusBadge(o.status)+'</td><td>'+formatDate(o.createdAt)+'</td></tr>';}));
+  el.querySelectorAll("[data-ops-order]").forEach(function(b){b.onclick=function(){openOperationsOrder(b.dataset.opsOrder);};});
+}
+async function openOperationsOrder(id){
+  var d=await operationsRequest("/api/admin/operations/orders/"+id),o=d.order,el=document.getElementById("operationsViews");
+  el.innerHTML='<button class="btn light" id="opsBackOrders">← Orders</button><div class="panel" style="margin-top:12px"><div class="head"><div><span class="eyebrow">ORDER</span><h2>'+escapeHtml(o.reference)+'</h2><p>'+escapeHtml(o.customer.name)+' · '+escapeHtml(o.customer.phone)+'</p><p>'+escapeHtml(o.customer.location||"No delivery location")+'</p></div>'+statusBadge(o.paymentStatus)+'</div>'+
+    '<div class="tablewrap"><table class="table"><thead><tr><th>Product snapshot</th><th>Qty</th><th>Agreed unit price</th><th>Line total</th></tr></thead><tbody>'+o.items.map(function(i){return '<tr><td>'+escapeHtml(i.name)+'</td><td>'+i.quantity+'</td><td>'+operationsMoney(i.unitPrice,o.currency)+'</td><td>'+operationsMoney(i.lineTotal,o.currency)+'</td></tr>';}).join("")+'</tbody></table></div>'+
+    '<div class="detail" style="margin-top:14px"><div><b>Subtotal</b><span>'+operationsMoney(o.subtotal,o.currency)+'</span></div><div><b>Delivery</b><span>'+operationsMoney(o.deliveryFee,o.currency)+'</span></div><div><b>Total</b><span><strong>'+operationsMoney(o.total,o.currency)+'</strong></span></div><div><b>Fulfilment</b><span>'+statusBadge(o.fulfilmentStatus)+'</span></div></div>'+
+    '<div class="toolbar" style="margin-top:16px"><select id="opsFulfilment"><option value="pending">Pending</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="out_for_delivery">Out for delivery</option><option value="delivered">Delivered</option></select><button class="btn light" id="saveOpsFulfilment">Update fulfilment</button>'+(o.paymentStatus!=="paid"?' <button class="btn red" id="generateOpsPayment">Generate Payment Link</button>':"")+'</div><div id="opsPaymentResult"></div></div>';
+  document.getElementById("opsBackOrders").onclick=function(){showOperationsView("orders");};document.getElementById("opsFulfilment").value=o.fulfilmentStatus;
+  document.getElementById("saveOpsFulfilment").onclick=async function(){try{await operationsRequest("/api/admin/operations/orders/"+id+"/fulfilment",{method:"PATCH",body:JSON.stringify({status:document.getElementById("opsFulfilment").value})});openOperationsOrder(id);}catch(e){alert(e.message);}};
+  var pay=document.getElementById("generateOpsPayment");if(pay)pay.onclick=async function(){try{var p=await operationsRequest("/api/admin/operations/orders/"+id+"/payments",{method:"POST"});document.getElementById("opsPaymentResult").innerHTML='<div class="notice"><b>Payment request created</b><p>'+escapeHtml(p.payment.reference)+'</p><p><a href="'+escapeHtml(p.payment.authorizationUrl)+'" target="_blank">'+escapeHtml(p.payment.authorizationUrl)+'</a></p><button class="btn light" id="copyOpsPayment">Copy Payment Link</button></div>';document.getElementById("copyOpsPayment").onclick=function(){navigator.clipboard.writeText(p.payment.authorizationUrl);};}catch(e){alert(e.message);}};
+}
+async function renderOperationsPayments(){var d=await operationsRequest("/api/admin/operations/payments");document.getElementById("operationsViews").innerHTML='<div class="hero"><div><span class="eyebrow">PAYMENTS</span><h2>Payment transactions</h2></div></div>'+operationsTable(["Reference","Order","Amount","Status","Gateway","Created"],d.payments.map(function(p){return '<tr><td>'+escapeHtml(p.reference)+'</td><td>'+escapeHtml(p.orderReference||"—")+'</td><td>'+operationsMoney(p.amount,p.currency)+'</td><td>'+statusBadge(p.status)+'</td><td>'+escapeHtml(p.gateway)+'</td><td>'+formatDate(p.createdAt)+'</td></tr>';}));}
+async function renderOperationsCustomers(){var d=await operationsRequest("/api/admin/operations/customers");document.getElementById("operationsViews").innerHTML='<div class="hero"><div><span class="eyebrow">CUSTOMERS</span><h2>Customer accounts</h2></div></div>'+operationsTable(["Name","Phone","Email","Quotes","Orders","Total paid","Joined"],d.customers.map(function(c){return '<tr><td>'+escapeHtml(c.name)+'</td><td>'+escapeHtml(c.phone||"—")+'</td><td>'+escapeHtml(c.email)+'</td><td>'+c.quoteCount+'</td><td>'+c.orderCount+'</td><td>'+operationsMoney(c.totalPaid)+'</td><td>'+formatDate(c.createdAt)+'</td></tr>';}));}
+async function renderOperationsDelivery(){var d=await operationsRequest("/api/admin/operations/delivery");document.getElementById("operationsViews").innerHTML='<div class="hero"><div><span class="eyebrow">DELIVERY</span><h2>Fulfilment and delivery</h2></div></div>'+operationsTable(["Order","Customer","Destination","Payment","Fulfilment","Delivery"],d.delivery.map(function(x){return '<tr><td>'+escapeHtml(x.orderReference)+'</td><td>'+escapeHtml(x.customerName)+'</td><td>'+escapeHtml(x.destination||"—")+'</td><td>'+statusBadge(x.paymentStatus)+'</td><td>'+statusBadge(x.fulfilmentStatus)+'</td><td>'+statusBadge(x.deliveryStatus)+'</td></tr>';}));}
+async function renderOperationsProducts(){var d=await operationsRequest("/api/admin/operations/products"),el=document.getElementById("operationsViews");el.innerHTML='<div class="hero"><div><span class="eyebrow">PRODUCTS / CATALOGUE</span><h2>Manage the authoritative catalogue</h2><p class="muted small">Media remains controlled by the existing Media Center.</p></div></div><div class="toolbar"><button class="btn red" id="opsAddProduct">Add product</button><a class="btn light" href="admin.html">Open Media Center</a></div>'+operationsTable(["Catalogue #","Product","Category","Pricing","Availability","Media","Status"],d.products.map(function(p){return '<tr><td>'+escapeHtml(p.catalogueNumber||"—")+'</td><td><strong>'+escapeHtml(p.name)+'</strong></td><td>'+escapeHtml(p.category)+'</td><td>'+escapeHtml(p.priceMode)+(p.price!=null?" · "+operationsMoney(p.price,p.currency):"")+'</td><td>'+escapeHtml(p.availabilityStatus)+'</td><td>'+p.mediaCount+'</td><td>'+statusBadge(p.status)+'</td></tr>';}))+'<div id="opsProductForm"></div>';document.getElementById("opsAddProduct").onclick=function(){renderOperationsProductForm();};}
+function renderOperationsProductForm(){document.getElementById("opsProductForm").innerHTML='<div class="panel"><h3>Add product</h3><div class="toolbar"><label>Name<input id="opn"></label><label>Category<input id="opc"></label><label>Pricing<select id="opm"><option value="quote">Quote Required</option><option value="fixed">Fixed price</option></select></label></div><div class="toolbar"><label>Price<input id="opp" type="number" min="0"></label><label>Availability<select id="opa"><option value="available">Available</option><option value="unavailable">Unavailable</option><option value="preorder">Pre-order</option></select></label></div><label>Description<textarea id="opd"></textarea></label><label>Specifications JSON<textarea id="opspec">{}</textarea></label><button class="btn red" id="opsSaveProduct">Create Product</button></div>';document.getElementById("opsSaveProduct").onclick=async function(){try{await operationsRequest("/api/admin/operations/products",{method:"POST",body:JSON.stringify({name:document.getElementById("opn").value,category:document.getElementById("opc").value,priceMode:document.getElementById("opm").value,price:document.getElementById("opm").value==="fixed"?Number(document.getElementById("opp").value):null,availabilityStatus:document.getElementById("opa").value,description:document.getElementById("opd").value,specifications:JSON.parse(document.getElementById("opspec").value||"{}"),active:true,mediaIds:[]})});renderOperationsProducts();}catch(e){alert(e.message);}};}
 window.addEventListener("load", async function () {
+  var operationsPage = /\\/ops\\.html$/.test(location.pathname);
   document.getElementById("admin").innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:20px"><div class="panel" style="max-width:520px;text-align:center"><span class="eyebrow">TWINS ADMIN</span><h1>Checking staff access…</h1><p class="muted">Connecting to the authenticated operations workspace.</p></div></main>';
   try {
     var session = await request("/api/account/me");
@@ -440,6 +528,7 @@ window.addEventListener("load", async function () {
     if (role === "admin" || role === "staff") {
       currentUser = Object.assign({}, session.user, {remote:true});
       localStorage.setItem("twins_user", JSON.stringify(currentUser));
+      if (operationsPage) { operationsShell(session.user); return; }
       renderShell();
       return;
     }
