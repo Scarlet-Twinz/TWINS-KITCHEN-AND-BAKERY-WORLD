@@ -1,4 +1,4 @@
-import hashlib, hmac, json, os, secrets, urllib.error, urllib.request, uuid
+import hashlib, hmac, json, os, secrets, urllib.error, urllib.request, urllib.parse, uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request, File, UploadFile
@@ -110,7 +110,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         if digits.startswith("0") and len(digits)==11: digits="234"+digits[1:]
         if not digits or len(digits)<10: return None
         message="Hello. I found your "+str(title or "product")+" on the Twins Marketplace. I would like to ask about availability, condition and purchase details."
-        return "https://wa.me/"+digits+"?text="+__import__("urllib.parse").parse.quote(message)
+        return "https://wa.me/"+digits+"?text="+urllib.parse.quote(message)
 
     def _listing_dict(conn, row):
         return {"id":str(row[0]),"title":row[1],"category":row[2],"description":row[3],
