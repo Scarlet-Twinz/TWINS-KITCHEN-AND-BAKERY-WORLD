@@ -58,6 +58,29 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             raise HTTPException(status_code=502, detail=body.get("message", "Payment provider rejected the request"))
         return body.get("data") or {}
 
+    
+    def _activate_successful_payment(conn, tx, data):
+        """Idempotently apply a verified Paystack success to our own records."""
+        expected_amount=int(tx[3])
+        expected_currency=str(tx[4])
+        actual_amount=int(data.get("amount") or 0)
+        actual_currency=str(data.get("currency") or "")
+        if str(data.get("status") or "")!="success":
+            return False, "provider did not report success"
+        if actual_amount!=expected_amount or actual_currency!=expected_currency:
+            return False, "payment amount or currency mismatch"
+        payment_meta={"paystackTransactionId":data.get("id"),"paidAt":data.get("paid_at") or data.get("paidAt")}
+        conn.execute("""update payment_transactions set status='successful',gateway_status=%s,
+          processed_at=coalesce(processed_at,now()),updated_at=now(),
+          metadata=coalesce(metadata,'{}'::jsonb)||%s::jsonb where id=%s""",
+          (str(data.get("gateway_response") or "success"),json.dumps(payment_meta),tx[0]))
+        if tx[2]:
+            now=datetime.now(timezone.utc)
+            conn.execute("""update seller_subscriptions set status='active',
+              starts_at=coalesce(starts_at,%s),last_payment_at=%s,updated_at=now() where id=%s""",
+              (now,now,tx[2]))
+        return True, "successful"
+
     def _profile(conn, uid):
         return conn.execute("""select id,user_id,display_name,phone,location,verification_status,seller_status,created_at,updated_at
           from seller_profiles where user_id=%s""", (uid,)).fetchone()
@@ -273,6 +296,8 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
                       values (%s,%s,'image',%s,%s,%s,%s,%s,%s)""",
                       (media_id,lid,str(relative).replace(chr(92),"/"),original[:240],sort_order,inspection.mime_type,digest,len(data)))
                     saved.append({"id":str(media_id),"filename":original,"url":(_public_base()+"/api/marketplace/media/"+str(media_id)) if _public_base() else "/api/marketplace/media/"+str(media_id)})
+                if listing[1] in ("published","rejected","paused"):
+                    conn.execute("update marketplace_listings set status='pending_review',published_at=null,updated_at=now() where id=%s",(lid,))
                 conn.commit()
             except Exception:
                 for target in staged: target.unlink(missing_ok=True)
@@ -292,7 +317,11 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             path=(root/row[0]).resolve()
             try: path.relative_to(root)
             except ValueError: raise HTTPException(status_code=403,detail="Invalid media path")
-            conn.execute("delete from marketplace_listing_media where id=%s",(mid,));conn.commit()
+            conn.execute("delete from marketplace_listing_media where id=%s",(mid,))
+            status=conn.execute("select status from marketplace_listings where id=%s",(lid,)).fetchone()[0]
+            if status=="published":
+                conn.execute("update marketplace_listings set status='pending_review',published_at=null,updated_at=now() where id=%s",(lid,))
+            conn.commit()
         path.unlink(missing_ok=True);return {"ok":True}
 
     @router.post("/listings/{listing_id}/report",status_code=201)
@@ -368,6 +397,45 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         return {"subscription":{"id":str(row[0]),"plan":row[1],"status":row[2],"gateway":row[3],"reference":row[4],
           "planCode":row[5],"startsAt":row[6].isoformat() if row[6] else None,"endsAt":row[7].isoformat() if row[7] else None,
           "createdAt":row[8].isoformat(),"updatedAt":row[9].isoformat()}}
+
+
+    @router.post("/payments/verify")
+    def verify_payment(reference:str,request:Request):
+        session=require_session(request);uid=uuid.UUID(session["sub"])
+        reference=reference.strip()
+        if not reference or len(reference)>100: raise HTTPException(status_code=422,detail="Invalid payment reference")
+        with db() as conn:
+            tx=conn.execute("""select id,user_id,seller_subscription_id,amount,currency,status
+              from payment_transactions where reference=%s and user_id=%s for update""",(reference,uid)).fetchone()
+            if not tx: raise HTTPException(status_code=404,detail="Payment not found")
+            if tx[5]=="successful":
+                return {"payment":{"reference":reference,"status":"successful","verified":True}}
+        data=_paystack("GET","/transaction/verify/"+reference)
+        with db() as conn:
+            tx=conn.execute("""select id,user_id,seller_subscription_id,amount,currency,status
+              from payment_transactions where reference=%s and user_id=%s for update""",(reference,uid)).fetchone()
+            if not tx: raise HTTPException(status_code=404,detail="Payment not found")
+            ok,message=_activate_successful_payment(conn,tx,data)
+            if not ok:
+                provider_status=str(data.get("status") or "unknown")
+                if provider_status in {"failed","abandoned","reversed"}:
+                    conn.execute("update payment_transactions set status='failed',gateway_status=%s,processed_at=now(),updated_at=now() where id=%s and status<>'successful'",(provider_status,tx[0]))
+                conn.commit()
+                return {"payment":{"reference":reference,"status":provider_status,"verified":False,"message":message}}
+            conn.commit()
+        return {"payment":{"reference":reference,"status":"successful","verified":True}}
+
+    @router.get("/subscriptions/me/manage-link")
+    def subscription_manage_link(request:Request):
+        session=require_session(request);uid=uuid.UUID(session["sub"])
+        with db() as conn:
+            row=conn.execute("""select gateway_subscription_code from seller_subscriptions ss
+              join seller_profiles sp on sp.id=ss.seller_id
+              where sp.user_id=%s and ss.gateway='paystack' and ss.gateway_subscription_code is not null
+              order by ss.updated_at desc limit 1""",(uid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="No active Paystack subscription found")
+        data=_paystack("GET","/subscription/"+str(row[0])+"/manage/link/")
+        return {"url":data.get("link")}
 
     @router.get("/payment-status")
     def payment_status(reference:str,request:Request):
