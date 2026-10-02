@@ -645,7 +645,7 @@ def _next_catalogue_number(conn):
     return (conn.execute("select coalesce(max(catalogue_number),0)+1 from products").fetchone()[0] or 1)
 
 def _next_order_reference(conn):
-    value=conn.execute("select nextval('twins_order_reference_seq')").fetchone()[0]
+    value=conn.execute("select coalesce(max(case when reference like 'TK-%' and length(reference)=9 then cast(substr(reference,4) as integer) else 0 end),0)+1 from orders").fetchone()[0]
     return f"TK-{int(value):06d}"
 
 def _category_id(conn,name:str):
