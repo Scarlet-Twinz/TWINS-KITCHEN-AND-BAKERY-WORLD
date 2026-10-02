@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     port: int=8000
     cookie_secure: bool=False
     media_storage_root: str="../storage/media-intake"
+    public_base_url: str=""
+    paystack_secret_key: str=""
+    marketplace_storage_root: str="../storage/marketplace"
+    marketplace_max_image_bytes: int=10*1024*1024
     media_node_command: str="node"
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
@@ -869,47 +873,6 @@ def catalogue():
     return {"products":[{"id":r[0],"name":r[1],"description":r[2],"tag":r[3],"priceMode":r[4],"active":r[5]} for r in rows]}
 
 
-@app.get("/api/marketplace/listings")
-def marketplace_listings(category:str|None=None,limit:int=50):
-    with db() as conn:
-        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,sp.display_name,sp.verification_status
-        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
-        where ml.status='published' and (%s is null or ml.category=%s)
-        order by ml.created_at desc limit %s""",(category,category,limit)).fetchall()
-    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"seller":r[8],"sellerVerification":r[9]} for r in rows]}
-
-@app.post("/api/marketplace/listings",status_code=201)
-def create_marketplace_listing(payload:MarketplaceListingPayload,request:Request):
-    session=require_session(request)
-    uid=uuid.UUID(session["sub"]);lid=uuid.uuid4()
-    with db() as conn:
-        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if not seller:
-            seller_id=uuid.uuid4()
-            conn.execute("insert into seller_profiles (id,user_id,display_name,phone,verification_status) values (%s,%s,(select name from users where id=%s),(select phone from users where id=%s),'pending')",(seller_id,uid,uid,uid))
-        else:seller_id=seller[0]
-        conn.execute("insert into marketplace_listings (id,seller_id,title,category,description,price_mode,price,location,status) values (%s,%s,%s,%s,%s,%s,%s,%s,'pending_review')",(lid,seller_id,payload.title,payload.category,payload.description,payload.priceMode,payload.price,payload.location))
-        conn.commit()
-    return {"listing":{"id":str(lid),"status":"pending_review"}}
-
-@app.get("/api/marketplace/me")
-def my_marketplace_listings(request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"])
-    with db() as conn:
-        rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,ml.location,ml.status,ml.created_at
-        from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id where sp.user_id=%s order by ml.created_at desc limit 100""",(uid,)).fetchall()
-    return {"listings":[{"id":str(r[0]),"title":r[1],"category":r[2],"description":r[3],"priceMode":r[4],"price":r[5],"currency":r[6],"location":r[7],"status":r[8],"createdAt":r[9].isoformat()} for r in rows]}
-
-@app.post("/api/marketplace/seller-plan-intent",status_code=201)
-def seller_plan_intent(payload:SellerPlanPayload,request:Request):
-    session=require_session(request);uid=uuid.UUID(session["sub"]);sid=uuid.uuid4()
-    with db() as conn:
-        seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
-        if not seller:raise HTTPException(status_code=400,detail="Create a seller profile first")
-        conn.execute("insert into seller_subscriptions (id,seller_id,plan,status) values (%s,%s,%s,'pending_payment')",(sid,seller[0],payload.plan))
-        conn.commit()
-    return {"subscription":{"id":str(sid),"plan":payload.plan,"status":"pending_payment"}}
-
 @app.get("/api/project-plans/me")
 def my_project_plan(request:Request):
     session=require_session(request)
@@ -988,3 +951,7 @@ def admin_quotes(request:Request):
     with db() as conn:
         rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0) from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
     return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
+
+# Production marketplace routes are isolated from the Operations Admin.
+from marketplace_api import register_marketplace_routes
+register_marketplace_routes(app, db, settings, require_session, require_admin, inspect_image_bytes)
