@@ -921,10 +921,22 @@ def report_listing(listing_id:str,payload:MarketplaceReportPayload,request:Reque
 def moderate_listing(listing_id:str,status:str,request:Request):
     require_admin(request)
     allowed={"published","rejected","paused","sold","archived"}
-    if status not in allowed:raise HTTPException(status_code=422,detail="Unsupported moderation status")
+    if status not in allowed: raise HTTPException(status_code=422,detail="Unsupported moderation status")
+    try: lid=uuid.UUID(listing_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
     with db() as conn:
-        cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,uuid.UUID(listing_id)));conn.commit()
-        if cur.rowcount==0:raise HTTPException(status_code=404,detail="Listing not found")
+        if status=="published":
+            row=conn.execute("""select ml.id,sp.verification_status,sp.seller_status,
+              (select count(*) from marketplace_listing_media where listing_id=ml.id)
+              from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id where ml.id=%s for update""",(lid,)).fetchone()
+            if not row: raise HTTPException(status_code=404,detail="Listing not found")
+            if row[1]!="verified" or row[2]!="active": raise HTTPException(status_code=409,detail="Seller must be verified and active before publication")
+            if int(row[3])<1: raise HTTPException(status_code=409,detail="A listing must have at least one image before publication")
+            cur=conn.execute("update marketplace_listings set status='published',published_at=now(),updated_at=now() where id=%s",(lid,))
+        else:
+            cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,lid))
+            if cur.rowcount==0: raise HTTPException(status_code=404,detail="Listing not found")
+        conn.commit()
     return {"ok":True,"status":status}
 
 @app.post("/api/quotes",status_code=201)
