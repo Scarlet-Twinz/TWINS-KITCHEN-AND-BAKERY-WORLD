@@ -952,6 +952,48 @@ def admin_quotes(request:Request):
         rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0) from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
     return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
 
+@app.patch("/api/admin/marketplace/listings/{listing_id}")
+def moderate_listing(listing_id:str,status:str,request:Request):
+    require_admin(request)
+    allowed={"published","rejected","paused","sold","archived"}
+    if status not in allowed: raise HTTPException(status_code=422,detail="Unsupported moderation status")
+    with db() as conn:
+        try: lid=uuid.UUID(listing_id)
+        except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
+        if status=="published":
+            cur=conn.execute("update marketplace_listings set status=%s,published_at=now(),updated_at=now() where id=%s",(status,lid))
+        else:
+            cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,lid))
+        conn.commit()
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Listing not found")
+    return {"ok":True,"status":status}
+
+@app.post("/api/quotes",status_code=201)
+def create_quote(payload:QuotePayload,request:Request):
+    session=read_session(request);qid=uuid.uuid4();ref=payload.reference or f"TW-{datetime.now().year}-{secrets.token_hex(3).upper()}";uid=uuid.UUID(session["sub"]) if session else None
+    with db() as conn:
+        conn.execute("insert into quotes (id,reference,user_id,name,email,phone,business,project_stage,location,capacity,space,utilities,requirements,status,package_name) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Prepared',%s)",(qid,ref,uid,payload.name,payload.email,payload.phone,payload.business,payload.stage,payload.location,payload.capacity,payload.space,payload.utilities,payload.requirements,payload.packageName))
+        for item in payload.items:
+            row=conn.execute("select id from products where legacy_catalogue_id=%s",(item.id,)).fetchone();pid=row[0] if row else None
+            conn.execute("insert into quote_items (id,quote_id,product_id,quantity) values (%s,%s,%s,%s)",(uuid.uuid4(),qid,pid,item.quantity))
+        conn.commit()
+    return {"quote":{"id":str(qid),"reference":ref,"status":"Prepared","createdAt":datetime.now(timezone.utc).isoformat()}}
+
+@app.get("/api/quotes/me")
+def my_quotes(request:Request):
+    session=require_session(request)
+    with db() as conn:
+        rows=conn.execute("select reference,name,business,status,created_at from quotes where user_id=%s order by created_at desc limit 50",(session["sub"],)).fetchall()
+    return {"quotes":[{"reference":r[0],"name":r[1],"business":r[2],"status":r[3],"createdAt":r[4].isoformat()} for r in rows]}
+
+@app.get("/api/admin/quotes")
+def admin_quotes(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""select q.reference,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,coalesce(sum(qi.quantity),0)
+          from quotes q left join quote_items qi on qi.quote_id=q.id group by q.id order by q.created_at desc limit 100""").fetchall()
+    return {"quotes":[{"reference":r[0],"name":r[1],"email":r[2],"phone":r[3],"business":r[4],"stage":r[5],"location":r[6],"capacity":r[7],"space":r[8],"utilities":r[9],"requirements":r[10],"packageName":r[11],"status":r[12],"createdAt":r[13].isoformat(),"itemCount":r[14]} for r in rows]}
+
 # Production marketplace routes are isolated from the Operations Admin.
 from marketplace_api import register_marketplace_routes
 register_marketplace_routes(app, db, settings, require_session, require_admin, inspect_image_bytes)
