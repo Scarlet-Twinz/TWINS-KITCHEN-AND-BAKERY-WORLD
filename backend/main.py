@@ -2,7 +2,7 @@ import base64, hashlib, hmac, json, os, re, secrets, time, uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-import bcrypt, psycopg
+import bcrypt, psycopg, httpx
 from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     cookie_secure: bool=False
     auth_rate_limit: int=10
     auth_rate_window_seconds: int=900
+    paystack_secret_key: str=""
+    paystack_base_url: str="https://api.paystack.co"
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
 SESSION_COOKIE="__Host-twins_session" if settings.cookie_secure else "twins_session"
@@ -78,6 +80,15 @@ def validate_production_security():
             raise RuntimeError("COOKIE_SECURE=true is required in production")
         if not origins:
             raise RuntimeError("FRONTEND_ORIGINS must contain at least one allowed origin in production")
+
+def apply_operations_migration():
+    if not settings.database_url: return
+    migration_path=Path(__file__).resolve().parent/"migrations"/"001_operations_admin_v1.sql"
+    if not migration_path.exists(): return
+    statements=[x.strip() for x in migration_path.read_text(encoding="utf-8").split(";") if x.strip()]
+    with db() as conn:
+        for statement in statements: conn.execute(statement)
+        conn.commit()
 
 def db():
     if not settings.database_url: raise HTTPException(status_code=503,detail="Database is not configured")
@@ -200,7 +211,7 @@ class DeliveryStatusPayload(BaseModel):
     trackingReference:str|None=None
 
 
-@app.get("/api/health")
+@app.on_event("startup")\ndef apply_startup_migrations():\n    try: apply_operations_migration()\n    except Exception as exc: raise RuntimeError(f"Operations migration failed: {exc}")\n\n@app.get("/api/health")
 def health():
     if not settings.database_url:return {"ok":True,"database":"not-configured","mode":"configuration"}
     try:
@@ -600,6 +611,233 @@ def admin_audit(request:Request):
         for r in rows
     ]}
 
+
+
+# Operations Admin v1. Server-authoritative commerce operations.
+class OrderCreateDetailedPayload(BaseModel):
+    quoteReference:str=Field(min_length=4,max_length=80)
+    items:list[dict[str,Any]]=Field(default_factory=list,max_length=100)
+    deliveryFee:float=Field(default=0,ge=0)
+    customerLocation:str|None=None
+    customerNotes:str|None=None
+    internalNotes:str|None=None
+
+class ProductPayload(BaseModel):
+    name:str=Field(min_length=2,max_length=180)
+    category:str=Field(min_length=2,max_length=100)
+    description:str|None=None
+    specifications:dict[str,Any]=Field(default_factory=dict)
+    priceMode:str=Field(default="quote")
+    price:float|None=Field(default=None,ge=0)
+    currency:str=Field(default="NGN",min_length=3,max_length=3)
+    availabilityStatus:str=Field(default="available",min_length=2,max_length=40)
+    active:bool=True
+    mediaIds:list[str]=Field(default_factory=list,max_length=50)
+
+class ProductUpdatePayload(ProductPayload):
+    pass
+
+def _slugify_product(value:str)->str:
+    slug=re.sub(r"[^a-z0-9]+","-",value.lower()).strip("-")
+    return slug or f"product-{secrets.token_hex(3)}"
+
+def _next_catalogue_number(conn):
+    return (conn.execute("select coalesce(max(catalogue_number),0)+1 from products").fetchone()[0] or 1)
+
+def _category_id(conn,name:str):
+    row=conn.execute("select id from categories where lower(name)=lower(%s)",(name.strip(),)).fetchone()
+    if row: return row[0]
+    cid=uuid.uuid4(); slug=_slugify_product(name)
+    while conn.execute("select 1 from categories where slug=%s",(slug,)).fetchone(): slug=f"{slug}-{secrets.token_hex(2)}"
+    conn.execute("insert into categories(id,slug,name) values(%s,%s,%s)",(cid,slug,name.strip()))
+    return cid
+
+@app.get("/api/admin/operations/overview")
+def operations_overview(request:Request):
+    require_admin(request)
+    with db() as conn:
+        q=conn.execute("select count(*) from quotes where status not in ('Closed')").fetchone()[0]
+        orders=conn.execute("select count(*) from orders where status not in ('completed','cancelled')").fetchone()[0]
+        awaiting=conn.execute("select count(*) from orders where payment_status in ('unpaid','pending') and status not in ('cancelled','completed')").fetchone()[0]
+        paid=conn.execute("select count(*) from orders where payment_status='paid'").fetchone()[0]
+        fulfil=conn.execute("select count(*) from orders where fulfilment_status in ('pending','preparing','ready') and payment_status='paid'").fetchone()[0]
+        delivery=conn.execute("select count(*) from deliveries where status in ('pending','scheduled','dispatched','in_transit')").fetchone()[0]
+        recent=conn.execute("select reference,customer_name,total_amount,payment_status,status,fulfilment_status,created_at from orders order by created_at desc limit 8").fetchall()
+    return {"kpis":{"newQuotes":q,"openOrders":orders,"awaitingPayment":awaiting,"paidOrders":paid,"awaitingFulfilment":fulfil,"awaitingDelivery":delivery},
+      "recentOrders":[{"reference":r[0],"customerName":r[1],"total":float(r[2]),"paymentStatus":r[3],"status":r[4],"fulfilmentStatus":r[5],"createdAt":r[6].isoformat()} for r in recent]}
+
+@app.get("/api/admin/operations/quotes/{reference}")
+def operations_quote_detail(reference:str,request:Request):
+    require_admin(request)
+    with db() as conn:
+        q=conn.execute("select q.id,q.reference,q.user_id,q.name,q.email,q.phone,q.business,q.project_stage,q.location,q.capacity,q.space,q.utilities,q.requirements,q.package_name,q.status,q.created_at,q.updated_at from quotes q where q.reference=%s",(reference,)).fetchone()
+        if not q: raise HTTPException(status_code=404,detail="Quote not found")
+        items=conn.execute("select qi.product_id,coalesce(p.name,'Catalogue item'),qi.quantity,p.legacy_catalogue_id from quote_items qi left join products p on p.id=qi.product_id where qi.quote_id=%s",(q[0],)).fetchall()
+    return {"quote":{"id":str(q[0]),"reference":q[1],"userId":str(q[2]) if q[2] else None,"name":q[3],"email":q[4],"phone":q[5],"business":q[6],"stage":q[7],"location":q[8],"capacity":q[9],"space":q[10],"utilities":q[11],"requirements":q[12],"packageName":q[13],"status":q[14],"createdAt":q[15].isoformat(),"updatedAt":q[16].isoformat(),"items":[{"productId":str(x[0]) if x[0] else None,"name":x[1],"quantity":x[2],"legacyId":x[3]} for x in items]}}
+
+@app.get("/api/admin/operations/orders/{order_id}")
+def operations_order_detail(order_id:str,request:Request):
+    require_admin(request); oid=uuid.UUID(order_id)
+    with db() as conn:
+        r=conn.execute("""select id,reference,user_id,quote_id,status,payment_status,fulfilment_status,currency,subtotal,delivery_fee,total_amount,customer_name,customer_email,customer_phone,customer_location,notes,internal_notes,created_at,updated_at from orders where id=%s""",(oid,)).fetchone()
+        if not r: raise HTTPException(status_code=404,detail="Order not found")
+        items=conn.execute("select id,product_id,product_name_snapshot,quantity,agreed_unit_price,line_total from order_items where order_id=%s order by id",(oid,)).fetchall()
+        payments=conn.execute("select id,reference,gateway,provider_reference,amount,currency,status,gateway_status,created_at,paid_at from payment_transactions where order_id=%s order by created_at desc",(oid,)).fetchall()
+        delivery=conn.execute("select id,status,recipient_name,phone,address,city,state,country,tracking_reference,scheduled_at,delivered_at,notes from deliveries where order_id=%s",(oid,)).fetchone()
+    return {"order":{"id":str(r[0]),"reference":r[1],"userId":str(r[2]) if r[2] else None,"quoteId":str(r[3]) if r[3] else None,"status":r[4],"paymentStatus":r[5],"fulfilmentStatus":r[6],"currency":r[7],"subtotal":float(r[8]),"deliveryFee":float(r[9]),"total":float(r[10]),"customer":{"name":r[11],"email":r[12],"phone":r[13],"location":r[14]},"notes":r[15],"internalNotes":r[16],"createdAt":r[17].isoformat(),"updatedAt":r[18].isoformat(),"items":[{"id":str(x[0]),"productId":str(x[1]) if x[1] else None,"name":x[2],"quantity":x[3],"unitPrice":float(x[4] or 0),"lineTotal":float(x[5] or 0)} for x in items],"payments":[{"id":str(x[0]),"reference":x[1],"gateway":x[2],"providerReference":x[3],"amount":float(x[4]),"currency":x[5],"status":x[6],"gatewayStatus":x[7],"createdAt":x[8].isoformat(),"paidAt":x[9].isoformat() if x[9] else None} for x in payments],"delivery":None if not delivery else {"id":str(delivery[0]),"status":delivery[1],"recipientName":delivery[2],"phone":delivery[3],"address":delivery[4],"city":delivery[5],"state":delivery[6],"country":delivery[7],"trackingReference":delivery[8],"scheduledAt":delivery[9].isoformat() if delivery[9] else None,"deliveredAt":delivery[10].isoformat() if delivery[10] else None,"notes":delivery[11]} }}
+
+@app.post("/api/admin/operations/orders/from-quote",status_code=201)
+def create_detailed_order(payload:OrderCreateDetailedPayload,request:Request):
+    actor=require_admin(request)
+    with db() as conn:
+        quote=conn.execute("select id,user_id,name,email,phone,location from quotes where reference=%s for update",(payload.quoteReference,)).fetchone()
+        if not quote: raise HTTPException(status_code=404,detail="Quote not found")
+        if conn.execute("select id from orders where quote_id=%s",(quote[0],)).fetchone(): raise HTTPException(status_code=409,detail="An order already exists for this quote")
+        oid=uuid.uuid4(); reference=f"TK-{_next_catalogue_number(conn):06d}"
+        while conn.execute("select 1 from orders where reference=%s",(reference,)).fetchone():
+            reference=f"TK-{secrets.randbelow(999999):06d}"
+        subtotal=0; valid_items=[]
+        for item in payload.items:
+            pid=uuid.UUID(str(item.get("productId"))); qty=int(item.get("quantity",0)); price=float(item.get("agreedUnitPrice",0))
+            if qty<1 or price<0: raise HTTPException(status_code=422,detail="Invalid order item")
+            row=conn.execute("select name from products where id=%s",(pid,)).fetchone()
+            if not row: raise HTTPException(status_code=404,detail="Product not found")
+            line=qty*price; subtotal+=line; valid_items.append((pid,row[0],qty,price,line))
+        if not valid_items: raise HTTPException(status_code=422,detail="At least one order item is required")
+        total=subtotal+payload.deliveryFee
+        conn.execute("""insert into orders(id,reference,user_id,quote_id,status,payment_status,fulfilment_status,currency,subtotal,delivery_fee,total_amount,customer_name,customer_email,customer_phone,customer_location,notes,internal_notes)
+          values(%s,%s,%s,%s,'confirmed','unpaid','pending','NGN',%s,%s,%s,%s,%s,%s,%s,%s,%s)""",(oid,reference,quote[1],quote[0],subtotal,payload.deliveryFee,total,quote[2],quote[3],quote[4],payload.customerLocation or quote[5],payload.customerNotes,payload.internalNotes))
+        for pid,name,qty,price,line in valid_items:
+            conn.execute("insert into order_items(id,order_id,product_id,product_name_snapshot,quantity,agreed_unit_price,line_total,name,unit_amount) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)",(uuid.uuid4(),oid,pid,name,qty,price,line,name,price))
+        write_audit(conn,uuid.UUID(actor["sub"]),"order.created","order",oid,{"quoteReference":payload.quoteReference,"total":total})
+        conn.commit()
+    return {"order":{"id":str(oid),"reference":reference,"status":"confirmed","paymentStatus":"unpaid","total":total}}
+
+@app.patch("/api/admin/operations/orders/{order_id}/fulfilment")
+def update_operations_fulfilment(order_id:str,payload:OrderStatusPayload,request:Request):
+    actor=require_admin(request); allowed={"pending","preparing","ready","out_for_delivery","delivered"}
+    if payload.status not in allowed: raise HTTPException(status_code=422,detail="Unsupported fulfilment status")
+    oid=uuid.UUID(order_id)
+    with db() as conn:
+        cur=conn.execute("update orders set fulfilment_status=%s,updated_at=now() where id=%s",(payload.status,oid))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Order not found")
+        if payload.status=="delivered": conn.execute("update orders set status='completed',updated_at=now() where id=%s",(oid,))
+        write_audit(conn,uuid.UUID(actor["sub"]),"order.fulfilment_changed","order",oid,{"status":payload.status}); conn.commit()
+    return {"ok":True,"status":payload.status}
+
+@app.get("/api/admin/operations/payments")
+def operations_payments(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""select pt.id,pt.reference,pt.gateway,pt.provider_reference,pt.amount,pt.currency,pt.status,pt.gateway_status,pt.created_at,pt.paid_at,o.reference from payment_transactions pt left join orders o on o.id=pt.order_id order by pt.created_at desc limit 200""").fetchall()
+    return {"payments":[{"id":str(r[0]),"reference":r[1],"gateway":r[2],"providerReference":r[3],"amount":float(r[4]),"currency":r[5],"status":r[6],"gatewayStatus":r[7],"createdAt":r[8].isoformat(),"paidAt":r[9].isoformat() if r[9] else None,"orderReference":r[10]} for r in rows]}
+
+@app.get("/api/admin/operations/customers")
+def operations_customers(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""select u.id,u.name,u.phone,u.email,u.created_at,count(distinct q.id),count(distinct o.id),coalesce(sum(case when o.payment_status='paid' then o.total_amount else 0 end),0),max(o.created_at)
+          from users u left join quotes q on q.user_id=u.id left join orders o on o.user_id=u.id where u.role='customer' group by u.id order by u.created_at desc limit 200""").fetchall()
+    return {"customers":[{"id":str(r[0]),"name":r[1],"phone":r[2],"email":r[3],"createdAt":r[4].isoformat(),"quoteCount":r[5],"orderCount":r[6],"totalPaid":float(r[7]),"latestOrderAt":r[8].isoformat() if r[8] else None} for r in rows]}
+
+@app.get("/api/admin/operations/delivery")
+def operations_delivery(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""select o.id,o.reference,o.customer_name,o.customer_phone,o.customer_location,o.payment_status,o.fulfilment_status,o.total_amount,d.status,d.address,d.city,d.state,d.notes
+          from orders o left join deliveries d on d.order_id=o.id where o.payment_status='paid' or o.fulfilment_status<>'pending' order by o.updated_at desc limit 200""").fetchall()
+    return {"delivery":[{"orderId":str(r[0]),"orderReference":r[1],"customerName":r[2],"phone":r[3],"destination":r[4],"paymentStatus":r[5],"fulfilmentStatus":r[6],"total":float(r[7]),"deliveryStatus":r[8] or "not_scheduled","address":r[9],"city":r[10],"state":r[11],"notes":r[12]} for r in rows]}
+
+@app.get("/api/admin/operations/products")
+def operations_products(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""select p.id,p.catalogue_number,p.name,coalesce(c.name,''),p.description,p.specifications,p.price_mode,p.price,p.currency,p.availability_status,p.active,p.status,
+          (select count(*) from product_media pm where pm.product_id=p.id) from products p left join categories c on c.id=p.category_id order by p.catalogue_number nulls last,p.name""").fetchall()
+    return {"products":[{"id":str(r[0]),"catalogueNumber":r[1],"name":r[2],"category":r[3],"description":r[4],"specifications":r[5] or {},"priceMode":r[6],"price":float(r[7]) if r[7] is not None else None,"currency":r[8],"availabilityStatus":r[9],"active":r[10],"status":r[11],"mediaCount":r[12]} for r in rows]}
+
+@app.post("/api/admin/operations/products",status_code=201)
+def create_operations_product(payload:ProductPayload,request:Request):
+    actor=require_admin(request)
+    if payload.priceMode not in ("quote","fixed"): raise HTTPException(status_code=422,detail="priceMode must be quote or fixed")
+    if payload.priceMode=="fixed" and payload.price is None: raise HTTPException(status_code=422,detail="Fixed-price products require a price")
+    with db() as conn:
+        pid=uuid.uuid4(); number=_next_catalogue_number(conn); slug=_slugify_product(payload.name)
+        while conn.execute("select 1 from products where slug=%s",(slug,)).fetchone(): slug=f"{slug}-{secrets.token_hex(2)}"
+        cid=_category_id(conn,payload.category)
+        conn.execute("""insert into products(id,catalogue_number,category_id,name,slug,description,tag,price_mode,price,currency,availability_status,active,status,specifications)
+          values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)""",(pid,number,cid,payload.name,slug,payload.description,payload.category,payload.priceMode,payload.price,payload.currency,payload.availabilityStatus,payload.active,json.dumps(payload.specifications)))
+        for i,mid in enumerate(payload.mediaIds):
+            conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')",(pid,i,uuid.UUID(mid)))
+        write_audit(conn,uuid.UUID(actor["sub"]),"product.created","product",pid,{"catalogueNumber":number}); conn.commit()
+    return {"product":{"id":str(pid),"catalogueNumber":number,"name":payload.name,"status":"DRAFT"}}
+
+@app.patch("/api/admin/operations/products/{product_id}")
+def update_operations_product(product_id:str,payload:ProductUpdatePayload,request:Request):
+    actor=require_admin(request); pid=uuid.UUID(product_id)
+    if payload.priceMode not in ("quote","fixed") or (payload.priceMode=="fixed" and payload.price is None): raise HTTPException(status_code=422,detail="Invalid pricing configuration")
+    with db() as conn:
+        row=conn.execute("select id from products where id=%s",(pid,)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Product not found")
+        cid=_category_id(conn,payload.category)
+        conn.execute("""update products set category_id=%s,name=%s,description=%s,tag=%s,price_mode=%s,price=%s,currency=%s,availability_status=%s,active=%s,specifications=%s,updated_at=now() where id=%s""",(cid,payload.name,payload.description,payload.category,payload.priceMode,payload.price,payload.currency,payload.availabilityStatus,payload.active,json.dumps(payload.specifications),pid))
+        if payload.mediaIds is not None:
+            conn.execute("update product_media set product_id=null where product_id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER') and id <> all(%s::uuid[])",(pid,[uuid.UUID(x) for x in payload.mediaIds] or [uuid.uuid4()]))
+            for i,mid in enumerate(payload.mediaIds): conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')",(pid,i,uuid.UUID(mid)))
+        write_audit(conn,uuid.UUID(actor["sub"]),"product.updated","product",pid,{"name":payload.name}); conn.commit()
+    return {"ok":True}
+
+@app.patch("/api/admin/operations/products/{product_id}/archive")
+def archive_operations_product(product_id:str,request:Request):
+    actor=require_admin(request); pid=uuid.UUID(product_id)
+    with db() as conn:
+        cur=conn.execute("update products set active=false,status='ARCHIVED',updated_at=now() where id=%s",(pid,))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Product not found")
+        write_audit(conn,uuid.UUID(actor["sub"]),"product.archived","product",pid); conn.commit()
+    return {"ok":True}
+
+@app.post("/api/admin/operations/orders/{order_id}/payments",status_code=201)
+def initialize_paystack_payment(order_id:str,request:Request):
+    actor=require_admin(request); oid=uuid.UUID(order_id)
+    if not settings.paystack_secret_key: raise HTTPException(status_code=503,detail="PAYSTACK_SECRET_KEY is not configured")
+    with db() as conn:
+        order=conn.execute("select id,reference,total_amount,currency,customer_name,customer_email,customer_phone,payment_status from orders where id=%s for update",(oid,)).fetchone()
+        if not order: raise HTTPException(status_code=404,detail="Order not found")
+        if order[7]=="paid": raise HTTPException(status_code=409,detail="Order is already paid")
+        if not order[5]: raise HTTPException(status_code=422,detail="Customer email is required for Paystack payment")
+        reference=f"TKPAY-{order[1]}-{secrets.token_hex(5).upper()}"
+        payload={"email":order[5],"amount":int(round(float(order[2])*100)),"currency":order[3],"reference":reference,"metadata":{"orderId":str(oid),"orderReference":order[1]}}
+        try:
+            with httpx.Client(timeout=20) as client: resp=client.post(settings.paystack_base_url+"/transaction/initialize",headers={"Authorization":"Bearer "+settings.paystack_secret_key,"Content-Type":"application/json"},json=payload)
+        except httpx.HTTPError as exc: raise HTTPException(status_code=502,detail=f"Payment provider unavailable: {exc}")
+        data=resp.json()
+        if resp.status_code>=400 or not data.get("status"): raise HTTPException(status_code=502,detail=data.get("message","Paystack initialization failed"))
+        provider_ref=data["data"]["reference"]
+        conn.execute("insert into payment_transactions(id,order_id,user_id,reference,provider_reference,gateway,purpose,amount,currency,status,gateway_status,metadata) values(%s,%s,%s,%s,%s,'paystack','order',%s,%s,'pending','initialized',%s)",(uuid.uuid4(),oid,order[0] if order[0] else None,reference,provider_ref,order[2],order[3],json.dumps(data.get("data",{}))))
+        conn.execute("update orders set payment_status='pending',updated_at=now() where id=%s",(oid,))
+        write_audit(conn,uuid.UUID(actor["sub"]),"payment.request_created","order",oid,{"reference":reference}); conn.commit()
+    return {"payment":{"reference":reference,"providerReference":provider_ref,"authorizationUrl":data["data"].get("authorization_url"),"amount":float(order[2]),"currency":order[3],"status":"pending"}}
+
+@app.post("/api/payments/paystack/webhook")
+async def paystack_webhook(request:Request):
+    body=await request.body(); signature=request.headers.get("x-paystack-signature","")
+    if not settings.paystack_secret_key or not signature: raise HTTPException(status_code=401,detail="Webhook verification unavailable")
+    expected=hmac.new(settings.paystack_secret_key.encode(),body,hashlib.sha512).hexdigest()
+    if not hmac.compare_digest(expected,signature): raise HTTPException(status_code=401,detail="Invalid webhook signature")
+    event=json.loads(body.decode("utf-8")); data=event.get("data") or {}; provider_ref=data.get("reference")
+    if event.get("event") not in ("charge.success","charge.failed") or not provider_ref: return {"ok":True}
+    with db() as conn:
+        tx=conn.execute("select id,order_id,amount,currency,status from payment_transactions where provider_reference=%s for update",(provider_ref,)).fetchone()
+        if not tx: return {"ok":True}
+        if tx[4]=="successful": return {"ok":True,"duplicate":True}
+        success=event.get("event")=="charge.success" and data.get("status")=="success" and int(data.get("amount") or 0)==int(round(float(tx[2])*100)) and str(data.get("currency") or "").upper()==str(tx[3]).upper()
+        new_status="successful" if success else "failed"
+        conn.execute("update payment_transactions set status=%s,gateway_status=%s,processed_at=now(),paid_at=case when %s='successful' then now() else paid_at end,updated_at=now() where id=%s",(new_status,data.get("status"),new_status,tx[0]))
+        if success:
+            conn.execute("update orders set payment_status='paid',updated_at=now() where id=%s",(tx[1],))
+            write_audit(conn,None,"payment.received","order",tx[1],{"providerReference":provider_ref})
+        conn.commit()
+    return {"ok":True}
 
 # Photo-first owner intake.
 _INTAKE_EXTENSIONS={".jpg",".jpeg",".png",".webp",".gif",".bmp"}
