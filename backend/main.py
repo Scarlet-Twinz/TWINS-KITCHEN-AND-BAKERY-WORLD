@@ -82,12 +82,15 @@ def validate_production_security():
             raise RuntimeError("FRONTEND_ORIGINS must contain at least one allowed origin in production")
 
 def apply_operations_migration():
-    if not settings.database_url: return
-    migration_path=Path(__file__).resolve().parent/"migrations"/"001_operations_admin_v1.sql"
-    if not migration_path.exists(): return
-    statements=[x.strip() for x in migration_path.read_text(encoding="utf-8").split(";") if x.strip()]
+    if not settings.database_url:
+        return
+    migration_dir=Path(__file__).resolve().parent/"migrations"
+    migrations=sorted(migration_dir.glob("*.sql"))
     with db() as conn:
-        for statement in statements: conn.execute(statement)
+        for migration_path in migrations:
+            statements=[x.strip() for x in migration_path.read_text(encoding="utf-8").split(";") if x.strip()]
+            for statement in statements:
+                conn.execute(statement)
         conn.commit()
 
 def db():
@@ -359,14 +362,42 @@ def report_listing(listing_id:str,payload:MarketplaceReportPayload,request:Reque
         conn.execute("insert into marketplace_reports (id,listing_id,reporter_user_id,reason,details) values (%s,%s,%s,%s,%s)",(rid,uuid.UUID(listing_id),uuid.UUID(session["sub"]) if session else None,payload.reason,payload.details));conn.commit()
     return {"report":{"id":str(rid),"status":"open"}}
 
+@app.get("/api/admin/marketplace/listings")
+def admin_marketplace_listings(request:Request):
+    require_admin(request)
+    with db() as conn:
+        rows=conn.execute("""
+            select ml.id,ml.title,ml.category,ml.location,ml.status,ml.created_at,
+                   sp.display_name,
+                   (select count(*) from marketplace_reports mr where mr.listing_id=ml.id and mr.status in ('open','reviewing')) as report_count
+            from marketplace_listings ml
+            join seller_profiles sp on sp.id=ml.seller_id
+            order by ml.created_at desc
+            limit 300
+        """).fetchall()
+    return {"listings":[
+        {"id":str(r[0]),"title":r[1],"category":r[2],"location":r[3],"status":r[4],
+         "createdAt":r[5].isoformat(),"seller":r[6],"reportCount":r[7]}
+        for r in rows
+    ]}
+
 @app.patch("/api/admin/marketplace/listings/{listing_id}")
 def moderate_listing(listing_id:str,status:str,request:Request):
-    require_admin(request)
+    actor=require_admin(request)
     allowed={"published","rejected","paused","sold","archived"}
     if status not in allowed:raise HTTPException(status_code=422,detail="Unsupported moderation status")
+    lid=uuid.UUID(listing_id)
     with db() as conn:
-        cur=conn.execute("update marketplace_listings set status=%s,updated_at=now() where id=%s",(status,uuid.UUID(listing_id)));conn.commit()
+        cur=conn.execute("""
+            update marketplace_listings
+            set status=%s,
+                published_at=case when %s='published' then coalesce(published_at,now()) else published_at end,
+                updated_at=now()
+            where id=%s
+        """,(status,status,lid))
         if cur.rowcount==0:raise HTTPException(status_code=404,detail="Listing not found")
+        write_audit(conn,uuid.UUID(actor["sub"]),"marketplace.listing_moderated","marketplace_listing",lid,{"status":status})
+        conn.commit()
     return {"ok":True,"status":status}
 
 @app.post("/api/quotes",status_code=201)
@@ -650,7 +681,7 @@ def _next_catalogue_number(conn):
     return (conn.execute("select coalesce(max(catalogue_number),0)+1 from products").fetchone()[0] or 1)
 
 def _next_order_reference(conn):
-    value=conn.execute("select coalesce(max(case when reference like 'TK-%' and length(reference)=9 then cast(substr(reference,4) as integer) else 0 end),0)+1 from orders").fetchone()[0]
+    value=conn.execute("select nextval('operations_order_reference_seq')").fetchone()[0]
     return f"TK-{int(value):06d}"
 
 def _category_id(conn,name:str):
@@ -785,8 +816,17 @@ def create_operations_product(payload:ProductPayload,request:Request):
         cid=_category_id(conn,payload.category)
         conn.execute("""insert into products(id,catalogue_number,category_id,name,slug,description,tag,price_mode,price,currency,availability_status,active,status,specifications)
           values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'DRAFT',%s)""",(pid,number,cid,payload.name,slug,payload.description,payload.category,payload.priceMode,payload.price,payload.currency,payload.availabilityStatus,payload.active,json.dumps(payload.specifications)))
-        for i,mid in enumerate(payload.mediaIds):
-            conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')",(pid,i,uuid.UUID(mid)))
+        media_ids=[uuid.UUID(x) for x in payload.mediaIds]
+        if media_ids:
+            owned=conn.execute("""
+                select id from product_media
+                where id=any(%s) and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')
+                  and (product_id is null or product_id=%s)
+            """,(media_ids,pid)).fetchall()
+            if len(owned)!=len(media_ids):
+                raise HTTPException(status_code=409,detail="One or more media assets are unavailable for this product")
+            for i,mid in enumerate(media_ids):
+                conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s",(pid,i,mid))
         write_audit(conn,uuid.UUID(actor["sub"]),"product.created","product",pid,{"catalogueNumber":number}); conn.commit()
     return {"product":{"id":str(pid),"catalogueNumber":number,"name":payload.name,"status":"DRAFT"}}
 
@@ -800,8 +840,18 @@ def update_operations_product(product_id:str,payload:ProductUpdatePayload,reques
         cid=_category_id(conn,payload.category)
         conn.execute("""update products set category_id=%s,name=%s,description=%s,tag=%s,price_mode=%s,price=%s,currency=%s,availability_status=%s,active=%s,specifications=%s,updated_at=now() where id=%s""",(cid,payload.name,payload.description,payload.category,payload.priceMode,payload.price,payload.currency,payload.availabilityStatus,payload.active,json.dumps(payload.specifications),pid))
         if payload.mediaIds is not None:
-            conn.execute("update product_media set product_id=null where product_id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER') and id <> all(%s::uuid[])",(pid,[uuid.UUID(x) for x in payload.mediaIds] or [uuid.uuid4()]))
-            for i,mid in enumerate(payload.mediaIds): conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')",(pid,i,uuid.UUID(mid)))
+            media_ids=[uuid.UUID(x) for x in payload.mediaIds]
+            if media_ids:
+                owned=conn.execute("""
+                    select id from product_media
+                    where id=any(%s) and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER')
+                      and (product_id is null or product_id=%s)
+                """,(media_ids,pid)).fetchall()
+                if len(owned)!=len(media_ids):
+                    raise HTTPException(status_code=409,detail="One or more media assets are unavailable for this product")
+            conn.execute("update product_media set product_id=null where product_id=%s and source in ('OWNER','OWNER/LOCAL','LOCAL','TWINS_OWNER') and (id <> all(%s::uuid[]))",(pid,media_ids))
+            for i,mid in enumerate(media_ids):
+                conn.execute("update product_media set product_id=%s,sort_order=%s where id=%s",(pid,i,mid))
         write_audit(conn,uuid.UUID(actor["sub"]),"product.updated","product",pid,{"name":payload.name}); conn.commit()
     return {"ok":True}
 
