@@ -878,9 +878,9 @@ def intake_name_group(group_id:str,payload:IntakeNamePayload,request:Request):
         while conn.execute("select 1 from products where slug=%s",(slug,)).fetchone():
             slug=f"{base}-{n}";n+=1
         conn.execute("""insert into products
-            (id,legacy_catalogue_id,category_id,name,slug,description,tag,price_mode,active,status,product_type,owner_confirmed_at)
+            (id,catalogue_number,category_id,name,slug,description,tag,price_mode,active,status,product_type,owner_confirmed_at)
             values (%s,%s,%s,%s,%s,%s,%s,'quote',true,'DRAFT',%s,now())""",
-            (pid,new_id,category_id,name,slug,"Owner-confirmed product from photo intake.",None,payload.productType or group[2]))
+            (pid,product_number,category_id,name,slug,"Owner-confirmed product from photo intake.",None,payload.productType or group[2]))
         assets=conn.execute("select a.id,a.original_name,a.storage_path from candidate_group_assets cga join intake_assets a on a.id=cga.asset_id where cga.group_id=%s order by cga.position,a.created_at",(gid,)).fetchall()
         for pos,a in enumerate(assets):
             src="storage/intake/"+a[2].replace("\\","/")
