@@ -1,10 +1,11 @@
-import base64, hashlib, hmac, json, secrets, time, uuid
+import base64, hashlib, hmac, json, os, re, secrets, time, uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 import bcrypt, psycopg
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -22,7 +23,9 @@ class Settings(BaseSettings):
     model_config=SettingsConfigDict(env_file=".env",extra="ignore")
 settings=Settings()
 SESSION_COOKIE="__Host-twins_session" if settings.cookie_secure else "twins_session"
-app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.3.0")
+app=FastAPI(title="Twins Kitchen & Bakery World API",version="0.4.0")
+INTAKE_ROOT=Path(__file__).resolve().parent.parent/"storage"/"intake"
+INTAKE_ROOT.mkdir(parents=True,exist_ok=True)
 origins=[x.strip() for x in settings.frontend_origins.split(",") if x.strip()]
 trusted_hosts=[x.strip() for x in settings.trusted_hosts.split(",") if x.strip()]
 if trusted_hosts:
@@ -596,3 +599,304 @@ def admin_audit(request:Request):
          "metadata":r[4],"createdAt":r[5].isoformat(),"actor":r[6]}
         for r in rows
     ]}
+
+
+# Photo-first owner intake.
+_INTAKE_EXTENSIONS={".jpg",".jpeg",".png",".webp",".gif",".bmp"}
+_INTAKE_MIME_PREFIX="image/"
+
+def _safe_name(value:str)->str:
+    value=Path(value or "photo").name
+    value=re.sub(r"[^A-Za-z0-9._ -]+","_",value).strip(" .")
+    return value or "photo"
+
+def _normalise_words(value:str)->str:
+    value=re.sub(r"[_-]+"," ",value.lower())
+    value=re.sub(r"\b(?:front|back|side|left|right|top|bottom|angle|view|photo|image|img|pic)\b"," ",value)
+    value=re.sub(r"\b\d{1,4}\b$"," ",value)
+    value=re.sub(r"\s+"," ",value).strip()
+    return value
+
+def _bucket_name(relative_path:str,filename:str)->str:
+    text=(relative_path or filename).lower()
+    rules=[
+        ("Mixers",("mixer","planetary","spiral mixer")),
+        ("Ovens",("oven","deck oven","rack oven","convection")),
+        ("Slicers",("slicer","bread slicer","meat slicer")),
+        ("Refrigeration",("refrigerator","refrigeration","freezer","chiller","display cooler","cold room")),
+        ("Tables",("table","workbench","work table")),
+        ("Dough & Bakery Machines",("dough","sheeter","proofer","proofing","divider")),
+        ("Packaging Machines",("packaging","sealer","filler","wrapping")),
+        ("Cooking Equipment",("range","fryer","grill","griddle","cooker")),
+    ]
+    for name,words in rules:
+        if any(w in text for w in words): return name
+    parts=Path(relative_path).parts if relative_path else ()
+    if len(parts)>1:
+        return _normalise_words(parts[-2]).title() or "Other"
+    return "Other"
+
+def _group_key(relative_path:str,filename:str)->str:
+    stem=Path(filename).stem
+    parent=Path(relative_path).parent.as_posix() if relative_path else ""
+    clean=_normalise_words(stem)
+    # Keep meaningful capacity/model tokens; only strip trailing sequence/view tokens.
+    clean=re.sub(r"\s+(?:\d{1,4}|a|b|c)$","",clean).strip()
+    return f"{parent.lower()}::{clean}" if parent and parent!="." else clean
+
+def _image_signature(content:bytes,filename:str)->bool:
+    ext=Path(filename).suffix.lower()
+    if ext in (".jpg",".jpeg"): return content[:3]==b"\xff\xd8\xff"
+    if ext==".png": return content[:8]==b"\x89PNG\r\n\x1a\n"
+    if ext==".gif": return content[:6] in (b"GIF87a",b"GIF89a")
+    if ext==".webp": return content[:4]==b"RIFF" and content[8:12]==b"WEBP"
+    if ext==".bmp": return content[:2]==b"BM"
+    return False
+
+class IntakeGroupPayload(BaseModel):
+    assetIds:list[str]=Field(min_length=1,max_length=5000)
+    name:str|None=None
+
+class IntakeNamePayload(BaseModel):
+    name:str=Field(min_length=2,max_length=200)
+    productType:str|None=Field(default=None,max_length=120)
+    category:str|None=Field(default=None,max_length=120)
+
+class IntakeMovePayload(BaseModel):
+    assetIds:list[str]=Field(min_length=1,max_length=5000)
+    targetGroupId:str|None=None
+
+class IntakeMergePayload(BaseModel):
+    groupIds:list[str]=Field(min_length=2,max_length=100)
+
+class IntakeStatusPayload(BaseModel):
+    status:str=Field(min_length=3,max_length=30)
+
+@app.post("/api/admin/intake/batches",status_code=201)
+def intake_create_batch(name:str=Form("Owner photo intake"),request:Request=None):
+    actor=require_admin(request)
+    bid=uuid.uuid4()
+    with db() as conn:
+        conn.execute("insert into intake_batches (id,name,created_by) values (%s,%s,%s)",(bid,name.strip() or "Owner photo intake",actor["sub"]))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.batch_created","intake_batch",bid,{"name":name})
+        conn.commit()
+    return {"batch":{"id":str(bid),"name":name.strip() or "Owner photo intake","status":"OPEN"}}
+
+@app.post("/api/admin/intake/batches/{batch_id}/upload",status_code=201)
+async def intake_upload(batch_id:str,request:Request,files:list[UploadFile]=File(...),relative_paths:str=Form("[]")):
+    actor=require_admin(request)
+    try: bid=uuid.UUID(batch_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid batch id")
+    try: paths=json.loads(relative_paths)
+    except Exception: paths=[]
+    if not isinstance(paths,list): paths=[]
+    with db() as conn:
+        if not conn.execute("select id from intake_batches where id=%s",(bid,)).fetchone():
+            raise HTTPException(status_code=404,detail="Intake batch not found")
+        created=[]
+        for idx,upload in enumerate(files):
+            original=_safe_name(upload.filename or "photo")
+            ext=Path(original).suffix.lower()
+            if ext not in _INTAKE_EXTENSIONS or not (upload.content_type or "").startswith(_INTAKE_MIME_PREFIX):
+                raise HTTPException(status_code=415,detail=f"Unsupported image: {original}")
+            data=await upload.read()
+            if not data or len(data)>25*1024*1024:
+                raise HTTPException(status_code=413,detail=f"Invalid image size: {original}")
+            if not _image_signature(data,original):
+                raise HTTPException(status_code=415,detail=f"Image signature does not match file type: {original}")
+            digest=hashlib.sha256(data).hexdigest()
+            asset_id=uuid.uuid4()
+            rel=str(paths[idx]) if idx<len(paths) else original
+            duplicate=conn.execute("select id from intake_assets where sha256=%s order by created_at limit 1",(digest,)).fetchone()
+            dest=INTAKE_ROOT/str(bid)
+            dest.mkdir(parents=True,exist_ok=True)
+            filename=f"{asset_id.hex}{ext}"
+            storage=dest/filename
+            storage.write_bytes(data)
+            conn.execute("""insert into intake_assets
+                (id,batch_id,original_name,relative_path,storage_path,mime_type,byte_size,sha256,duplicate_of)
+                values (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (asset_id,bid,original,rel,str(storage.relative_to(INTAKE_ROOT)),upload.content_type,len(data),digest,duplicate[0] if duplicate else None))
+            created.append({"id":str(asset_id),"name":original,"relativePath":rel,"duplicateOf":str(duplicate[0]) if duplicate else None,"sha256":digest})
+        conn.execute("update intake_batches set updated_at=now() where id=%s",(bid,))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.assets_uploaded","intake_batch",bid,{"count":len(created)})
+        conn.commit()
+    return {"assets":created}
+
+@app.get("/api/admin/intake/assets/{asset_id}/file")
+def intake_asset_file(asset_id:str,request:Request):
+    require_admin(request)
+    try: aid=uuid.UUID(asset_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid asset id")
+    with db() as conn: row=conn.execute("select storage_path,mime_type,original_name from intake_assets where id=%s",(aid,)).fetchone()
+    if not row: raise HTTPException(status_code=404,detail="Asset not found")
+    path=INTAKE_ROOT/row[0]
+    if not path.is_file(): raise HTTPException(status_code=404,detail="Stored photo not found")
+    return FileResponse(path,media_type=row[1],filename=row[2])
+
+@app.get("/api/admin/intake/batches/{batch_id}")
+def intake_batch(batch_id:str,request:Request):
+    require_admin(request)
+    try: bid=uuid.UUID(batch_id)
+    except ValueError: raise HTTPException(status_code=422,detail="Invalid batch id")
+    with db() as conn:
+        batch=conn.execute("select id,name,status,created_at,updated_at from intake_batches where id=%s",(bid,)).fetchone()
+        if not batch: raise HTTPException(status_code=404,detail="Intake batch not found")
+        assets=conn.execute("""select id,original_name,relative_path,byte_size,sha256,duplicate_of,created_at
+                               from intake_assets where batch_id=%s order by created_at""",(bid,)).fetchall()
+        buckets=conn.execute("""select id,name,normalized_key from intake_buckets where batch_id=%s order by name""",(bid,)).fetchall()
+        groups=conn.execute("""select cg.id,cg.bucket_id,cg.name,cg.status,cg.grouping_basis,cg.product_id,
+                                      count(cga.asset_id)
+                               from candidate_groups cg
+                               left join candidate_group_assets cga on cga.group_id=cg.id
+                               where cg.bucket_id in (select id from intake_buckets where batch_id=%s)
+                               group by cg.id order by cg.created_at""",(bid,)).fetchall()
+        group_assets=conn.execute("""select cga.group_id,cga.asset_id
+                                     from candidate_group_assets cga
+                                     join candidate_groups cg on cg.id=cga.group_id
+                                     join intake_buckets ib on ib.id=cg.bucket_id
+                                     where ib.batch_id=%s""",(bid,)).fetchall()
+    return {"batch":{"id":str(batch[0]),"name":batch[1],"status":batch[2],"createdAt":batch[3].isoformat(),"updatedAt":batch[4].isoformat()},
+            "assets":[{"id":str(r[0]),"name":r[1],"relativePath":r[2],"size":r[3],"sha256":r[4],"duplicateOf":str(r[5]) if r[5] else None,"createdAt":r[6].isoformat()} for r in assets],
+            "buckets":[{"id":str(r[0]),"name":r[1],"normalizedKey":r[2]} for r in buckets],
+            "groups":[{"id":str(r[0]),"bucketId":str(r[1]),"name":r[2],"status":r[3],"basis":r[4],"productId":str(r[5]) if r[5] else None,"assetCount":r[6]} for r in groups],
+            "groupAssets":[{"groupId":str(r[0]),"assetId":str(r[1])} for r in group_assets]}
+
+@app.post("/api/admin/intake/batches/{batch_id}/suggest",status_code=201)
+def intake_suggest(batch_id:str,request:Request):
+    actor=require_admin(request)
+    bid=uuid.UUID(batch_id)
+    with db() as conn:
+        assets=conn.execute("select id,original_name,relative_path from intake_assets where batch_id=%s order by created_at",(bid,)).fetchall()
+        if not assets: return {"createdGroups":0,"message":"No photos to organize yet"}
+        bucket_map={}
+        group_map={}
+        for aid,name,rel in assets:
+            bname=_bucket_name(rel,name); bkey=re.sub(r"[^a-z0-9]+","-",bname.lower()).strip("-") or "other"
+            brow=conn.execute("select id from intake_buckets where batch_id=%s and normalized_key=%s",(bid,bkey)).fetchone()
+            if not brow:
+                bucket_id=uuid.uuid4();conn.execute("insert into intake_buckets (id,batch_id,name,normalized_key) values (%s,%s,%s,%s)",(bucket_id,bid,bname,bkey))
+            else: bucket_id=brow[0]
+            gkey=_group_key(rel,name)
+            if not gkey: gkey=f"asset-{aid}"
+            mapkey=(bucket_id,gkey)
+            if mapkey not in group_map:
+                grow=conn.execute("select id from candidate_groups where bucket_id=%s and name=%s and status in ('SUGGESTED','UNRESOLVED')",(bucket_id,gkey[:160])).fetchone()
+                gid=grow[0] if grow else uuid.uuid4()
+                if not grow:
+                    conn.execute("insert into candidate_groups (id,bucket_id,name,status,grouping_basis) values (%s,%s,%s,'SUGGESTED','FILENAME')",(gid,bucket_id,gkey[:160]))
+                group_map[mapkey]=gid
+            gid=group_map[mapkey]
+            conn.execute("insert into candidate_group_assets (group_id,asset_id) values (%s,%s) on conflict do nothing",(gid,aid))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.suggestions_generated","intake_batch",bid,{"assets":len(assets)})
+        conn.commit()
+    return {"createdGroups":len(group_map)}
+
+@app.post("/api/admin/intake/groups",status_code=201)
+def intake_create_group(payload:IntakeGroupPayload,request:Request):
+    actor=require_admin(request)
+    asset_ids=[uuid.UUID(x) for x in payload.assetIds]
+    with db() as conn:
+        row=conn.execute("""select a.batch_id from intake_assets a where a.id=%s""",(asset_ids[0],)).fetchone()
+        if not row: raise HTTPException(status_code=404,detail="Asset not found")
+        bid=row[0]
+        bucket_id=uuid.uuid4()
+        name=(payload.name or "New product group").strip()
+        conn.execute("insert into intake_buckets (id,batch_id,name,normalized_key) values (%s,%s,%s,%s) on conflict do nothing",(bucket_id,bid,"Manual grouping",f"manual-{bucket_id.hex}"))
+        gid=uuid.uuid4()
+        conn.execute("insert into candidate_groups (id,bucket_id,name,status,grouping_basis) values (%s,%s,%s,'UNRESOLVED','MANUAL')",(gid,bucket_id,name))
+        for pos,aid in enumerate(asset_ids):
+            conn.execute("insert into candidate_group_assets (group_id,asset_id,position) values (%s,%s,%s) on conflict do nothing",(gid,aid,pos))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.group_created","candidate_group",gid,{"assetCount":len(asset_ids)})
+        conn.commit()
+    return {"group":{"id":str(gid),"name":name,"status":"UNRESOLVED","assetCount":len(asset_ids)}}
+
+@app.post("/api/admin/intake/groups/{group_id}/move")
+def intake_move_assets(group_id:str,payload:IntakeMovePayload,request:Request):
+    actor=require_admin(request)
+    gid=uuid.UUID(group_id); aids=[uuid.UUID(x) for x in payload.assetIds]
+    with db() as conn:
+        target=uuid.UUID(payload.targetGroupId) if payload.targetGroupId else uuid.uuid4()
+        if not payload.targetGroupId:
+            brow=conn.execute("select bucket_id from candidate_groups where id=%s",(gid,)).fetchone()
+            if not brow: raise HTTPException(status_code=404,detail="Source group not found")
+            target=uuid.uuid4()
+            conn.execute("insert into candidate_groups (id,bucket_id,name,status,grouping_basis) values (%s,%s,'New product group','UNRESOLVED','MANUAL')",(target,brow[0]))
+        if not conn.execute("select id from candidate_groups where id=%s",(target,)).fetchone(): raise HTTPException(status_code=404,detail="Target group not found")
+        conn.execute("delete from candidate_group_assets where group_id=%s and asset_id=any(%s)",(gid,aids))
+        for aid in aids: conn.execute("insert into candidate_group_assets (group_id,asset_id) values (%s,%s) on conflict do nothing",(target,aid))
+        conn.execute("update candidate_groups set updated_at=now(),status='UNRESOLVED' where id=%s",(target,))
+        conn.commit()
+    return {"targetGroupId":str(target)}
+
+@app.post("/api/admin/intake/groups/merge")
+def intake_merge_groups(payload:IntakeMergePayload,request:Request):
+    actor=require_admin(request)
+    gids=[uuid.UUID(x) for x in payload.groupIds]
+    keep=gids[0]
+    with db() as conn:
+        if len(conn.execute("select id from candidate_groups where id=any(%s)",(gids,)).fetchall())!=len(gids): raise HTTPException(status_code=404,detail="One or more groups not found")
+        for gid in gids[1:]:
+            conn.execute("insert into candidate_group_assets (group_id,asset_id,position) select %s,asset_id,position from candidate_group_assets where group_id=%s on conflict do nothing",(keep,gid))
+            conn.execute("delete from candidate_group_assets where group_id=%s",(gid,))
+            conn.execute("update candidate_groups set status='MERGED',updated_at=now() where id=%s",(gid,))
+        conn.execute("update candidate_groups set status='UNRESOLVED',updated_at=now() where id=%s",(keep,))
+        conn.commit()
+    return {"groupId":str(keep)}
+
+@app.patch("/api/admin/intake/groups/{group_id}")
+def intake_update_group(group_id:str,payload:IntakeStatusPayload,request:Request):
+    require_admin(request)
+    allowed={"SUGGESTED","UNRESOLVED","CONFIRMED","NAMED","ARCHIVED"}
+    if payload.status not in allowed: raise HTTPException(status_code=422,detail="Unsupported group status")
+    with db() as conn:
+        cur=conn.execute("update candidate_groups set status=%s,updated_at=now() where id=%s",(payload.status,uuid.UUID(group_id)))
+        if cur.rowcount==0: raise HTTPException(status_code=404,detail="Group not found")
+        conn.commit()
+    return {"ok":True,"status":payload.status}
+
+@app.post("/api/admin/intake/groups/{group_id}/name",status_code=201)
+def intake_name_group(group_id:str,payload:IntakeNamePayload,request:Request):
+    actor=require_admin(request)
+    gid=uuid.UUID(group_id);name=payload.name.strip()
+    if not name: raise HTTPException(status_code=422,detail="Product name is required")
+    with db() as conn:
+        group=conn.execute("""select cg.id,cg.product_id,ib.name,ib.batch_id
+                              from candidate_groups cg join intake_buckets ib on ib.id=cg.bucket_id where cg.id=%s""",(gid,)).fetchone()
+        if not group: raise HTTPException(status_code=404,detail="Group not found")
+        if group[1]: raise HTTPException(status_code=409,detail="This group already has a product")
+        category_id=None
+        if payload.category:
+            category_id=conn.execute("select id from categories where lower(name)=lower(%s) limit 1",(payload.category,)).fetchone()
+            category_id=category_id[0] if category_id else None
+        pid=uuid.uuid4()
+        max_id=conn.execute("select coalesce(max(legacy_catalogue_id),0) from products").fetchone()[0] or 0
+        new_id=max_id+1
+        slug=re.sub(r"[^a-z0-9]+","-",name.lower()).strip("-") or f"product-{new_id}"
+        base=slug
+        n=2
+        while conn.execute("select 1 from products where slug=%s",(slug,)).fetchone():
+            slug=f"{base}-{n}";n+=1
+        conn.execute("""insert into products
+            (id,legacy_catalogue_id,category_id,name,slug,description,tag,price_mode,active,status,product_type,owner_confirmed_at)
+            values (%s,%s,%s,%s,%s,%s,%s,'quote',true,'DRAFT',%s,now())""",
+            (pid,new_id,category_id,name,slug,"Owner-confirmed product from photo intake.",None,payload.productType or group[2]))
+        assets=conn.execute("select a.id,a.original_name,a.storage_path from candidate_group_assets cga join intake_assets a on a.id=cga.asset_id where cga.group_id=%s order by cga.position,a.created_at",(gid,)).fetchall()
+        for pos,a in enumerate(assets):
+            src="storage/intake/"+a[2].replace("\\","/")
+            conn.execute("insert into product_media (id,product_id,kind,src,alt_text,sort_order) values (%s,%s,'image',%s,%s,%s)",(uuid.uuid4(),pid,src,name,pos))
+        alias=re.sub(r"\s+"," ",name.lower()).strip()
+        conn.execute("insert into catalogue_aliases (id,product_id,alias,normalized_alias) values (%s,%s,%s,%s) on conflict do nothing",(uuid.uuid4(),pid,name,alias))
+        conn.execute("update candidate_groups set name=%s,status='NAMED',product_id=%s,updated_at=now() where id=%s",(name,pid,gid))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.product_created","product",pid,{"groupId":str(gid),"assetCount":len(assets),"legacyCatalogueId":new_id})
+        conn.commit()
+    return {"product":{"id":str(pid),"legacyId":new_id,"name":name,"slug":slug,"assetCount":len(assets),"status":"DRAFT"}}
+
+@app.post("/api/admin/intake/batches/{batch_id}/complete")
+def intake_complete_batch(batch_id:str,request:Request):
+    actor=require_admin(request);bid=uuid.UUID(batch_id)
+    with db() as conn:
+        conn.execute("update intake_batches set status='COMPLETED',updated_at=now() where id=%s",(bid,))
+        write_audit(conn,uuid.UUID(actor["sub"]),"intake.batch_completed","intake_batch",bid,{})
+        conn.commit()
+    return {"ok":True}
