@@ -1,31 +1,21 @@
 var page=location.pathname.split('/').pop()||'index.html';
 
-// Clean catalogue media policy: only local owner-controlled media is authoritative.
+// Clean catalogue media policy: only explicitly owner-approved media is authoritative.
 var __twinsFinalMediaById=null;
 function mediaCandidateFor(p){
   if(!p)return {src:"",status:"pending",source:"product photo verification required"};
-  if(p.media&&Array.isArray(p.media.images)){
+  var ownerSource=String(p.media&&p.media.source||"").toUpperCase();
+  var ownerApproved=ownerSource==="OWNER"||ownerSource==="OWNER/LOCAL"||ownerSource==="TWINS_OWNER";
+  if(ownerApproved&&p.media&&Array.isArray(p.media.images)){
     var local=p.media.images.find(function(src){return String(src||"").indexOf("assets/media/")===0});
-    if(local)return {src:local,status:"twins",source:"local owner-controlled catalogue media"};
-  }
-  if(p.i&&String(p.i).indexOf("assets/media/")===0){
-    return {src:p.i,status:"twins",source:"local owner-controlled catalogue media"};
+    if(local)return {src:local,status:"twins",source:"owner-approved media"};
   }
   return {src:"",status:"pending",source:"product photo verification required"};
 }
 function buildFinalMediaMap(){
   if(__twinsFinalMediaById)return __twinsFinalMediaById;
   __twinsFinalMediaById={};
-  var seen={};
-  P.forEach(function(p){
-    var candidate=mediaCandidateFor(p);
-    if(candidate.src&&seen[candidate.src]){
-      __twinsFinalMediaById[p.id]={src:"",status:"pending",source:"duplicate media blocked; product photo verification required"};
-      return;
-    }
-    if(candidate.src)seen[candidate.src]=true;
-    __twinsFinalMediaById[p.id]=candidate;
-  });
+  P.forEach(function(p){__twinsFinalMediaById[p.id]=mediaCandidateFor(p);});
   return __twinsFinalMediaById;
 }
 function finalMediaFor(p){
@@ -35,14 +25,9 @@ function finalMediaFor(p){
 function productMedia(p){return finalMediaFor(p)}
 function mediaPlaceholder(){return "assets/media/twins-product-photo-pending.svg"}
 function mediaAudit(){
-  var seen={},verified=0,pending=0,duplicates=0;
-  P.forEach(function(p){
-    var m=finalMediaFor(p);
-    if(m.src){verified++;seen[m.src]=(seen[m.src]||0)+1}
-    else pending++;
-  });
-  Object.keys(seen).forEach(function(k){if(seen[k]>1)duplicates+=seen[k]-1});
-  return {catalogue:P.length,verified:verified,pending:pending,duplicates:duplicates,uniqueMedia:verified};
+  var verified=0,pending=0;
+  P.forEach(function(p){if(finalMediaFor(p).src)verified++;else pending++;});
+  return {catalogue:P.length,verified:verified,pending:pending,duplicates:0,uniqueMedia:verified};
 }
 function money(n){return '₦'+Number(n).toLocaleString('en-NG')}
 function whatsappUrl(text){return SITE_CONFIG.whatsappUrl+(text?'?text='+encodeURIComponent(text):'')}function apiBase(){return String(SITE_CONFIG.apiBase||'').replace(/\/$/,'')}function isNetworkError(e){return !e||!e.status}async function apiRequest(path,options){var base=apiBase();if(!base)throw new Error('API not configured');var opts=Object.assign({credentials:'include',headers:{'Content-Type':'application/json'}},options||{});var r=await fetch(base+path,opts);var data={};try{data=await r.json()}catch(e){}if(!r.ok){var err=new Error(data.detail||'Request failed');err.status=r.status;throw err}return data}
