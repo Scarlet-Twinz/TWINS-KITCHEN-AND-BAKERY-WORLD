@@ -60,7 +60,7 @@ function renderShell() {
     .split(" ").map(function (x) { return x.charAt(0); }).slice(0, 2).join("").toUpperCase();
 
   var navItems = [
-    ["overview","Overview"], ["catalogue","Catalogue"], ["inventory","Inventory"],
+    ["overview","Overview"], ["intake","Photo Intake"], ["catalogue","Catalogue"], ["inventory","Inventory"],
     ["quotes","Quotes"], ["orders","Orders"], ["customers","Customers & Staff"],
     ["payments","Payments"], ["delivery","Delivery"], ["marketplace","Marketplace"],
     ["audit","Audit Log"], ["settings","Settings"]
@@ -116,7 +116,7 @@ function showView(name) {
   target.classList.add("active");
 
   var titles = {
-    overview:"Operations Overview", catalogue:"Catalogue Management", inventory:"Inventory",
+    overview:"Operations Overview", intake:"Photo Intake", catalogue:"Catalogue Management", inventory:"Inventory",
     quotes:"Quotation Requests", orders:"Orders", customers:"Customers & Staff",
     payments:"Payments", delivery:"Delivery", marketplace:"Marketplace Moderation",
     audit:"Audit Log", settings:"Admin Settings"
@@ -126,6 +126,7 @@ function showView(name) {
   if (window.innerWidth < 760) document.getElementById("adminSide").classList.remove("open");
 
   if (name === "overview") renderOverview();
+  else if (name === "intake") renderIntake();
   else if (name === "catalogue") renderCatalogue();
   else if (name === "quotes") renderQuotes();
   else if (name === "customers") renderCustomers();
@@ -446,3 +447,190 @@ window.addEventListener("load", async function () {
   deny();
 });
 })();
+
+var intakeState = { batch:null, data:null, selectedAssets:new Set(), selectedGroups:new Set() };
+
+function intakeApi(path, options) { return request(path, options); }
+
+async function renderIntake() {
+  var el=document.getElementById("view-intake");
+  el.innerHTML=hero("OWNER PHOTO INTAKE","Organise photos into real products.","The system can suggest broad buckets and safe filename-based groups. It never decides product identity for you.")+
+    '<div class="intaketoolbar">'+
+      '<button class="btn red" id="intakeNew">New photo batch</button>'+
+      '<label class="btn light intakefilebtn">Choose photos<input id="intakeFiles" type="file" accept="image/*" multiple></label>'+
+      '<label class="btn light intakefolderbtn">Choose a photo folder<input id="intakeFolder" type="file" accept="image/*" webkitdirectory directory multiple></label>'+
+      '<button class="btn light" id="intakeSuggest" disabled>Organise safely</button>'+
+      '<button class="btn light" id="intakeComplete" disabled>Complete batch</button>'+
+    '</div>'+
+    '<div class="intakehint" id="intakeHint">Start a batch, then upload many owner photos. Filename/folder relationships are suggestions only.</div>'+
+    '<div id="intakeSummary"></div>'+
+    '<div class="intakegrid"><aside class="intakeside" id="intakeBuckets"></aside><main class="intakemain" id="intakeGroups"></main></div>'+
+    '<div class="intakefooter" id="intakeActions"></div>';
+  document.getElementById("intakeNew").onclick=createIntakeBatch;
+  document.getElementById("intakeFiles").onchange=function(){handleIntakeFiles(this.files)};
+  document.getElementById("intakeFolder").onchange=function(){handleIntakeFiles(this.files)};
+  document.getElementById("intakeSuggest").onclick=suggestIntake;
+  document.getElementById("intakeComplete").onclick=completeIntake;
+  if(intakeState.batch) await refreshIntake();
+}
+
+async function createIntakeBatch(){
+  var name=prompt("Batch name:","Twins owner photo intake");
+  if(name===null)return;
+  var fd=new FormData();fd.append("name",name.trim()||"Twins owner photo intake");
+  try{
+    var res=await fetch(apiBase()+"/api/admin/intake/batches",{method:"POST",body:fd,credentials:"include"});
+    var data=await res.json();if(!res.ok)throw new Error(data.detail||"Could not create batch");
+    intakeState.batch=data.batch;intakeState.data=null;intakeState.selectedAssets.clear();intakeState.selectedGroups.clear();
+    await refreshIntake();
+  }catch(e){alert(e.message)}
+}
+
+async function handleIntakeFiles(fileList){
+  if(!intakeState.batch){alert("Create a photo batch first.");return}
+  var files=Array.from(fileList||[]);if(!files.length)return;
+  var fd=new FormData();
+  files.forEach(function(file){fd.append("files",file,file.name)});
+  fd.append("relative_paths",JSON.stringify(files.map(function(file){return file.webkitRelativePath||file.name})));
+  var hint=document.getElementById("intakeHint");hint.textContent="Uploading "+files.length+" photo(s)…";
+  try{
+    var res=await fetch(apiBase()+"/api/admin/intake/batches/"+encodeURIComponent(intakeState.batch.id)+"/upload",{method:"POST",body:fd,credentials:"include"});
+    var data=await res.json();if(!res.ok)throw new Error(data.detail||"Upload failed");
+    hint.textContent=data.assets.length+" photo(s) added. Next, organise them safely.";
+    await refreshIntake();
+    document.getElementById("intakeSuggest").disabled=false;
+  }catch(e){hint.textContent=e.message;alert(e.message)}
+}
+
+async function refreshIntake(){
+  if(!intakeState.batch)return;
+  try{
+    var data=await intakeApi("/api/admin/intake/batches/"+encodeURIComponent(intakeState.batch.id));
+    intakeState.data=data;intakeState.batch=data.batch;renderIntakeData();
+    document.getElementById("intakeSuggest").disabled=!data.assets.length;
+    document.getElementById("intakeComplete").disabled=!data.assets.length;
+  }catch(e){document.getElementById("intakeHint").textContent=e.message}
+}
+
+function intakeAsset(id){
+  return (intakeState.data.assets||[]).find(function(a){return a.id===id});
+}
+function intakeGroup(id){return (intakeState.data.groups||[]).find(function(g){return g.id===id});}
+function intakeGroupAssetIds(groupId){
+  return (intakeState.data.groupAssets||[]).filter(function(x){return x.groupId===groupId}).map(function(x){return x.assetId});
+}
+function intakeImage(id){
+  return apiBase()+"/api/admin/intake/assets/"+encodeURIComponent(id)+"/file";
+}
+
+function renderIntakeData(){
+  var d=intakeState.data;if(!d)return;
+  var grouped=(d.groups||[]).filter(function(g){return g.status!=="MERGED"&&g.status!=="ARCHIVED"});
+  var named=grouped.filter(function(g){return g.status==="NAMED"}).length;
+  var unresolved=grouped.filter(function(g){return g.status==="UNRESOLVED"}).length;
+  document.getElementById("intakeSummary").innerHTML=
+    '<div class="intakekpis"><div><b>'+d.assets.length+'</b><span>Photos</span></div><div><b>'+d.buckets.length+'</b><span>Type buckets</span></div><div><b>'+grouped.length+'</b><span>Candidate groups</span></div><div><b>'+named+'</b><span>Named products</span></div><div><b>'+unresolved+'</b><span>Unresolved</span></div></div>';
+  document.getElementById("intakeBuckets").innerHTML='<div class="intakesectiontitle">TYPE BUCKETS</div>'+
+    (d.buckets.length?d.buckets.map(function(b){
+      var groups=grouped.filter(function(g){return g.bucketId===b.id});
+      var count=groups.reduce(function(n,g){return n+g.assetCount},0);
+      return '<button class="intakebucket" data-bucket="'+b.id+'"><b>'+escapeHtml(b.name)+'</b><span>'+count+' photos · '+groups.length+' groups</span></button>';
+    }).join(""):'<div class="empty">Upload photos, then click Organise safely.</div>')+
+    '<div class="intakesectiontitle" style="margin-top:18px">UNRESOLVED</div><button class="intakebucket" id="showUnresolved"><b>Unresolved work</b><span>Photos not yet confidently grouped</span></button>';
+  document.querySelectorAll(".intakebucket[data-bucket]").forEach(function(b){b.onclick=function(){renderBucket(b.dataset.bucket)}});
+  var ur=document.getElementById("showUnresolved");if(ur)ur.onclick=function(){renderUnresolved()};
+  if(!document.querySelector(".intakebucket[data-bucket].active"))renderAllIntakeGroups();
+}
+
+function renderAllIntakeGroups(){
+  renderGroupPanel((intakeState.data.groups||[]).filter(function(g){return g.status!=="MERGED"&&g.status!=="ARCHIVED"}),"All suggested groups");
+}
+function renderBucket(bucketId){
+  var bucket=(intakeState.data.buckets||[]).find(function(b){return b.id===bucketId});
+  renderGroupPanel((intakeState.data.groups||[]).filter(function(g){return g.bucketId===bucketId&&g.status!=="MERGED"&&g.status!=="ARCHIVED"}),bucket?bucket.name:"Bucket");
+}
+function renderUnresolved(){
+  renderGroupPanel((intakeState.data.groups||[]).filter(function(g){return g.status==="UNRESOLVED"}),"Unresolved groups");
+}
+
+function renderGroupPanel(groups,title){
+  var d=intakeState.data;
+  var html='<div class="intakepanelhead"><div><span class="eyebrow">CANDIDATE GROUPS</span><h3>'+escapeHtml(title)+'</h3><p class="muted small">Select a group to inspect its photos. Suggested groups are not product identities.</p></div>'+
+    '<div class="intakepanelactions"><button class="btn light mini" id="selectAllVisible">Select visible groups</button><button class="btn light mini" id="mergeSelected" disabled>Merge selected</button></div></div>';
+  html+='<div class="intakegroups">';
+  if(!groups.length)html+='<div class="empty">Nothing here yet.</div>';
+  groups.forEach(function(g){
+    var ids=intakeGroupAssetIds(g.id);
+    var selected=intakeState.selectedGroups.has(g.id);
+    html+='<article class="intakegroup '+(selected?"selected":"")+'" data-group="'+g.id+'">'+
+      '<label class="intakegroupcheck"><input type="checkbox" data-group-check="'+g.id+'" '+(selected?"checked":"")+'></label>'+
+      '<div><div class="intakegrouphead"><div><span class="eyebrow">'+escapeHtml(g.status)+'</span><h4>'+escapeHtml(g.name)+'</h4><small>'+g.assetCount+' photo(s) · '+escapeHtml(g.basis)+'</small></div>'+
+      '<div class="intakegroupbuttons"><button class="btn light mini" data-inspect="'+g.id+'">Inspect</button><button class="btn light mini" data-name="'+g.id+'">Name</button></div></div>'+
+      '<div class="intakethumbs">'+ids.slice(0,8).map(function(id){return '<img src="'+intakeImage(id)+'" alt="" loading="lazy">'}).join("")+
+      (ids.length>8?'<span class="morethumb">+'+(ids.length-8)+'</span>':"")+'</div></div></article>';
+  });
+  html+='</div>';
+  document.getElementById("intakeGroups").innerHTML=html;
+  document.getElementById("selectAllVisible").onclick=function(){groups.forEach(function(g){intakeState.selectedGroups.add(g.id)});renderGroupPanel(groups,title)};
+  document.getElementById("mergeSelected").disabled=intakeState.selectedGroups.size<2;
+  document.getElementById("mergeSelected").onclick=mergeSelectedGroups;
+  document.querySelectorAll("[data-group-check]").forEach(function(input){input.onchange=function(){if(input.checked)intakeState.selectedGroups.add(input.dataset.groupCheck);else intakeState.selectedGroups.delete(input.dataset.groupCheck);renderGroupPanel(groups,title)}});
+  document.querySelectorAll("[data-inspect]").forEach(function(b){b.onclick=function(){inspectGroup(b.dataset.inspect)}});
+  document.querySelectorAll("[data-name]").forEach(function(b){b.onclick=function(){nameIntakeGroup(b.dataset.name)}});
+  document.getElementById("intakeActions").innerHTML='<div class="intakeselection">Selected groups: <b>'+intakeState.selectedGroups.size+'</b></div><div><button class="btn light" id="clearGroupSelection">Clear selection</button></div>';
+  document.getElementById("clearGroupSelection").onclick=function(){intakeState.selectedGroups.clear();renderGroupPanel(groups,title)};
+}
+
+function inspectGroup(groupId){
+  var g=intakeGroup(groupId);if(!g)return;
+  var ids=intakeGroupAssetIds(groupId);
+  var selected=new Set(ids.filter(function(id){return intakeState.selectedAssets.has(id)}));
+  document.getElementById("intakeGroups").innerHTML=
+    '<div class="intakepanelhead"><div><span class="eyebrow">GROUP REVIEW</span><h3>'+escapeHtml(g.name)+'</h3><p class="muted small">'+ids.length+' photo(s). Grouping and naming remain separate decisions.</p></div><div class="intakepanelactions"><button class="btn light mini" id="backGroups">Back to groups</button><button class="btn light mini" id="selectAllPhotos">Select all</button><button class="btn red mini" id="newGroupFromSelection" disabled>Move selected to new group</button></div></div>'+
+    '<div class="intakephotoactions"><button class="btn light mini" id="confirmGroup">Confirm grouping</button><button class="btn light mini" id="markUnresolved">Leave unresolved</button><button class="btn red mini" id="nameThisGroup">Name this product</button></div>'+
+    '<div class="intakephotogrid">'+ids.map(function(id){var a=intakeAsset(id);var on=selected.has(id);return '<label class="intakephoto '+(on?"checked":"")+'"><input type="checkbox" data-asset-check="'+id+'" '+(on?"checked":"")+'><img src="'+intakeImage(id)+'" alt="'+escapeHtml(a?a.name:"")+'"><span>'+escapeHtml(a?a.name:"")+'</span></label>'}).join("")+'</div>';
+  document.getElementById("backGroups").onclick=renderAllIntakeGroups;
+  document.getElementById("selectAllPhotos").onclick=function(){ids.forEach(function(id){intakeState.selectedAssets.add(id)});inspectGroup(groupId)};
+  document.querySelectorAll("[data-asset-check]").forEach(function(input){input.onchange=function(){if(input.checked)intakeState.selectedAssets.add(input.dataset.assetCheck);else intakeState.selectedAssets.delete(input.dataset.assetCheck);inspectGroup(groupId)}});
+  document.getElementById("newGroupFromSelection").disabled=intakeState.selectedAssets.size===0;
+  document.getElementById("newGroupFromSelection").onclick=function(){moveSelectedToNewGroup(groupId)};
+  document.getElementById("confirmGroup").onclick=function(){updateGroupStatus(groupId,"CONFIRMED")};
+  document.getElementById("markUnresolved").onclick=function(){updateGroupStatus(groupId,"UNRESOLVED")};
+  document.getElementById("nameThisGroup").onclick=function(){nameIntakeGroup(groupId)};
+  document.getElementById("intakeActions").innerHTML='<div class="intakeselection">Selected photos: <b>'+intakeState.selectedAssets.size+'</b></div><div><button class="btn light" id="clearPhotoSelection">Clear photo selection</button></div>';
+  document.getElementById("clearPhotoSelection").onclick=function(){ids.forEach(function(id){intakeState.selectedAssets.delete(id)});inspectGroup(groupId)};
+}
+
+async function updateGroupStatus(id,status){
+  try{await intakeApi("/api/admin/intake/groups/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({status:status})});await refreshIntake();inspectGroup(id)}catch(e){alert(e.message)}
+}
+async function moveSelectedToNewGroup(sourceGroupId){
+  var ids=Array.from(intakeState.selectedAssets).filter(function(id){return intakeGroupAssetIds(sourceGroupId).indexOf(id)>-1});
+  if(!ids.length)return;
+  try{await intakeApi("/api/admin/intake/groups/"+encodeURIComponent(sourceGroupId)+"/move",{method:"POST",body:JSON.stringify({assetIds:ids})});ids.forEach(function(id){intakeState.selectedAssets.delete(id)});await refreshIntake();renderAllIntakeGroups()}catch(e){alert(e.message)}
+}
+async function mergeSelectedGroups(){
+  var ids=Array.from(intakeState.selectedGroups);if(ids.length<2)return;
+  try{await intakeApi("/api/admin/intake/groups/merge",{method:"POST",body:JSON.stringify({groupIds:ids})});intakeState.selectedGroups.clear();await refreshIntake();renderAllIntakeGroups()}catch(e){alert(e.message)}
+}
+async function nameIntakeGroup(groupId){
+  var g=intakeGroup(groupId);if(!g)return;
+  var name=prompt("Product name for this entire group:",g.status==="NAMED"?g.name:"");
+  if(name===null)return;
+  if(!name.trim())return alert("Product name is required.");
+  var type=prompt("Product type/category (for example: Mixer):", "");
+  try{
+    var data=await intakeApi("/api/admin/intake/groups/"+encodeURIComponent(groupId)+"/name",{method:"POST",body:JSON.stringify({name:name.trim(),productType:type&&type.trim()||null,category:type&&type.trim()||null})});
+    alert("Created Product "+data.product.legacyId+" — "+data.product.name+" with "+data.product.assetCount+" photo(s).");
+    intakeState.selectedGroups.delete(groupId);await refreshIntake();renderAllIntakeGroups();
+  }catch(e){alert(e.message)}
+}
+async function suggestIntake(){
+  if(!intakeState.batch)return;
+  try{var data=await intakeApi("/api/admin/intake/batches/"+encodeURIComponent(intakeState.batch.id)+"/suggest",{method:"POST",body:"{}"});document.getElementById("intakeHint").textContent="Created/updated "+data.createdGroups+" safe filename-based group suggestion(s). No product identity was assigned.";await refreshIntake()}catch(e){alert(e.message)}
+}
+async function completeIntake(){
+  if(!intakeState.batch)return;
+  if(!confirm("Complete this intake batch? Unresolved groups will remain unresolved and can still be reviewed later."))return;
+  try{await intakeApi("/api/admin/intake/batches/"+encodeURIComponent(intakeState.batch.id)+"/complete",{method:"POST",body:"{}"});await refreshIntake()}catch(e){alert(e.message)}
+}
