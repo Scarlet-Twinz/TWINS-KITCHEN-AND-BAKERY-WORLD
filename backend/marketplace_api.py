@@ -202,16 +202,23 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             return {"listings":[_listing_dict(conn,r) for r in rows]}
 
     @router.get("/listings/{listing_id}")
-    def public_listing(listing_id:str):
+    def public_listing(listing_id:str,request:Request):
         try: lid=uuid.UUID(listing_id)
         except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
+        session=None
+        try: session=require_session(request)
+        except HTTPException: pass
         with db() as conn:
             row=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,
-              ml.location,sp.display_name,sp.phone,sp.verification_status,ml.status,ml.created_at,ml.updated_at
+              ml.location,sp.display_name,sp.phone,sp.verification_status,ml.status,ml.created_at,ml.updated_at,sp.seller_status,sp.user_id
               from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
-              where ml.id=%s and ml.status='published' and sp.seller_status='active'""",(lid,)).fetchone()
+              where ml.id=%s""",(lid,)).fetchone()
             if not row: raise HTTPException(status_code=404,detail="Listing not found")
-            return {"listing":_listing_dict(conn,row)}
+            public=row[11]=="published" and row[14]=="active"
+            owner=session and str(session["sub"])==str(row[15])
+            if not public and not owner:
+                raise HTTPException(status_code=404,detail="Listing not found")
+            return {"listing":_listing_dict(conn,row[:14])}
 
     @router.get("/media/{media_id}")
     def listing_media(media_id:str,request:Request):
