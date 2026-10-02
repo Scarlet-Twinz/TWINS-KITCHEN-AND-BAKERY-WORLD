@@ -445,4 +445,62 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
             else: conn.commit()
         return {"ok":True}
 
+    class MarketplaceOrderRequest(BaseModel):
+        buyerName: str = Field(min_length=2,max_length=160)
+        buyerEmail: str | None = None
+        buyerPhone: str = Field(min_length=3,max_length=60)
+        deliveryLocation: str | None = Field(default=None,max_length=500)
+        quantity: int = Field(default=1,gt=0,le=100000)
+        notes: str | None = Field(default=None,max_length=2000)
+
+    @router.post("/listings/{listing_id}/events", status_code=201)
+    def listing_event(listing_id: str, eventType: str, request: Request):
+        if eventType not in {"view","contact","save"}: raise HTTPException(422,"Unsupported marketplace event")
+        try: lid=uuid.UUID(listing_id)
+        except ValueError: raise HTTPException(422,"Invalid listing ID")
+        try: session=require_session(request); actor=uuid.UUID(session["sub"])
+        except HTTPException: actor=None
+        with db() as conn:
+            row=conn.execute("select seller_id,status from marketplace_listings where id=%s",(lid,)).fetchone()
+            if not row or row[1]!="published": raise HTTPException(404,"Listing not found")
+            if eventType=="view": conn.execute("update marketplace_listings set view_count=view_count+1,updated_at=updated_at where id=%s",(lid,))
+            elif eventType=="contact": conn.execute("update marketplace_listings set contact_count=contact_count+1,updated_at=updated_at where id=%s",(lid,))
+            elif eventType=="save": conn.execute("update marketplace_listings set save_count=save_count+1,updated_at=updated_at where id=%s",(lid,))
+            conn.execute("insert into marketplace_events (id,listing_id,seller_id,event_type,actor_user_id) values (%s,%s,%s,%s,%s)",(uuid.uuid4(),lid,row[0],eventType,actor));conn.commit()
+        return {"ok":True}
+
+    @router.get("/seller/analytics")
+    def seller_analytics(request: Request):
+        session=require_session(request); uid=uuid.UUID(session["sub"])
+        with db() as conn:
+            seller=conn.execute("select id from seller_profiles where user_id=%s",(uid,)).fetchone()
+            if not seller:return {"analytics":{"views":0,"contacts":0,"saves":0,"orderRequests":0,"listings":[]}}
+            totals=conn.execute("select count(*) filter(where event_type='view'),count(*) filter(where event_type='contact'),count(*) filter(where event_type='save'),count(*) filter(where event_type='order_request') from marketplace_events where seller_id=%s",(seller[0],)).fetchone()
+            rows=conn.execute("select id,title,status,view_count,contact_count,save_count from marketplace_listings where seller_id=%s order by created_at desc limit 100",(seller[0],)).fetchall()
+        return {"analytics":{"views":totals[0],"contacts":totals[1],"saves":totals[2],"orderRequests":totals[3],"listings":[{"id":str(r[0]),"title":r[1],"status":r[2],"views":r[3],"contacts":r[4],"saves":r[5]} for r in rows]}}
+
+    @router.get("/seller/orders")
+    def seller_orders(request: Request):
+        session=require_session(request);uid=uuid.UUID(session["sub"])
+        with db() as conn:
+            rows=conn.execute("""select mo.id,mo.reference,ml.title,mo.buyer_name,mo.buyer_phone,mo.quantity,mo.unit_price,mo.total,mo.currency,mo.order_status,mo.payment_status,mo.created_at
+              from marketplace_orders mo join marketplace_listings ml on ml.id=mo.listing_id join seller_profiles sp on sp.id=mo.seller_id
+              where sp.user_id=%s order by mo.created_at desc limit 100""",(uid,)).fetchall()
+        return {"orders":[{"id":str(r[0]),"reference":r[1],"listing":r[2],"buyerName":r[3],"buyerPhone":r[4],"quantity":r[5],"unitPrice":float(r[6]),"total":float(r[7]),"currency":r[8],"orderStatus":r[9],"paymentStatus":r[10],"createdAt":r[11].isoformat()} for r in rows]}
+
+    @router.post("/listings/{listing_id}/order-request", status_code=201)
+    def create_order_request(listing_id: str, payload: MarketplaceOrderRequest, request: Request):
+        try: lid=uuid.UUID(listing_id)
+        except ValueError: raise HTTPException(422,"Invalid listing ID")
+        try: session=require_session(request); buyer_uid=uuid.UUID(session["sub"])
+        except HTTPException: buyer_uid=None
+        with db() as conn:
+            row=conn.execute("select id,seller_id,price_mode,price,currency,status from marketplace_listings where id=%s and status='published'",(lid,)).fetchone()
+            if not row: raise HTTPException(404,"Listing not found")
+            if row[2]!="fixed" or row[3] is None: raise HTTPException(409,"This marketplace listing requires seller confirmation before an order can be requested")
+            unit=float(row[3]); subtotal=round(unit*payload.quantity,2); ref="TM-"+datetime.now(timezone.utc).strftime("%Y")+"-"+uuid.uuid4().hex[:8].upper(); oid=uuid.uuid4()
+            conn.execute("insert into marketplace_orders (id,reference,listing_id,seller_id,buyer_user_id,buyer_name,buyer_email,buyer_phone,delivery_location,quantity,unit_price,currency,subtotal,total,seller_net_amount,notes) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(oid,ref,lid,row[1],buyer_uid,payload.buyerName.strip(),payload.buyerEmail,payload.buyerPhone.strip(),payload.deliveryLocation,payload.quantity,unit,row[4],subtotal,subtotal,subtotal,payload.notes))
+            conn.execute("insert into marketplace_events (id,listing_id,seller_id,event_type,actor_user_id) values (%s,%s,%s,'order_request',%s)",(uuid.uuid4(),lid,row[1],buyer_uid));conn.commit()
+        return {"order":{"id":str(oid),"reference":ref,"status":"requested","paymentStatus":"not_configured","total":subtotal}}
+
     app.include_router(router)
