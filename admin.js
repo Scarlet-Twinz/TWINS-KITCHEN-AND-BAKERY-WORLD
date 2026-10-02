@@ -619,7 +619,12 @@ async function nameIntakeGroup(groupId){
   var type=prompt("Product type/category (for example: Mixer):", "");
   try{
     var data=await intakeApi("/api/admin/intake/groups/"+encodeURIComponent(groupId)+"/name",{method:"POST",body:JSON.stringify({name:name.trim(),productType:type&&type.trim()||null,category:type&&type.trim()||null})});
-    alert("Created Product "+data.product.legacyId+" — "+data.product.name+" with "+data.product.assetCount+" photo(s).");
+    var approve=confirm("Created Product "+data.product.catalogueNumber+" — "+data.product.name+" with "+data.product.assetCount+" photo(s).\\n\\nApprove this product now?");
+    if(approve){
+      await intakeApi("/api/admin/intake/products/"+encodeURIComponent(data.product.id)+"/status",{method:"PATCH",body:JSON.stringify({status:"APPROVED"})});
+      var publish=confirm("Product approved. Publish it now?");
+      if(publish) await intakeApi("/api/admin/intake/products/"+encodeURIComponent(data.product.id)+"/status",{method:"PATCH",body:JSON.stringify({status:"PUBLISHED"})});
+    }
     intakeState.selectedGroups.delete(groupId);await refreshIntake();renderAllIntakeGroups();
   }catch(e){alert(e.message)}
 }
