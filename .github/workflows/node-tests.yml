@@ -17,7 +17,7 @@ jobs:
       - name: Run full Node test suite
         run: node --test tools/media-ingestion/test/*.test.js
       - name: Check public storefront JavaScript
-        run: node --check app.js
+        run: node --check app.js && node --check marketplace.js
       - name: Run Phase 1 reference audit
         run: node tools/media-ingestion/index.js reference-audit
 
@@ -33,7 +33,7 @@ jobs:
       - name: Install backend dependencies
         run: python -m pip install -r backend/requirements.txt
       - name: Run Media Center syntax checks
-        run: python -m py_compile backend/main.py backend/media_center.py backend/create_owner.py backend/migrate.py
+        run: python -m py_compile backend/main.py backend/marketplace_api.py backend/media_center.py backend/create_owner.py backend/migrate.py
       - name: Run Media Center unit tests
         working-directory: backend
         run: python -m unittest discover -p "test_*.py"
