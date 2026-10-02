@@ -1,113 +1,48 @@
 var page=location.pathname.split('/').pop()||'index.html';
 
-// Phase 6 final media guard: every catalogue card gets a relevant visual reference.
-var FINAL_MEDIA_RULES=[
-[/deep freezer|chest freezer|upright freezer|display chiller|refrigerator|freezer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026="],
-[/food warmer|bain marie|warming cabinet|display warmer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/12/4456814/1.jpg?5287="],
-[/meat slicer|meat cutter|food slicer/i,"https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/61/7686914/1.jpg?1535="],
-[/extraction hood|extractor hood|exhaust hood|ventilation hood|range hood/i,"https://pictures-nigeria.jijistatic.net/201050015_NjIwLTQ2NS1hOWYxNTk4ZGUz.webp"],
-[/dstv|gotv|decoder|satellite/i,"https://www.dstv.com/media/secccbpm/7s-hd-single-view.png?anchor=center&mode=crop&rnd=132894551843430000&width=737"],
-[/single burner|one burner|1 burner/i,"https://www.mutbex.com/remta-cej21l-taban-rafli-tek-gozlu-gazli-ocak-45x505x806-cm-gazli-ocaklar-remta-59097-26-B.jpg"],
-[/two burner|2 burner/i,"https://image.made-in-china.com/2f0j00wKmYEMVkfPop/Commercial-Kitchen-Equipment-Table-Top-Gas-Stove.webp"],
-[/three burner|3 burner/i,"https://cdn.myikas.com/images/42158d38-d603-46cf-81ea-1639749e332d/0e45f817-b321-4f3e-9b86-5be1d127a60a/3840/cej25l.webp"],
-[/four burner|4 burner/i,"https://www.gastrodiscount.info/media/image/product/6212/lg/gasherd-serie-900-4-brenner-9999-36-kw-g20-900x900x850-mm-bxtxh.jpg"],
-[/six burner|6 burner|gas range|cooking range/i,"https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2"],
-[/spiral mixer|dough mixer/i,"https://www.hobartcorp.com/sites/default/files/styles/max_1300x1300/public/webdam-assets/Spiral%20Mixer%20HSL130%20f%20.png?itok=XAbWgPIq"],
-[/planetary mixer|cake mixer/i,"https://cdnimg.webstaurantstore.com/images/products/large/52221/833586.jpg"],
-[/convection oven|deck oven|bakery oven|commercial oven/i,"https://www.ekmekciler.gen.tr/Dosyalar/UrunResim/maksan-mkf-10-digi-konveksiyonlu-firin_3172.jpg"],
-[/food processor/i,"https://uploads.prod01.sydney.platformos.com/instances/647/assets/modules/homepage/webapp_uploads/blog/images/robotcoupe-r301ultrafoodprocessor21772766060899-1772766063538.png"],
-[/vegetable cutter|vegetable slicer/i,"https://www.italyline.rs/f/pics/Seckalice-za-povrce/seckalica-za-povrce-samic-CA301_b.jpg"],
-[/deep fryer|fryer/i,"https://static.wixstatic.com/media/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp/v1/fill/w_570%2Ch_570%2Cal_c%2Cq_80%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp"],
-[/juice extractor|juice machine|juicer/i,"https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp"],
-[/coffee machine|espresso machine|coffee grinder/i,"https://coffeeya.net/data/editor/goods/1/2020/07/3996_a517ae935e170bfaf94ea2e0a803ef401335531.jpg"],
-[/storage rack|shelving|wall shelf|wall cabinet/i,"https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg"],
-[/three compartment sink|hand wash sink|sink station|stainless sink/i,"https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg"],
-[/ice cream machine|frozen dessert/i,"https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-[/work table|prep table|stainless table/i,"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"],
-[/dining chair|restaurant chair|banquet table/i,"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-[/gas griddle|griddle|shawarma grill|pizza oven/i,"https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1200&q=85"]
-];
-var FINAL_CATEGORY_MEDIA={
-"Cooking Equipment":["https://cdn11.bigcommerce.com/s-bco4q2hsce/images/stencil/572x712/products/11486/26037/gbs6ts_1__73519.1735426729.JPG?c=2","https://image.made-in-china.com/2f0j00wKmYEMVkfPop/Commercial-Kitchen-Equipment-Table-Top-Gas-Stove.webp","https://static.wixstatic.com/media/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp/v1/fill/w_570%2Ch_570%2Cal_c%2Cq_80%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/5a52bd_9f8c850b0b774d08a518f345fa350174~mv2.webp"],
-"Bakery Equipment":["https://www.hobartcorp.com/sites/default/files/styles/max_1300x1300/public/webdam-assets/Spiral%20Mixer%20HSL130%20f%20.png?itok=XAbWgPIq","https://cdnimg.webstaurantstore.com/images/products/large/52221/833586.jpg","https://www.ekmekciler.gen.tr/Dosyalar/UrunResim/maksan-mkf-10-digi-konveksiyonlu-firin_3172.jpg"],
-"Food Preparation":["https://uploads.prod01.sydney.platformos.com/instances/647/assets/modules/homepage/webapp_uploads/blog/images/robotcoupe-r301ultrafoodprocessor21772766060899-1772766063538.png","https://www.italyline.rs/f/pics/Seckalice-za-povrce/seckalica-za-povrce-samic-CA301_b.jpg","https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/61/7686914/1.jpg?1535="],
-"Cold Storage":["https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/78/0913104/1.jpg?1026=","https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-"Bar & Beverage":["https://coffeeya.net/data/editor/goods/1/2020/07/3996_a517ae935e170bfaf94ea2e0a803ef401335531.jpg","https://www.robot-coupe.com/robot-coupe-global/Products/Extracteurs%20de%20Jus/image-thumb__21468__RBC_cover_center_1140_580/J%2080.webp","https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=1200&q=85"],
-"Storage":["https://s.alicdn.com/@sc04/kf/H3a01c6919809452a9e4267fc8a5564a6H/CFT-Customized-Stainless-Steel-Square-Tube-Kitchen-Shelving-NSF-Certification-Heavy-Duty-Capacity-Casters-for-Commercial-Use.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"],
-"Ventilation":["https://pictures-nigeria.jijistatic.net/201050015_NjIwLTQ2NS1hOWYxNTk4ZGUz.webp"],
-"Serving Equipment":["https://ng.jumia.is/unsafe/fit-in/150x150/filters%3Afill%28white%29/product/12/4456814/1.jpg?5287=","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-"Restaurant & Hotel":["https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85"],
-"Catering Supplies":["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85","https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=85"],
-"Kitchen Equipment":["https://cdnimg.webstaurantstore.com/images/products/large/29087/2402747.jpg","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85"]
-};
-/* Phase Six strict media gate: these supplied/local mappings were audited as visually mismatched to their product titles.
-   They must remain pending until an exact product photo is sourced; never silently reuse a nearby product image. */
-var PHASE_SIX_MEDIA_BLOCKLIST={54:"One-Bag Bakery Oven is not represented by the supplied deck-oven stack image.",76:"Commercial Chest Freezer - Large is not represented by the supplied ice-cream-machine image.",77:"Commercial Undercounter Refrigerator is not represented by the supplied refrigerated-display-case image.",86:"Stainless Wall Shelf - 4ft is not represented by the supplied retail-shelf image.",88:"Heavy-Duty 4-Tier Storage Rack is not represented by the supplied retail-shelf image."};
-var __twinsOverrideById=null;
-function buildOverrideMap(){
- if(__twinsOverrideById)return __twinsOverrideById;
- __twinsOverrideById={};
- P.forEach(function(p){
-   var name=String(p.n||"").toLowerCase().trim();
-   var matches=Object.keys(typeof CATALOG_MEDIA_OVERRIDES!=="undefined"?CATALOG_MEDIA_OVERRIDES:{}).filter(function(k){
-     var key=String(k).toLowerCase().trim();
-     return key&&name.indexOf(key)>-1;
-   }).sort(function(a,b){return b.length-a.length});
-   if(matches.length)__twinsOverrideById[p.id]=CATALOG_MEDIA_OVERRIDES[matches[0]];
- });
- return __twinsOverrideById;
-}
-function mediaCandidateFor(p){
- if(PHASE_SIX_MEDIA_BLOCKLIST[p.id])return {src:"",status:"pending",source:"strict media audit blocked mismatched supplied image"};
- var idOverride=(typeof CATALOG_MEDIA_OVERRIDES_BY_ID!=="undefined"&&CATALOG_MEDIA_OVERRIDES_BY_ID[p.id])||"";
- if(idOverride)return {src:idOverride,status:"reference",source:"verified product reference",sourceKey:"product-id-"+p.id};
- var overrides=buildOverrideMap(),override=overrides[p.id];
- if(override)return {src:override,status:"reference",source:"verified product reference",sourceKey:String(p.n||"")};
- if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("supplied Twins")===0){
-   return {src:p.media.images[0],status:"twins",source:p.media.source};
- }
- if(p.media&&p.media.images&&p.media.images.length&&String(p.media.source||"").indexOf("verified product reference")===0){
-   return {src:p.media.images[0],status:"reference",source:p.media.source};
- }
- if(p.i&&String(p.i).indexOf("assets/media/")===0){
-   return {src:p.i,status:"twins",source:"local Twins catalogue media"};
- }
- if(p.i&&p.media&&p.media.images&&p.media.images.indexOf(p.i)>-1&&String(p.media.source||"").indexOf("verified product reference")===0){
-   return {src:p.i,status:"reference",source:p.media.source};
- }
- return {src:"",status:"pending",source:"product photo verification required"};
-}
+// Clean catalogue media policy: only local owner-controlled media is authoritative.
 var __twinsFinalMediaById=null;
+function mediaCandidateFor(p){
+  if(!p)return {src:"",status:"pending",source:"product photo verification required"};
+  if(p.media&&Array.isArray(p.media.images)){
+    var local=p.media.images.find(function(src){return String(src||"").indexOf("assets/media/")===0});
+    if(local)return {src:local,status:"twins",source:"local owner-controlled catalogue media"};
+  }
+  if(p.i&&String(p.i).indexOf("assets/media/")===0){
+    return {src:p.i,status:"twins",source:"local owner-controlled catalogue media"};
+  }
+  return {src:"",status:"pending",source:"product photo verification required"};
+}
 function buildFinalMediaMap(){
- if(__twinsFinalMediaById)return __twinsFinalMediaById;
- __twinsFinalMediaById={};
- var seen={};
- P.forEach(function(p){
-   var candidate=mediaCandidateFor(p);
-   if(candidate.src&&seen[candidate.src]){
-     __twinsFinalMediaById[p.id]={src:"",status:"pending",source:"duplicate media blocked; product photo verification required"};
-     return;
-   }
-   if(candidate.src)seen[candidate.src]=true;
-   __twinsFinalMediaById[p.id]=candidate;
- });
- return __twinsFinalMediaById;
+  if(__twinsFinalMediaById)return __twinsFinalMediaById;
+  __twinsFinalMediaById={};
+  var seen={};
+  P.forEach(function(p){
+    var candidate=mediaCandidateFor(p);
+    if(candidate.src&&seen[candidate.src]){
+      __twinsFinalMediaById[p.id]={src:"",status:"pending",source:"duplicate media blocked; product photo verification required"};
+      return;
+    }
+    if(candidate.src)seen[candidate.src]=true;
+    __twinsFinalMediaById[p.id]=candidate;
+  });
+  return __twinsFinalMediaById;
 }
 function finalMediaFor(p){
- if(!p)return {src:"",status:"pending",source:"product photo verification required"};
- return buildFinalMediaMap()[p.id]||{src:"",status:"pending",source:"product photo verification required"};
+  if(!p)return {src:"",status:"pending",source:"product photo verification required"};
+  return buildFinalMediaMap()[p.id]||{src:"",status:"pending",source:"product photo verification required"};
 }
 function productMedia(p){return finalMediaFor(p)}
-function mediaPlaceholder(p){return "assets/media/twins-product-photo-pending.svg"}
+function mediaPlaceholder(){return "assets/media/twins-product-photo-pending.svg"}
 function mediaAudit(){
- var seen={},verified=0,pending=0,duplicates=0;
- P.forEach(function(p){
-   var m=finalMediaFor(p);
-   if(m.src){verified++;seen[m.src]=(seen[m.src]||0)+1}
-   else pending++;
- });
- Object.keys(seen).forEach(function(k){if(seen[k]>1)duplicates+=seen[k]-1});
- return {catalogue:P.length,verified:verified,pending:pending,duplicates:duplicates,uniqueMedia:verified};
+  var seen={},verified=0,pending=0,duplicates=0;
+  P.forEach(function(p){
+    var m=finalMediaFor(p);
+    if(m.src){verified++;seen[m.src]=(seen[m.src]||0)+1}
+    else pending++;
+  });
+  Object.keys(seen).forEach(function(k){if(seen[k]>1)duplicates+=seen[k]-1});
+  return {catalogue:P.length,verified:verified,pending:pending,duplicates:duplicates,uniqueMedia:verified};
 }
 function money(n){return '₦'+Number(n).toLocaleString('en-NG')}
 function whatsappUrl(text){return SITE_CONFIG.whatsappUrl+(text?'?text='+encodeURIComponent(text):'')}function apiBase(){return String(SITE_CONFIG.apiBase||'').replace(/\/$/,'')}function isNetworkError(e){return !e||!e.status}async function apiRequest(path,options){var base=apiBase();if(!base)throw new Error('API not configured');var opts=Object.assign({credentials:'include',headers:{'Content-Type':'application/json'}},options||{});var r=await fetch(base+path,opts);var data={};try{data=await r.json()}catch(e){}if(!r.ok){var err=new Error(data.detail||'Request failed');err.status=r.status;throw err}return data}
