@@ -292,9 +292,9 @@ alter table payment_transactions add column if not exists processed_at timestamp
 -- Photo-first product identity and media provenance.
 alter table products add column if not exists catalogue_number integer unique;
 create index if not exists idx_products_catalogue_number on products(catalogue_number);
-alter table product_media add column if not exists source text not null default 'OWNER';
-alter table product_media add column if not exists rights text not null default 'OWNED';
-alter table product_media add column if not exists provenance text not null default 'OWNER/LOCAL';
+alter table product_media add column if not exists source text not null default 'LEGACY';
+alter table product_media add column if not exists rights text not null default 'UNKNOWN';
+alter table product_media add column if not exists provenance text not null default 'LEGACY/UNVERIFIED';
 
 -- Photo-first owner intake workflow.
 alter table products add column if not exists status text not null default 'PUBLISHED'
