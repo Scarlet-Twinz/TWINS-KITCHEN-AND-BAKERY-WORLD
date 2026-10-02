@@ -12,6 +12,7 @@ alter table seller_subscriptions add column if not exists next_payment_at timest
 
 alter table seller_profiles add column if not exists verified_at timestamptz;
 alter table marketplace_listings add column if not exists published_at timestamptz;
+alter table marketplace_listings add column if not exists media_rights_attested_at timestamptz;
 alter table payment_transactions add column if not exists processed_at timestamptz;
 
 create index if not exists idx_marketplace_listing_media_listing
