@@ -814,7 +814,7 @@ def initialize_paystack_payment(order_id:str,request:Request):
         if not order: raise HTTPException(status_code=404,detail="Order not found")
         if order[8]=="paid": raise HTTPException(status_code=409,detail="Order is already paid")
         if not order[6]: raise HTTPException(status_code=422,detail="Customer email is required for Paystack payment")
-        reference=f"TKPAY-{order[1]}-{secrets.token_hex(5).upper()}"
+        reference=f"TKPAY-{order[2]}-{secrets.token_hex(5).upper()}"
         payload={"email":order[6],"amount":int(round(float(order[2])*100)),"currency":order[3],"reference":reference,"metadata":{"orderId":str(oid),"orderReference":order[1]}}
         try:
             with httpx.Client(timeout=20) as client: resp=client.post(settings.paystack_base_url+"/transaction/initialize",headers={"Authorization":"Bearer "+settings.paystack_secret_key,"Content-Type":"application/json"},json=payload)
