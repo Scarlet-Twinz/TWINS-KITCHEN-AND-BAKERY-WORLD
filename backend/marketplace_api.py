@@ -104,11 +104,19 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
                  "url":(base+"/api/marketplace/media/"+str(r[0])) if base else "/api/marketplace/media/"+str(r[0]),
                  "alt":r[3] or "","sortOrder":r[4],"createdAt":r[5].isoformat()} for r in rows]
 
+    def _seller_contact_url(phone, title):
+        digits="".join(ch for ch in str(phone or "") if ch.isdigit())
+        if digits.startswith("00"): digits=digits[2:]
+        if digits.startswith("0") and len(digits)==11: digits="234"+digits[1:]
+        if not digits or len(digits)<10: return None
+        message="Hello. I found your "+str(title or "product")+" on the Twins Marketplace. I would like to ask about availability, condition and purchase details."
+        return "https://wa.me/"+digits+"?text="+__import__("urllib.parse").parse.quote(message)
+
     def _listing_dict(conn, row):
         return {"id":str(row[0]),"title":row[1],"category":row[2],"description":row[3],
                 "priceMode":row[4],"price":float(row[5]) if row[5] is not None else None,"currency":row[6],
-                "location":row[7],"seller":row[8],"sellerVerification":row[9],"status":row[10],
-                "createdAt":row[11].isoformat(),"updatedAt":row[12].isoformat(),"media":_listing_media(conn,row[0])}
+                "location":row[7],"seller":row[8],"sellerPhone":row[9],"sellerContactUrl":_seller_contact_url(row[9],row[1]),"sellerVerification":row[10],"status":row[11],
+                "createdAt":row[12].isoformat(),"updatedAt":row[13].isoformat(),"media":_listing_media(conn,row[0])}
 
     class ListingPayload(BaseModel):
         title: str = Field(min_length=3,max_length=160)
@@ -147,7 +155,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         limit=max(1,min(limit,100))
         with db() as conn:
             rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,
-              ml.location,sp.display_name,sp.verification_status,ml.status,ml.created_at,ml.updated_at
+              ml.location,sp.display_name,sp.phone,sp.verification_status,ml.status,ml.created_at,ml.updated_at
               from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
               where ml.status='published' and sp.seller_status='active'
               and (%s is null or ml.category=%s) order by ml.created_at desc limit %s""",(category,category,limit)).fetchall()
@@ -159,7 +167,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         except ValueError: raise HTTPException(status_code=422,detail="Invalid listing ID")
         with db() as conn:
             row=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,
-              ml.location,sp.display_name,sp.verification_status,ml.status,ml.created_at,ml.updated_at
+              ml.location,sp.display_name,sp.phone,sp.verification_status,ml.status,ml.created_at,ml.updated_at
               from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
               where ml.id=%s and ml.status='published' and sp.seller_status='active'""",(lid,)).fetchone()
             if not row: raise HTTPException(status_code=404,detail="Listing not found")
@@ -193,7 +201,7 @@ def register_marketplace_routes(app, db, settings, require_session, require_admi
         session=require_session(request);uid=uuid.UUID(session["sub"])
         with db() as conn:
             rows=conn.execute("""select ml.id,ml.title,ml.category,ml.description,ml.price_mode,ml.price,ml.currency,
-              ml.location,sp.display_name,sp.verification_status,ml.status,ml.created_at,ml.updated_at
+              ml.location,sp.display_name,sp.phone,sp.verification_status,ml.status,ml.created_at,ml.updated_at
               from marketplace_listings ml join seller_profiles sp on sp.id=ml.seller_id
               where sp.user_id=%s order by ml.created_at desc limit 100""",(uid,)).fetchall()
             return {"listings":[_listing_dict(conn,r) for r in rows]}
